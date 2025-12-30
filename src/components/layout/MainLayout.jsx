@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, Play, Plus } from 'lucide-react' 
+import MovieSection from '../ui/MovieSection.jsx';
 
 import img1 from '../../assets/placeholder_1.jpeg'
 import img2 from '../../assets/placeholder_2.jpeg'
@@ -7,15 +8,14 @@ import img3 from '../../assets/placeholder_3.jpeg'
 import img4 from '../../assets/placeholder_4.jpeg'
 import img5 from '../../assets/placeholder_5.jpeg'
 
-
 function MainLayout() {
 
     const contentData = [
-        { id: 1, title: "Wednesday", desc: "Smart, sarcastic and a little dead inside.", image: img1 },
-        { id: 2, title: "Money Heist", desc: "Eight thieves take hostages in the Royal Mint.", image: img2 },
-        { id: 3, title: "Breaking Bad", desc: "A chemistry teacher turned drug dealer.", image: img3 },
-        { id: 4, title: "Elite", desc: "Three working-class teens enroll in an exclusive school.", image: img4 },
-        { id: 5, title: "Lucifer", desc: "The devil decides to take a vacation in LA.", image: img5 },
+        { id: 1, title: "Wednesday", desc: "Smart, sarcastic and a little dead inside.", image: img1, rating: 8.7, genre: "Comedy" },
+        { id: 2, title: "Money Heist", desc: "Eight thieves take hostages in the Royal Mint.", image: img2, rating: 8.3, genre: "Crime" },
+        { id: 3, title: "Breaking Bad", desc: "A chemistry teacher turned drug dealer.", image: img3, rating: 9.5, genre: "Drama" },
+        { id: 4, title: "Elite", desc: "Three working-class teens enroll in an exclusive school.", image: img4, rating: 7.5, genre: "Drama" },
+        { id: 5, title: "Lucifer", desc: "The devil decides to take a vacation in LA.", image: img5, rating: 8.1, genre: "Fantasy" },
     ];
 
     const slides = [
@@ -26,24 +26,32 @@ function MainLayout() {
 
     const [curr, setCurr] = useState(1);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [autoSlide, setAutoSlide] = useState(true);
-
     const [touchStart, setTouchStart] = useState(null);
     const [touchEnd, setTouchEnd] = useState(null);
 
+    const handleWatch = (item) => {
+        console.log(`Watching ${item.title}`);
+        // TODO: Implement video player or navigation
+    };
+
+    const handleAddToList = (item) => {
+        console.log(`Added ${item.title} to list`);
+        // TODO: Implement add to favorites/watchlist
+    };
+
     const autoSlideInterval = 5000;
 
-    const prev = () => {
-        if(isTransitioning) return;
-        setIsTransitioning(true);
-        setCurr((curr) => curr - 1);
-    }
-
-    const next = () => {
+    const next = useCallback(() => {
         if (isTransitioning) return;
         setIsTransitioning(true);
         setCurr((curr) => curr + 1);
-    }
+    }, [isTransitioning]);
+
+    const prev = useCallback(() => {
+        if(isTransitioning) return;
+        setIsTransitioning(true);
+        setCurr((curr) => curr - 1);
+    }, [isTransitioning]);
 
     const handleTransitionEnd = () => {
         setIsTransitioning(false);
@@ -73,17 +81,14 @@ function MainLayout() {
     }
 
     useEffect(() =>{
-        if(!autoSlide) return;
         const slideInterval = setInterval(next, autoSlideInterval);
         return () => clearInterval(slideInterval);
-    }, [autoSlide]);
+    }, [next]);
 
     return (
         <div className='w-full bg-[#0f1014] relative pb-8'>
             <div 
                 className='relative w-full h-[55vh] md:h-[85vh] overflow-hidden group'
-                onMouseEnter={() => setAutoSlide(false)}
-                onMouseLeave={() => setAutoSlide(true)}
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
@@ -121,7 +126,7 @@ function MainLayout() {
                                         <button 
                                             type='button' 
                                             className='flex items-center gap-2 px-6 py-2.5 md:px-8 md:py-3 bg-[#ff6f61] hover:bg-[#ff5a4a] text-white rounded-lg font-bold text-sm md:text-base transition-all transform hover:scale-105 shadow-lg shadow-red-500/30 cursor-pointer pointer-events-auto' 
-                                            onClick={() => console.log(`Watching ${item.title}`)}
+                                            onClick={() => handleWatch(item)}
                                         >
                                             <Play size={18} fill="currentColor" className="md:w-5 md:h-5" />
                                             Watch Now
@@ -129,7 +134,7 @@ function MainLayout() {
                                         <button 
                                             type='button' 
                                             className='flex items-center gap-2 px-6 py-2.5 md:px-6 md:py-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white rounded-lg font-semibold text-sm md:text-base transition-all cursor-pointer pointer-events-auto'
-                                            onClick={() => console.log(`Added ${item.title} to list`)}
+                                            onClick={() => handleAddToList(item)}
                                         >
                                             <Plus size={18} className="md:w-5 md:h-5" />
                                             My List
@@ -142,10 +147,18 @@ function MainLayout() {
                 </div>
 
                 <div className="absolute inset-0 hidden md:flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    <button onClick={prev} className='p-3 rounded-full bg-black/30 hover:bg-black/60 text-white border border-white/10 transition backdrop-blur-md pointer-events-auto hover:scale-110'>
+                    <button 
+                        onClick={prev} 
+                        aria-label="Previous slide"
+                        className='p-3 rounded-full bg-black/30 hover:bg-black/60 text-white border border-white/10 transition backdrop-blur-md pointer-events-auto hover:scale-110'
+                    >
                         <ChevronLeft size={32} />
                     </button>
-                    <button onClick={next} className='p-3 rounded-full bg-black/30 hover:bg-black/60 text-white border border-white/10 transition backdrop-blur-md pointer-events-auto hover:scale-110'>
+                    <button 
+                        onClick={next} 
+                        aria-label="Next slide"
+                        className='p-3 rounded-full bg-black/30 hover:bg-black/60 text-white border border-white/10 transition backdrop-blur-md pointer-events-auto hover:scale-110'
+                    >
                         <ChevronRight size={32} />
                     </button>
                 </div>
@@ -165,6 +178,11 @@ function MainLayout() {
                         />
                     ))}
                 </div>
+            </div>
+            <div className="space-y-8 mt-8">
+                <MovieSection title="Trending Now" movies={contentData} />
+                <MovieSection title="Popular Movies" movies={contentData} />
+                <MovieSection title="Recommended for You" movies={contentData} />
             </div>
         </div>
     )

@@ -2,21 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { ChevronLeft, ChevronRight, Play, Plus } from 'lucide-react' 
 import MovieSection from '../ui/MovieSection.jsx';
 
-import img1 from '../../assets/placeholder_1.jpeg'
-import img2 from '../../assets/placeholder_2.jpeg'
-import img3 from '../../assets/placeholder_3.jpeg'
-import img4 from '../../assets/placeholder_4.jpeg'
-import img5 from '../../assets/placeholder_5.jpeg'
-
 function MainLayout() {
-
-    const contentData = [
-        { id: 1, title: "Wednesday", desc: "Smart, sarcastic and a little dead inside.", image: img1, rating: 8.7, genre: "Comedy" },
-        { id: 2, title: "Money Heist", desc: "Eight thieves take hostages in the Royal Mint.", image: img2, rating: 8.3, genre: "Crime" },
-        { id: 3, title: "Breaking Bad", desc: "A chemistry teacher turned drug dealer.", image: img3, rating: 9.5, genre: "Drama" },
-        { id: 4, title: "Elite", desc: "Three working-class teens enroll in an exclusive school.", image: img4, rating: 7.5, genre: "Drama" },
-        { id: 5, title: "Lucifer", desc: "The devil decides to take a vacation in LA.", image: img5, rating: 8.1, genre: "Fantasy" },
-    ];
 
     const slides = [
         contentData[contentData.length - 1],

@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import MovieCard from "../ui/MovieCard";
+import MovieCardSkeleton from "../ui/MovieCardSkeleton";
 
-function Row({ title, movies = [] }) {
+function Row({ title, movies = [], loading = false, onMovieClick }) {
   const scrollRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -38,7 +39,7 @@ function Row({ title, movies = [] }) {
 
   return (
     <section className="mb-8 sm:mb-10 md:mb-12" role="region" aria-labelledby={`${title.replace(/\s+/g, '-').toLowerCase()}-heading`}>
-      <h2 id={`${title.replace(/\s+/g, '-').toLowerCase()}-heading`} className="text-white text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-5 md:mb-6 px-4 sm:px-6">{title}</h2>
+      <h2 id={`${title.replace(/\s+/g, '-').toLowerCase()}-heading`} className="text-white text-xl sm:text-2xl md:text-3xl font-bold mb-4 sm:mb-5 md:mb-6 px-4 sm:px-6 leading-tight">{title}</h2>
       <div className="relative">
         <div className="group">
           <button
@@ -68,11 +69,17 @@ function Row({ title, movies = [] }) {
           role="list"
           aria-label={`${title} movies`}
         >
-          {movies.map((movie) => (
-            <div key={movie.id} role="listitem">
-              <MovieCard movie={movie} />
-            </div>
-          ))}
+          {loading ? (
+            Array.from({ length: 8 }).map((_, index) => (
+              <MovieCardSkeleton key={`skeleton-${title}-${index}`} />
+            ))
+          ) : (
+            movies.map((movie, index) => (
+              <div key={`${movie.id}-${title}-${index}`} role="listitem">
+                <MovieCard movie={movie} onClick={onMovieClick} />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

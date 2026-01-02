@@ -8,3 +8,17 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Mobile menu animations and touch improvements */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Prevent zoom on input focus */
+  input[type="text"], input[type="search"] {
+    font-size: 16px;
+  }
+}

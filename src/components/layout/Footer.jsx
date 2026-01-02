@@ -11,7 +11,7 @@ function Footer() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center mb-8">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <span className="text-xl font-bold text-white tracking-wide">myFlix</span>
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-wide">myFlix</span>
           </div>
           
           <div className="flex gap-4" role="list" aria-label="Social media links">
@@ -25,7 +25,7 @@ function Footer() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Browse</h3>
+            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Browse</h3>
             <ul className="space-y-2" role="list">
               <FooterItem href="/movies">Movies</FooterItem>
               <FooterItem href="/series">TV Shows</FooterItem>
@@ -35,7 +35,7 @@ function Footer() {
           </div>
           
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Support</h3>
+            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Support</h3>
             <ul className="space-y-2" role="list">
               <FooterItem href="/help">Help Center</FooterItem>
               <FooterItem href="/account">Account</FooterItem>
@@ -44,7 +44,7 @@ function Footer() {
           </div>
           
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Company</h3>
+            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Company</h3>
             <ul className="space-y-2" role="list">
               <FooterItem href="/about">About</FooterItem>
               <FooterItem href="/careers">Careers</FooterItem>
@@ -53,7 +53,7 @@ function Footer() {
           </div>
           
           <div>
-            <h3 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Legal</h3>
+            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Legal</h3>
             <ul className="space-y-2" role="list">
               <FooterItem href="/privacy">Privacy Policy</FooterItem>
               <FooterItem href="/terms">Terms of Use</FooterItem>
@@ -63,12 +63,12 @@ function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-gray-800">
-          <p className="text-sm">&copy; {new Date().getFullYear()} myFlix. All rights reserved.</p>
+          <p className="text-xs sm:text-sm leading-relaxed">&copy; {new Date().getFullYear()} myFlix. All rights reserved.</p>
           <div className="flex items-center gap-2 mt-4 md:mt-0">
             <Mail className="w-4 h-4 text-gray-500" />
             <a 
               href="mailto:support@myflix.example" 
-              className="text-sm hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm"
+              className="text-xs sm:text-sm hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm leading-relaxed"
               aria-label="Email support"
             >
               support@myflix.example
@@ -85,7 +85,7 @@ function FooterItem({ href, children }) {
     <li role="listitem">
       <a 
         href={href}
-        className="hover:text-white transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm"
+        className="hover:text-white transition-colors text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm"
       >
         {children}
       </a>

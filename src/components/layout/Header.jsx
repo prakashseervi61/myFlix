@@ -202,7 +202,7 @@ function Header() {
                 )}
                 
                 {/* Mobile Menu - Slide in from left */}
-                <div className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-gray-900 border-r border-white/20 z-50 md:hidden transform transition-transform duration-300 ease-out ${
+                <div className={`fixed top-0 left-0 h-screen w-80 max-w-[85vw] bg-gray-800 z-50 md:hidden transform transition-transform duration-300 ease-out ${
                     menuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}>
                     {/* Menu Header */}
@@ -267,6 +267,15 @@ function Header() {
                         </div>
                     </div>
                 </div>
+                
+                {/* Clickable area outside sidebar */}
+                {menuOpen && (
+                    <div 
+                        className="fixed top-0 right-0 h-screen bg-transparent z-40 md:hidden"
+                        style={{ left: '320px', width: 'calc(100vw - 320px)' }}
+                        onClick={() => setMenuOpen(false)}
+                    />
+                )}
             </>
         </nav>
     );

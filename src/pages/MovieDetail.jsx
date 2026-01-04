@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Clock, Calendar, User, Plus, Check } from 'lucide-react';
 import { useMovieDetails } from '../hooks/useMovieDetails';
@@ -9,6 +9,10 @@ function MovieDetail() {
   const navigate = useNavigate();
   const { movie, loading, error } = useMovieDetails(id);
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   if (loading) {
     return (

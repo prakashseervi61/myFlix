@@ -60,10 +60,14 @@ function SearchDropdown({ results, loading, error, onClose }) {
             {results.slice(0, 6).map((movie, index) => (
               <div
                 key={movie.id}
-                className={`group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-white/10 cursor-pointer transition-all duration-200 border-b border-white/5 last:border-b-0 ${
+                className={`group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-white/10 cursor-pointer transition-all duration-200 border-b border-white/5 last:border-b-0 touch-manipulation ${
                   index === 0 ? 'bg-white/5' : ''
                 }`}
                 onClick={() => handleMovieClick(movie)}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleMovieClick(movie);
+                }}
               >
                 {/* Movie Poster */}
                 <div className="relative flex-shrink-0">

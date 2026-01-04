@@ -28,7 +28,7 @@ function MovieCard({ movie, onClick }) {
 
   return (
     <div 
-      className="group relative min-w-[140px] sm:min-w-[200px] md:min-w-[280px] cursor-pointer transition-all duration-300 hover:scale-105 rounded-xl" 
+      className="group relative min-w-[140px] sm:min-w-[200px] md:min-w-[280px] cursor-pointer transition-all duration-300 md:hover:scale-105 rounded-xl" 
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
@@ -41,7 +41,7 @@ function MovieCard({ movie, onClick }) {
             src={movie.poster}
             alt={movie.title}
             onError={() => setImageError(true)}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110 select-none"
+            className="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-110 select-none"
             draggable={false}
           />
         ) : (
@@ -54,8 +54,8 @@ function MovieCard({ movie, onClick }) {
         )}
       </div>
       
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-xl flex flex-col justify-end p-3 sm:p-4">
-        <div className="text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 md:group-hover:opacity-100 transition-all duration-300 rounded-xl flex flex-col justify-end p-3 sm:p-4">
+        <div className="text-white transform translate-y-2 md:group-hover:translate-y-0 transition-transform duration-300">
           <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 line-clamp-1 leading-tight">{movie.title}</h3>
           
           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-300 mb-3">
@@ -77,8 +77,8 @@ function MovieCard({ movie, onClick }) {
             onClick={handleWatchlistClick}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all touch-manipulation ${
               inWatchlist 
-                ? 'bg-green-600 text-white hover:bg-green-700' 
-                : 'bg-white/20 text-white hover:bg-white/30'
+                ? 'bg-green-600 text-white md:hover:bg-green-700' 
+                : 'bg-white/20 text-white md:hover:bg-white/30'
             }`}
           >
             {inWatchlist ? (

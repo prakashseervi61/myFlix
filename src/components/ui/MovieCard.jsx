@@ -6,6 +6,7 @@ function MovieCard({ movie, onClick }) {
   const { inWatchlist, handleWatchlistClick } = useMovieCardLogic(movie);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
   
   if (!movie) return null;
 
@@ -28,13 +29,24 @@ function MovieCard({ movie, onClick }) {
   };
 
   const handleTouchStart = (e) => {
-    e.preventDefault();
-    setIsHovered(true);
+    const touch = e.touches[0];
+    setTouchStart({ x: touch.clientX, y: touch.clientY });
   };
 
   const handleTouchEnd = (e) => {
-    e.preventDefault();
-    handleCardClick(e);
+    if (!touchStart) return;
+    
+    const touch = e.changedTouches[0];
+    const deltaX = Math.abs(touch.clientX - touchStart.x);
+    const deltaY = Math.abs(touch.clientY - touchStart.y);
+    
+    // Only trigger click if movement is minimal (not a swipe)
+    if (deltaX < 10 && deltaY < 10) {
+      e.preventDefault();
+      handleCardClick(e);
+    }
+    
+    setTouchStart(null);
     setTimeout(() => setIsHovered(false), 150);
   };
 
@@ -76,7 +88,7 @@ function MovieCard({ movie, onClick }) {
         )}
       </div>
       
-      <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-all duration-300 rounded-xl flex flex-col justify-end p-3 sm:p-4 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent transition-all duration-300 rounded-xl flex flex-col justify-end p-3 sm:p-4 ${isHovered ? 'md:opacity-100' : 'opacity-0'}`}>
         <div className={`text-white transform transition-transform duration-300 ${isHovered ? 'translate-y-0' : 'translate-y-2'}`}>
           <h3 className="font-bold text-sm sm:text-base md:text-lg mb-2 line-clamp-1 leading-tight">{movie.title}</h3>
           

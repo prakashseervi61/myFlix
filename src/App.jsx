@@ -38,7 +38,7 @@ function HomePage() {
               <div className="h-8 bg-gray-700 rounded w-48 mb-6 mx-4"></div>
               <div className="flex gap-4 px-4 overflow-hidden">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="min-w-[200px] aspect-[2/3] bg-gray-700 rounded-xl animate-pulse"></div>
+                  <div key={i} className="min-w-[200px] aspect-[2/3] md:aspect-[16/9] bg-gray-700 rounded-xl animate-pulse"></div>
                 ))}
               </div>
             </div>

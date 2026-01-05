@@ -79,7 +79,7 @@ function Row({ title, movies, loading = false, onMovieClick }) {
             onClick={() => scroll('left')}
             aria-label={`Scroll ${title} left`}
             type="button"
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-40 bg-gradient-to-r from-black/90 to-transparent text-white flex items-center justify-center transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-40 bg-gradient-to-r from-black/90 to-transparent text-white items-center justify-center transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
@@ -89,7 +89,7 @@ function Row({ title, movies, loading = false, onMovieClick }) {
             onClick={() => scroll('right')}
             aria-label={`Scroll ${title} right`}
             type="button"
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-40 bg-gradient-to-l from-black/90 to-transparent text-white flex items-center justify-center transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-40 bg-gradient-to-l from-black/90 to-transparent text-white items-center justify-center transition-opacity duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
           >
             <ChevronRight className="w-6 h-6" />
           </button>

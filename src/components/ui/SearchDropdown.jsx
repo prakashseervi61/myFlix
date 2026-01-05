@@ -7,9 +7,16 @@ function SearchDropdown({ results, loading, error, onClose }) {
 
   if ((!results || !results.length) && !loading && !error) return null;
 
-  const handleMovieClick = (movie) => {
+  const handleMovieClick = (movie, e) => {
+    e?.preventDefault();
     onClose();
     navigate(`/movie/${movie.id}`);
+  };
+
+  const handleTouchEnd = (movie, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleMovieClick(movie, e);
   };
 
   return (
@@ -63,11 +70,8 @@ function SearchDropdown({ results, loading, error, onClose }) {
                 className={`group flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-white/10 cursor-pointer transition-all duration-200 border-b border-white/5 last:border-b-0 touch-manipulation ${
                   index === 0 ? 'bg-white/5' : ''
                 }`}
-                onClick={() => handleMovieClick(movie)}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  handleMovieClick(movie);
-                }}
+                onClick={(e) => handleMovieClick(movie, e)}
+                onTouchEnd={(e) => handleTouchEnd(movie, e)}
               >
                 {/* Movie Poster */}
                 <div className="relative flex-shrink-0">

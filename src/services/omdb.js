@@ -2,15 +2,58 @@
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 const BASE_URL = 'https://www.omdbapi.com';
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+const MAX_CACHE_SIZE = 50;
+const REQUEST_TIMEOUT = 20000; // 20 seconds - increased for slower connections
 
-// Simple cache implementation
-const cache = new Map();
+// LRU Cache implementation
+class LRUCache {
+  constructor(maxSize) {
+    this.maxSize = maxSize;
+    this.cache = new Map();
+  }
+
+  get(key) {
+    if (this.cache.has(key)) {
+      const value = this.cache.get(key);
+      this.cache.delete(key);
+      this.cache.set(key, value);
+      return value;
+    }
+    return undefined;
+  }
+
+  set(key, value) {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    this.cache.set(key, value);
+  }
+
+  clear() {
+    this.cache.clear();
+  }
+}
+
+const cache = new LRUCache(MAX_CACHE_SIZE);
+
+// Input sanitization
+function sanitizeInput(input) {
+  if (!input || typeof input !== 'string') return '';
+  return input.replace(/[<>"'&]/g, '').trim().slice(0, 100);
+}
 
 class OMDbService {
   constructor() {
-    if (!API_KEY) {
-      throw new Error('OMDb API key is missing. Set VITE_OMDB_API_KEY in .env file.');
-    }
+    this.hasValidApiKey = Boolean(API_KEY);
+    // Don't throw - allow app to start but provide degraded experience
+  }
+
+  // Check if service is available
+  isAvailable() {
+    return this.hasValidApiKey;
   }
 
   // Build API URL with parameters
@@ -24,18 +67,30 @@ class OMDbService {
   }
 
   // Generic API request with caching
-  async request(url, cacheKey) {
+  async request(url, cacheKey, signal) {
+    // Return mock data if API key is missing
+    if (!this.hasValidApiKey) {
+      throw new Error('Movie service unavailable. Please check configuration.');
+    }
+
     // Check cache first
-    if (cacheKey && cache.has(cacheKey)) {
+    if (cacheKey && cache.get(cacheKey)) {
       const cached = cache.get(cacheKey);
       if (Date.now() - cached.timestamp < CACHE_DURATION) {
         return cached.data;
       }
-      cache.delete(cacheKey);
     }
 
     try {
-      const response = await fetch(url);
+      // Add timeout to prevent hanging requests
+      const timeoutController = new AbortController();
+      const timeoutId = setTimeout(() => timeoutController.abort(), REQUEST_TIMEOUT);
+      
+      const combinedSignal = signal ? this.combineAbortSignals([signal, timeoutController.signal]) : timeoutController.signal;
+      
+      const response = await fetch(url, { signal: combinedSignal });
+      clearTimeout(timeoutId);
+      
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -53,19 +108,36 @@ class OMDbService {
 
       return data;
     } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout or cancelled');
+      }
       console.error('OMDb API Error:', error);
       throw error;
     }
   }
 
+  // Combine multiple abort signals
+  combineAbortSignals(signals) {
+    const controller = new AbortController();
+    signals.forEach(signal => {
+      if (signal.aborted) {
+        controller.abort();
+      } else {
+        signal.addEventListener('abort', () => controller.abort());
+      }
+    });
+    return controller.signal;
+  }
+
   // Search movies by title
-  async searchMovies(query, page = 1) {
-    if (!query?.trim()) return { Search: [], totalResults: 0 };
+  async searchMovies(query, page = 1, signal) {
+    const sanitizedQuery = sanitizeInput(query);
+    if (!sanitizedQuery) return { Search: [], totalResults: 0 };
     
-    const url = this.buildUrl({ s: query.trim(), page });
-    const cacheKey = `search_${query}_${page}`;
+    const url = this.buildUrl({ s: sanitizedQuery, page });
+    const cacheKey = `search_${sanitizedQuery}_${page}`;
     
-    const data = await this.request(url, cacheKey);
+    const data = await this.request(url, cacheKey, signal);
     return {
       Search: data.Search || [],
       totalResults: parseInt(data.totalResults) || 0
@@ -73,13 +145,14 @@ class OMDbService {
   }
 
   // Get movie details by ID
-  async getMovieById(id) {
-    if (!id?.trim()) throw new Error('Movie ID is required');
+  async getMovieById(id, signal) {
+    const sanitizedId = sanitizeInput(id);
+    if (!sanitizedId) throw new Error('Movie ID is required');
     
-    const url = this.buildUrl({ i: id.trim(), plot: 'full' });
-    const cacheKey = `movie_${id}`;
+    const url = this.buildUrl({ i: sanitizedId, plot: 'full' });
+    const cacheKey = `movie_${sanitizedId}`;
     
-    return await this.request(url, cacheKey);
+    return await this.request(url, cacheKey, signal);
   }
 
   // Format movie data for UI components

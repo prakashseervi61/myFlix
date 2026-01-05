@@ -20,9 +20,36 @@ export function useWatchlist() {
   // Save to localStorage whenever watchlist changes
   useEffect(() => {
     try {
-      localStorage.setItem(WATCHLIST_KEY, JSON.stringify(watchlist));
+      const data = JSON.stringify(watchlist);
+      // Check if data is too large (rough estimate)
+      if (data.length > 1024 * 1024) { // 1MB limit
+        console.warn('Watchlist data too large, truncating oldest items');
+        const truncated = watchlist.slice(-50); // Keep last 50 items
+        localStorage.setItem(WATCHLIST_KEY, JSON.stringify(truncated));
+        setWatchlist(truncated);
+      } else {
+        localStorage.setItem(WATCHLIST_KEY, data);
+      }
     } catch (error) {
-      console.error('Failed to save watchlist:', error);
+      if (error.name === 'QuotaExceededError') {
+        console.warn('localStorage quota exceeded, clearing old data');
+        try {
+          // Try to save a smaller version
+          const essential = watchlist.slice(-20).map(movie => ({
+            id: movie.id,
+            title: movie.title,
+            poster: movie.poster,
+            addedAt: movie.addedAt
+          }));
+          localStorage.setItem(WATCHLIST_KEY, JSON.stringify(essential));
+          setWatchlist(essential);
+        } catch (fallbackError) {
+          console.error('Failed to save even essential watchlist data:', fallbackError);
+          // Continue without localStorage
+        }
+      } else {
+        console.error('Failed to save watchlist:', error);
+      }
     }
   }, [watchlist]);
 

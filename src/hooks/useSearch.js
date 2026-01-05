@@ -12,6 +12,7 @@ export function useSearch() {
     // Cancel previous request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
+      abortControllerRef.current = null;
     }
 
     // Clear results if query is empty
@@ -36,12 +37,14 @@ export function useSearch() {
     // Debounce search
     const timeoutId = setTimeout(async () => {
       try {
+        // Create new controller after timeout
         abortControllerRef.current = new AbortController();
+        const currentController = abortControllerRef.current;
         
-        const searchResult = await omdbService.searchMovies(query.trim());
+        const searchResult = await omdbService.searchMovies(query.trim(), 1, currentController.signal);
         
-        // Check if request was aborted
-        if (abortControllerRef.current?.signal.aborted) {
+        // Check if this request is still current
+        if (currentController !== abortControllerRef.current || currentController.signal.aborted) {
           return;
         }
 
@@ -60,7 +63,8 @@ export function useSearch() {
         setError(err.message || 'Search failed');
         setResults([]);
       } finally {
-        if (!abortControllerRef.current?.signal.aborted) {
+        // Only update loading if this is still the current request
+        if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
           setLoading(false);
         }
       }
@@ -70,6 +74,7 @@ export function useSearch() {
       clearTimeout(timeoutId);
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
     };
   }, [query]);
@@ -79,6 +84,7 @@ export function useSearch() {
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
+        abortControllerRef.current = null;
       }
     };
   }, []);

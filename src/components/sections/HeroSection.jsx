@@ -23,11 +23,11 @@ function HeroSection({ movies = [] }) {
       backgroundImage: movie.poster
     }));
     
-    // Add first slide at end and last slide at beginning for infinite loop
+    // Add first slide at end and last slide at beginning for infinite loop with unique keys
     return movieSlides.length > 1 ? [
-      movieSlides[movieSlides.length - 1],
+      { ...movieSlides[movieSlides.length - 1], id: `${movieSlides[movieSlides.length - 1].id}-clone-start` },
       ...movieSlides,
-      movieSlides[0]
+      { ...movieSlides[0], id: `${movieSlides[0].id}-clone-end` }
     ] : movieSlides;
   }, [movies]);
 
@@ -133,16 +133,22 @@ function HeroSection({ movies = [] }) {
                 className="w-full h-full object-cover object-center"
                 onError={(e) => {
                   e.target.style.display = 'none';
+                  e.target.parentElement.querySelector('.fallback-bg').style.display = 'flex';
+                }}
+                onLoad={(e) => {
+                  if (e.target.naturalWidth === 0) {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.querySelector('.fallback-bg').style.display = 'flex';
+                  }
                 }}
               />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                <div className="text-center text-white/50">
-                  <div className="text-6xl mb-4">🎬</div>
-                  <p className="text-lg font-medium">{movie.title}</p>
-                </div>
+            ) : null}
+            <div className={`fallback-bg w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 items-center justify-center ${movie.backgroundImage ? 'hidden' : 'flex'}`}>
+              <div className="text-center text-white/50">
+                <div className="text-6xl mb-4">🎬</div>
+                <p className="text-lg font-medium">{movie.title}</p>
               </div>
-            )}
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
           </div>
         ))}

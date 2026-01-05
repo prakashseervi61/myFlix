@@ -17,28 +17,34 @@ function Header() {
         setShowSearchResults(query.length > 0 && (results.length > 0 || loading || error));
     }, [query, results, loading, error]);
 
-    // Click outside to close search results
+    // Handle escape key and click outside - consolidated
     useEffect(() => {
+        function handleEscapeKey(event) {
+            if (event.key === 'Escape') {
+                // Close in priority order to prevent conflicts
+                if (showSearchResults) {
+                    setShowSearchResults(false);
+                } else if (mobileSearchOpen) {
+                    setMobileSearchOpen(false);
+                } else if (menuOpen) {
+                    setMenuOpen(false);
+                }
+            }
+        }
+        
         function handleClickOutside(event) {
             if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
                 setShowSearchResults(false);
             }
         }
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    // Handle escape key to close mobile menu
-    useEffect(() => {
-        function handleEscapeKey(event) {
-            if (event.key === 'Escape') {
-                if (menuOpen) setMenuOpen(false);
-                if (mobileSearchOpen) setMobileSearchOpen(false);
-                if (showSearchResults) setShowSearchResults(false);
-            }
-        }
+        
         document.addEventListener('keydown', handleEscapeKey);
-        return () => document.removeEventListener('keydown', handleEscapeKey);
+        document.addEventListener('mousedown', handleClickOutside);
+        
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, [menuOpen, mobileSearchOpen, showSearchResults]);
 
     const handleSearch = (e) => {
@@ -53,10 +59,15 @@ function Header() {
         // TODO: Implement user menu functionality
     };
 
-    // Prevent background scrolling when mobile menu is open
+    // Prevent background scrolling and manage focus when mobile menu is open
     useEffect(() => {
         if (menuOpen) {
             document.body.style.overflow = 'hidden';
+            // Focus first interactive element in menu
+            const firstButton = document.querySelector('[data-mobile-menu] button');
+            if (firstButton) {
+                firstButton.focus();
+            }
         } else {
             document.body.style.overflow = 'unset';
         }
@@ -202,12 +213,18 @@ function Header() {
                 )}
                 
                 {/* Mobile Menu - Slide in from left */}
-                <div className={`fixed top-0 left-0 h-screen w-80 max-w-[85vw] bg-gray-800 z-50 md:hidden transform transition-transform duration-300 ease-out ${
-                    menuOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}>
+                <div 
+                    className={`fixed top-0 left-0 h-screen w-80 max-w-[85vw] bg-gray-800 z-50 md:hidden transform transition-transform duration-300 ease-out ${
+                        menuOpen ? 'translate-x-0' : '-translate-x-full'
+                    }`}
+                    data-mobile-menu
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="mobile-menu-title"
+                >
                     {/* Menu Header */}
                     <div className="flex items-center justify-between p-4 border-b border-white/10">
-                        <span className="text-xl font-bold text-white">myFlix</span>
+                        <span id="mobile-menu-title" className="text-xl font-bold text-white">myFlix</span>
                         <button
                             onClick={() => setMenuOpen(false)}
                             className="p-2 rounded-md text-white hover:bg-white/10 transition touch-manipulation"

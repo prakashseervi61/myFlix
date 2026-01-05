@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import { omdbService } from '../services/omdb';
-
-// Curated search terms to simulate movie categories
-const MOVIE_CATEGORIES = {
-  trending: ['marvel', 'batman', 'star wars', 'avengers'],
-  action: ['action', 'fast furious', 'mission impossible', 'john wick'],
-  comedy: ['comedy', 'funny', 'laugh', 'humor'],
-  drama: ['drama', 'oscar', 'award', 'story']
-};
+import { MOVIE_CATEGORIES, CATEGORY_LIMITS, API_CONFIG } from '../utils/config';
 
 export function useMovieCategories() {
   const [categories, setCategories] = useState({
@@ -18,23 +11,32 @@ export function useMovieCategories() {
   });
 
   useEffect(() => {
+    const abortController = new AbortController();
+    
     const fetchCategoryMovies = async (categoryName, searchTerms) => {
       try {
-        // Fetch movies from multiple search terms
-        const searchPromises = searchTerms.map(async (term, index) => {
-          // Stagger requests to avoid rate limiting
-          await new Promise(resolve => setTimeout(resolve, index * 200));
+        // Check if service is available
+        if (!omdbService.isAvailable()) {
+          throw new Error('Movie service is currently unavailable');
+        }
+
+        // Reduce concurrent requests - fetch sequentially instead of parallel
+        const allMovies = [];
+        for (let i = 0; i < searchTerms.length && i < 2; i++) { // Limit to 2 terms per category
+          const term = searchTerms[i];
           try {
-            const result = await omdbService.searchMovies(term);
-            return (result.Search || []).slice(0, 4); // Limit per search
+            await new Promise(resolve => setTimeout(resolve, i * API_CONFIG.STAGGER_DELAY));
+            const result = await omdbService.searchMovies(term, 1, abortController.signal);
+            const movies = (result.Search || []).slice(0, CATEGORY_LIMITS.PER_SEARCH);
+            allMovies.push(...movies);
           } catch (error) {
             console.warn(`Search failed for "${term}":`, error.message);
-            return [];
+            // Continue with other terms instead of failing completely
           }
-        });
-
-        const results = await Promise.all(searchPromises);
-        const allMovies = results.flat();
+        }
+        
+        // Check if component is still mounted
+        if (abortController.signal.aborted) return;
         
         // Remove duplicates and format
         const uniqueMovies = allMovies.filter((movie, index, self) => 
@@ -44,17 +46,19 @@ export function useMovieCategories() {
         const formattedMovies = uniqueMovies
           .map(omdbService.formatMovie)
           .filter(movie => movie !== null)
-          .slice(0, 12); // Limit total per category
+          .slice(0, CATEGORY_LIMITS.TOTAL_PER_CATEGORY);
 
         setCategories(prev => ({
           ...prev,
           [categoryName]: {
             movies: formattedMovies,
             loading: false,
-            error: null
+            error: formattedMovies.length === 0 ? 'No movies found for this category' : null
           }
         }));
       } catch (error) {
+        if (abortController.signal.aborted) return;
+        
         console.error(`Failed to fetch ${categoryName} movies:`, error);
         setCategories(prev => ({
           ...prev,
@@ -67,10 +71,24 @@ export function useMovieCategories() {
       }
     };
 
-    // Fetch all categories
-    Object.entries(MOVIE_CATEGORIES).forEach(([categoryName, searchTerms]) => {
-      fetchCategoryMovies(categoryName, searchTerms);
-    });
+    // Fetch categories sequentially to reduce server load
+    const fetchAllCategories = async () => {
+      const categoryEntries = Object.entries(MOVIE_CATEGORIES);
+      for (let i = 0; i < categoryEntries.length; i++) {
+        const [categoryName, searchTerms] = categoryEntries[i];
+        await fetchCategoryMovies(categoryName, searchTerms);
+        // Add delay between categories
+        if (i < categoryEntries.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    };
+
+    fetchAllCategories();
+
+    return () => {
+      abortController.abort();
+    };
   }, []);
 
   return categories;

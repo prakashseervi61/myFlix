@@ -1,12 +1,25 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import MovieCard from "../ui/MovieCard";
 import MovieCardSkeleton from "../ui/MovieCardSkeleton";
 
-function Row({ title, movies = [], loading = false, onMovieClick }) {
+// Stable default to prevent re-renders
+const EMPTY_MOVIES = [];
+
+function Row({ title, movies, loading = false, onMovieClick }) {
   const scrollRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  
+  // Use stable reference for movies array
+  const stableMovies = movies || EMPTY_MOVIES;
+  
+  // Memoize skeleton array to prevent recreation
+  const skeletonItems = useMemo(() => 
+    Array.from({ length: 8 }, (_, index) => (
+      <MovieCardSkeleton key={`skeleton-${title}-${index}`} />
+    )), [title]
+  );
 
   const scroll = (direction) => {
     const { current } = scrollRef;
@@ -70,12 +83,10 @@ function Row({ title, movies = [], loading = false, onMovieClick }) {
           aria-label={`${title} movies`}
         >
           {loading ? (
-            Array.from({ length: 8 }).map((_, index) => (
-              <MovieCardSkeleton key={`skeleton-${title}-${index}`} />
-            ))
+            skeletonItems
           ) : (
-            movies.map((movie, index) => (
-              <div key={`${movie.id}-${title}-${index}`} role="listitem">
+            stableMovies.map((movie) => (
+              <div key={movie.id} role="listitem">
                 <MovieCard movie={movie} onClick={onMovieClick} />
               </div>
             ))

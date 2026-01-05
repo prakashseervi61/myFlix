@@ -75,7 +75,7 @@ function MovieCard({ movie, onClick }) {
                 setImageError(true);
               }
             }}
-            className="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-110 select-none"
+            className="w-full h-full object-cover transition-transform duration-300 md:group-hover:scale-110 select-none pointer-events-none"
             draggable={false}
           />
         ) : (

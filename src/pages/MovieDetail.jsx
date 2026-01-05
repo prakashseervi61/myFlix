@@ -78,7 +78,7 @@ function MovieDetail() {
                 <img
                   src={movie.poster}
                   alt={movie.title}
-                  className="w-full aspect-[2/3] object-cover rounded-xl shadow-2xl"
+                  className="w-full aspect-[2/3] object-cover rounded-xl shadow-2xl select-none pointer-events-none"
                 />
               ) : (
                 <div className="w-full aspect-[2/3] bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center">

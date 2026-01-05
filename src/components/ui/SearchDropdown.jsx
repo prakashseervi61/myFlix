@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Star, AlertCircle, Clock, Search as SearchIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 function SearchDropdown({ results, loading, error, onClose }) {
   const navigate = useNavigate();
+  const [touchStart, setTouchStart] = useState(null);
 
   if ((!results || !results.length) && !loading && !error) return null;
 
@@ -13,10 +14,26 @@ function SearchDropdown({ results, loading, error, onClose }) {
     navigate(`/movie/${movie.id}`);
   };
 
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    setTouchStart({ x: touch.clientX, y: touch.clientY });
+  };
+
   const handleTouchEnd = (movie, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleMovieClick(movie, e);
+    if (!touchStart) return;
+    
+    const touch = e.changedTouches[0];
+    const deltaX = Math.abs(touch.clientX - touchStart.x);
+    const deltaY = Math.abs(touch.clientY - touchStart.y);
+    
+    // Only trigger click if movement is minimal (not a swipe)
+    if (deltaX < 10 && deltaY < 10) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleMovieClick(movie, e);
+    }
+    
+    setTouchStart(null);
   };
 
   return (
@@ -71,6 +88,7 @@ function SearchDropdown({ results, loading, error, onClose }) {
                   index === 0 ? 'bg-white/5' : ''
                 }`}
                 onClick={(e) => handleMovieClick(movie, e)}
+                onTouchStart={handleTouchStart}
                 onTouchEnd={(e) => handleTouchEnd(movie, e)}
               >
                 {/* Movie Poster */}
@@ -79,7 +97,7 @@ function SearchDropdown({ results, loading, error, onClose }) {
                     <img
                       src={movie.poster}
                       alt={movie.title}
-                      className="w-10 h-14 sm:w-12 sm:h-16 object-cover rounded-lg shadow-md group-hover:shadow-lg transition-shadow"
+                      className="w-10 h-14 sm:w-12 sm:h-16 object-cover rounded-lg shadow-md group-hover:shadow-lg transition-shadow select-none pointer-events-none"
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextElementSibling.style.display = 'flex';

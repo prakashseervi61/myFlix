@@ -5,6 +5,8 @@ import Footer from './components/layout/Footer'
 import HeroSection from './components/sections/HeroSection'
 import Row from './components/sections/Row'
 import MovieDetail from './pages/MovieDetail'
+import PlaceholderPage from './pages/PlaceholderPage'
+import LegalPage from './pages/LegalPage'
 import ErrorBoundary from './components/ErrorBoundary'
 import { useMovieCategories } from './hooks/useMovieCategories'
 
@@ -105,7 +107,13 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/movies" element={<HomePage />} />
           <Route path="/series" element={<HomePage />} />
+          <Route path="/anime" element={<PlaceholderPage />} />
+          <Route path="/new-releases" element={<PlaceholderPage />} />
           <Route path="/movie/:id" element={<MovieDetail />} />
+          <Route path="/page/:section" element={<PlaceholderPage />} />
+          <Route path="/privacy" element={<LegalPage type="privacy" />} />
+          <Route path="/terms" element={<LegalPage type="terms" />} />
+          <Route path="/cookies" element={<LegalPage type="cookies" />} />
         </Routes>
         <Footer />
       </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Github, Twitter, Instagram, Mail } from "lucide-react";
 
 function Footer() {
@@ -27,37 +28,37 @@ function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Browse</h3>
             <ul className="space-y-2" role="list">
-              <FooterItem href="/movies">Movies</FooterItem>
-              <FooterItem href="/series">TV Shows</FooterItem>
-              <FooterItem href="/anime">Anime</FooterItem>
-              <FooterItem href="/new-releases">New Releases</FooterItem>
+              <FooterItem to="/movies">Movies</FooterItem>
+              <FooterItem to="/series">TV Shows</FooterItem>
+              <FooterItem to="/anime">Anime</FooterItem>
+              <FooterItem to="/new-releases">New Releases</FooterItem>
             </ul>
           </div>
           
           <div>
             <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Support</h3>
             <ul className="space-y-2" role="list">
-              <FooterItem href="/help">Help Center</FooterItem>
-              <FooterItem href="/account">Account</FooterItem>
-              <FooterItem href="/contact">Contact Us</FooterItem>
+              <FooterItem to="/page/help-center">Help Center</FooterItem>
+              <FooterItem to="/page/account">Account</FooterItem>
+              <FooterItem to="/page/contact-us">Contact Us</FooterItem>
             </ul>
           </div>
           
           <div>
             <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Company</h3>
             <ul className="space-y-2" role="list">
-              <FooterItem href="/about">About</FooterItem>
-              <FooterItem href="/careers">Careers</FooterItem>
-              <FooterItem href="/press">Press</FooterItem>
+              <FooterItem to="/page/about">About</FooterItem>
+              <FooterItem to="/page/careers">Careers</FooterItem>
+              <FooterItem to="/page/press">Press</FooterItem>
             </ul>
           </div>
           
           <div>
             <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Legal</h3>
             <ul className="space-y-2" role="list">
-              <FooterItem href="/privacy">Privacy Policy</FooterItem>
-              <FooterItem href="/terms">Terms of Use</FooterItem>
-              <FooterItem href="/cookies">Cookie Preferences</FooterItem>
+              <FooterItem to="/privacy">Privacy Policy</FooterItem>
+              <FooterItem to="/terms">Terms of Use</FooterItem>
+              <FooterItem to="/cookies">Cookie Preferences</FooterItem>
             </ul>
           </div>
         </div>
@@ -80,15 +81,15 @@ function Footer() {
   );
 }
 
-function FooterItem({ href, children }) {
+function FooterItem({ to, children }) {
   return (
     <li role="listitem">
-      <a 
-        href={href}
+      <Link 
+        to={to}
         className="hover:text-white transition-colors text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm"
       >
         {children}
-      </a>
+      </Link>
     </li>
   );
 }

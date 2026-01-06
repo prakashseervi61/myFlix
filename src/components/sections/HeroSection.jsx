@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Play, Plus, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useWatchlist } from "../../hooks/useWatchlist";
+import { useWatchlist } from "../../contexts/WatchlistContext.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
 
 function HeroSection({ movies = [] }) {
@@ -19,7 +19,14 @@ function HeroSection({ movies = [] }) {
       navigate('/login');
       return;
     }
-    toggleWatchlist(slidesToShow[currentSlide]);
+    // Get the original movie from the movies array
+    const actualIndex = currentSlide - 1;
+    const currentMovie = movies && movies.length > 0 && actualIndex >= 0 && actualIndex < movies.length 
+      ? movies[actualIndex] 
+      : null;
+    if (currentMovie) {
+      toggleWatchlist(currentMovie);
+    }
   };
 
   // Use first 5 movies for hero carousel with infinite loop
@@ -195,7 +202,15 @@ function HeroSection({ movies = [] }) {
 
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button 
-              onClick={() => navigate(`/movie/${slidesToShow[currentSlide]?.id}`)}
+              onClick={() => {
+                const actualIndex = currentSlide - 1;
+                const currentMovie = movies && movies.length > 0 && actualIndex >= 0 && actualIndex < movies.length 
+                  ? movies[actualIndex] 
+                  : null;
+                if (currentMovie?.id) {
+                  navigate(`/movie/${currentMovie.id}`);
+                }
+              }}
               className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors"
             >
               <Play className="w-5 h-5 fill-current" />
@@ -205,12 +220,24 @@ function HeroSection({ movies = [] }) {
             <button 
               onClick={handleWatchlistClick}
               className={`flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors backdrop-blur-sm border ${
-                isInWatchlist(slidesToShow[currentSlide]?.id) 
+                (() => {
+                  const actualIndex = currentSlide - 1;
+                  const currentMovie = movies && movies.length > 0 && actualIndex >= 0 && actualIndex < movies.length 
+                    ? movies[actualIndex] 
+                    : null;
+                  return isInWatchlist(currentMovie?.id);
+                })()
                   ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
                   : 'bg-black/40 text-white border-white/20 hover:bg-black/60'
               }`}
             >
-              {isInWatchlist(slidesToShow[currentSlide]?.id) ? (
+              {(() => {
+                const actualIndex = currentSlide - 1;
+                const currentMovie = movies && movies.length > 0 && actualIndex >= 0 && actualIndex < movies.length 
+                  ? movies[actualIndex] 
+                  : null;
+                return isInWatchlist(currentMovie?.id);
+              })() ? (
                 <>
                   <Check className="w-5 h-5" />
                   In My List

@@ -10,8 +10,10 @@ import LegalPage from './pages/LegalPage'
 import ErrorBoundary from './components/ErrorBoundary'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import WatchlistPage from './pages/WatchlistPage'
 import { AuthProvider } from './hooks/useAuth.jsx'
 import { MovieProvider, useMovies } from './contexts/MovieContext.jsx'
+import { WatchlistProvider } from './contexts/WatchlistContext.jsx'
 
 // Move HomePage outside App to prevent remounting
 function HomePage() {
@@ -113,28 +115,31 @@ function App() {
 
   return (
     <AuthProvider>
-      <MovieProvider>
-        <ErrorBoundary>
-          <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
-            {!isAuthPage && <Header />}
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/movies" element={<HomePage />} />
-              <Route path="/series" element={<HomePage />} />
-              <Route path="/anime" element={<PlaceholderPage />} />
-              <Route path="/new-releases" element={<PlaceholderPage />} />
-              <Route path="/movie/:id" element={<MovieDetail />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/page/:section" element={<PlaceholderPage />} />
-              <Route path="/privacy" element={<LegalPage type="privacy" />} />
-              <Route path="/terms" element={<LegalPage type="terms" />} />
-              <Route path="/cookies" element={<LegalPage type="cookies" />} />
-            </Routes>
-            {!isAuthPage && <Footer />}
-          </div>
-        </ErrorBoundary>
-      </MovieProvider>
+      <WatchlistProvider>
+        <MovieProvider>
+          <ErrorBoundary>
+            <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
+              {!isAuthPage && <Header />}
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/movies" element={<HomePage />} />
+                <Route path="/series" element={<HomePage />} />
+                <Route path="/anime" element={<PlaceholderPage />} />
+                <Route path="/new-releases" element={<PlaceholderPage />} />
+                <Route path="/movie/:id" element={<MovieDetail />} />
+                <Route path="/watchlist" element={<WatchlistPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
+                <Route path="/page/:section" element={<PlaceholderPage />} />
+                <Route path="/privacy" element={<LegalPage type="privacy" />} />
+                <Route path="/terms" element={<LegalPage type="terms" />} />
+                <Route path="/cookies" element={<LegalPage type="cookies" />} />
+              </Routes>
+              {!isAuthPage && <Footer />}
+            </div>
+          </ErrorBoundary>
+        </MovieProvider>
+      </WatchlistProvider>
     </AuthProvider>
   )
 }

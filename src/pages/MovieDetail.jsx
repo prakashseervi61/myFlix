@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Clock, Calendar, User, Plus, Check } from 'lucide-react';
 import { useMovieDetails } from '../hooks/useMovieDetails';
-import { useWatchlist } from '../hooks/useWatchlist';
+import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 
 function MovieDetail() {

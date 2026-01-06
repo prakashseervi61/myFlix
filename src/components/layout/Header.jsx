@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, User, X, Menu, LogOut } from "lucide-react";
+import { Search, User, X, Menu, LogOut, Heart } from "lucide-react";
 import { useSearch } from "../../hooks/useSearch";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import SearchDropdown from "../ui/SearchDropdown";
@@ -15,6 +15,7 @@ function Header() {
     const navigate = useNavigate();
     const searchInputRef = useRef(null);
     const searchContainerRef = useRef(null);
+    const userMenuRef = useRef(null);
 
     // Show/hide search results
     useEffect(() => {
@@ -28,6 +29,8 @@ function Header() {
                 // Close in priority order to prevent conflicts
                 if (showSearchResults) {
                     setShowSearchResults(false);
+                } else if (showUserMenu) {
+                    setShowUserMenu(false);
                 } else if (mobileSearchOpen) {
                     setMobileSearchOpen(false);
                 } else if (menuOpen) {
@@ -40,6 +43,9 @@ function Header() {
             if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
                 setShowSearchResults(false);
             }
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+                setShowUserMenu(false);
+            }
         }
         
         document.addEventListener('keydown', handleEscapeKey);
@@ -49,7 +55,7 @@ function Header() {
             document.removeEventListener('keydown', handleEscapeKey);
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [menuOpen, mobileSearchOpen, showSearchResults]);
+    }, [menuOpen, mobileSearchOpen, showSearchResults, showUserMenu]);
 
     const handleSearch = (e) => {
         e?.preventDefault();
@@ -210,7 +216,7 @@ function Header() {
                             )}
                         </div>
                         {user ? (
-                            <div className="relative">
+                            <div className="relative" ref={userMenuRef}>
                                 <button 
                                     onClick={() => setShowUserMenu(!showUserMenu)}
                                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white font-semibold text-sm hover:bg-white/20 transition-colors"
@@ -221,8 +227,18 @@ function Header() {
                                 {showUserMenu && (
                                     <div className="absolute top-full right-0 mt-2 w-48 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl z-50">
                                         <button
+                                            onClick={() => {
+                                                navigate('/watchlist');
+                                                setShowUserMenu(false);
+                                            }}
+                                            className="flex items-center gap-2 w-full px-4 py-3 text-white hover:bg-white/10 transition-colors rounded-t-lg"
+                                        >
+                                            <Heart className="w-4 h-4" />
+                                            My Watchlist
+                                        </button>
+                                        <button
                                             onClick={handleLogout}
-                                            className="flex items-center gap-2 w-full px-4 py-3 text-white hover:bg-white/10 transition-colors rounded-lg"
+                                            className="flex items-center gap-2 w-full px-4 py-3 text-white hover:bg-white/10 transition-colors rounded-b-lg"
                                         >
                                             <LogOut className="w-4 h-4" />
                                             Logout
@@ -314,6 +330,16 @@ function Header() {
                                     <div className="px-4 py-2 text-white/60 text-sm">
                                         Welcome, {user.name}
                                     </div>
+                                    <button 
+                                        onClick={() => {
+                                            navigate('/watchlist');
+                                            setMenuOpen(false);
+                                        }}
+                                        className="flex items-center w-full py-3 px-4 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all touch-manipulation"
+                                    >
+                                        <Heart className="w-5 h-5 mr-3" />
+                                        <span>My Watchlist</span>
+                                    </button>
                                     <button 
                                         onClick={() => {
                                             handleLogout();

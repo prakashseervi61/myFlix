@@ -1,4 +1,4 @@
-import { useWatchlist } from './useWatchlist';
+import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from './useAuth.jsx';
 import { useNavigate } from 'react-router-dom';
 

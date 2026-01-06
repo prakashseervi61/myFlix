@@ -3,12 +3,22 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Clock, Calendar, User, Plus, Check } from 'lucide-react';
 import { useMovieDetails } from '../hooks/useMovieDetails';
 import { useWatchlist } from '../hooks/useWatchlist';
+import { useAuth } from '../hooks/useAuth.jsx';
 
 function MovieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { movie, loading, error } = useMovieDetails(id);
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const { user } = useAuth();
+
+  const handleWatchlistClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWatchlist(movie);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -60,19 +70,18 @@ function MovieDetail() {
   const inWatchlist = isInWatchlist(movie.id);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-20">
       <div className="container mx-auto px-4 py-6">
         <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-white hover:text-[#ff6f61] transition-colors mb-6 touch-manipulation"
+          onClick={() => navigate(-1)}
+          className="absolute top-16 left-4 sm:top-20 sm:left-6 text-gray-400 hover:text-white transition-colors z-10 p-2 sm:p-3 rounded-full border border-gray-600 hover:border-gray-400"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span>Back to Home</span>
+          <ArrowLeft className="w-6 h-6 sm:w-8 sm:h-8" />
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Movie Poster */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 ml-2">
             <div className="sticky top-6">
               {movie.poster ? (
                 <img
@@ -138,7 +147,7 @@ function MovieDetail() {
                 {/* Action Button */}
                 <div className="mb-8">
                   <button
-                    onClick={() => toggleWatchlist(movie)}
+                    onClick={handleWatchlistClick}
                     className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all touch-manipulation ${
                       inWatchlist
                         ? 'bg-green-600 text-white hover:bg-green-700'

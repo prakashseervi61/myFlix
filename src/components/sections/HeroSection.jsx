@@ -2,15 +2,25 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Play, Plus, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useWatchlist } from "../../hooks/useWatchlist";
+import { useAuth } from "../../hooks/useAuth.jsx";
 
 function HeroSection({ movies = [] }) {
   const navigate = useNavigate();
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
+  const { user } = useAuth();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+
+  const handleWatchlistClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleWatchlist(slidesToShow[currentSlide]);
+  };
 
   // Use first 5 movies for hero carousel with infinite loop
   const featuredMovies = useMemo(() => {
@@ -193,7 +203,7 @@ function HeroSection({ movies = [] }) {
             </button>
             
             <button 
-              onClick={() => toggleWatchlist(slidesToShow[currentSlide])}
+              onClick={handleWatchlistClick}
               className={`flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-lg transition-colors backdrop-blur-sm border ${
                 isInWatchlist(slidesToShow[currentSlide]?.id) 
                   ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 

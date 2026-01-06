@@ -1,14 +1,18 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link } from "react-router-dom";
-import { Search, User, X, Menu } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, User, X, Menu, LogOut } from "lucide-react";
 import { useSearch } from "../../hooks/useSearch";
+import { useAuth } from "../../hooks/useAuth.jsx";
 import SearchDropdown from "../ui/SearchDropdown";
 
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
     const [showSearchResults, setShowSearchResults] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
     const { query, setQuery, results, loading, error, clearResults } = useSearch();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const searchInputRef = useRef(null);
     const searchContainerRef = useRef(null);
 
@@ -56,7 +60,16 @@ function Header() {
     };
 
     const handleUserMenu = () => {
-        // TODO: Implement user menu functionality
+        if (user) {
+            setShowUserMenu(!showUserMenu);
+        } else {
+            navigate('/login');
+        }
+    };
+
+    const handleLogout = () => {
+        logout();
+        setShowUserMenu(false);
     };
 
     // Prevent background scrolling and manage focus when mobile menu is open
@@ -161,12 +174,14 @@ function Header() {
                                 >
                                     <Search className="w-5 h-5" />
                                 </button>
-                                <button 
-                                    onClick={handleUserMenu}
-                                    className="p-2 text-white hover:text-[#ff6f61] transition bg-white/10 rounded-full"
-                                >
-                                    <User className="w-5 h-5" />
-                                </button>
+                                {!user && (
+                                    <button 
+                                        onClick={handleUserMenu}
+                                        className="p-2 text-white hover:text-[#ff6f61] transition bg-white/10 rounded-full"
+                                    >
+                                        <User className="w-5 h-5" />
+                                    </button>
+                                )}
                             </>
                         )}
                     </div>
@@ -194,9 +209,32 @@ function Header() {
                                 />
                             )}
                         </div>
-                        <button className="px-4 py-2 rounded-full bg-[#ff6f61] text-white font-semibold text-sm hover:bg-[#ff523d] transition-colors">
-                            Login
-                        </button>
+                        {user ? (
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setShowUserMenu(!showUserMenu)}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white font-semibold text-sm hover:bg-white/20 transition-colors"
+                                >
+                                    <User className="w-4 h-4" />
+                                    {user.name}
+                                </button>
+                                {showUserMenu && (
+                                    <div className="absolute top-full right-0 mt-2 w-48 bg-black/95 backdrop-blur-md border border-white/10 rounded-lg shadow-xl z-50">
+                                        <button
+                                            onClick={handleLogout}
+                                            className="flex items-center gap-2 w-full px-4 py-3 text-white hover:bg-white/10 transition-colors rounded-lg"
+                                        >
+                                            <LogOut className="w-4 h-4" />
+                                            Logout
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <button className="px-4 py-2 rounded-full bg-[#ff6f61] text-white font-semibold text-sm hover:bg-[#ff523d] transition-colors" onClick={() => navigate('/login')}>
+                                Login
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -271,16 +309,34 @@ function Header() {
                         </button>
                         
                         <div className="pt-4 border-t border-white/10">
-                            <button 
-                                onClick={() => {
-                                    handleUserMenu();
-                                    setMenuOpen(false);
-                                }}
-                                className="flex items-center w-full py-3 px-4 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all touch-manipulation"
-                            >
-                                <User className="w-5 h-5 mr-3" />
-                                <span>Login</span>
-                            </button>
+                            {user ? (
+                                <>
+                                    <div className="px-4 py-2 text-white/60 text-sm">
+                                        Welcome, {user.name}
+                                    </div>
+                                    <button 
+                                        onClick={() => {
+                                            handleLogout();
+                                            setMenuOpen(false);
+                                        }}
+                                        className="flex items-center w-full py-3 px-4 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all touch-manipulation"
+                                    >
+                                        <LogOut className="w-5 h-5 mr-3" />
+                                        <span>Logout</span>
+                                    </button>
+                                </>
+                            ) : (
+                                <button 
+                                    onClick={() => {
+                                        handleUserMenu();
+                                        setMenuOpen(false);
+                                    }}
+                                    className="flex items-center w-full py-3 px-4 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-all touch-manipulation"
+                                >
+                                    <User className="w-5 h-5 mr-3" />
+                                    <span>Login</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

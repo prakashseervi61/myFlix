@@ -6,7 +6,7 @@
   <p>
     <a href="#"><img src="https://img.shields.io/badge/version-1.0-blueviolet?style=for-the-badge&logo=none" alt="Version"></a>
     <a href="#"><img src="https://img.shields.io/badge/status-active-brightgreen?style=for-the-badge&logo=none" alt="Status"></a>
-        <a href="https://github.com/your-username/myFlix/stargazers">
+        <a href="https://github.com/prakashseervi61/myFlix/">
           <img src="https://img.shields.io/github/stars/your-username/myFlix?style=for-the-badge&logo=github&color=FFD700" alt="Stars Badge"/>
         </a>
   </p>

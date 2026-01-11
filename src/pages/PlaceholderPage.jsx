@@ -19,19 +19,22 @@ function PlaceholderPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
       <div className="text-center px-4 max-w-md">
-        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-          {formatTitle(section)}
-        </h1>
-        <p className="text-gray-400 text-lg mb-8">
-          This page is coming soon. We're working hard to bring you this feature.
-        </p>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Home
-        </Link>
+        <div className="glass-morphism rounded-3xl p-12">
+          <div className="text-6xl mb-6 opacity-60">🚀</div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4 neon-text">
+            {formatTitle(section)}
+          </h1>
+          <p className="text-white/60 text-lg mb-8 leading-relaxed">
+            This page is coming soon. We're working hard to bring you this feature.
+          </p>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 text-white rounded-full font-semibold hover:from-cyan-400 hover:to-purple-500 transition-all neon-glow"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { omdbService } from '../services/omdb';
+import { apiService } from '../services/apiService.js';
 
 export function useMovieDetails(movieId) {
   const [movie, setMovie] = useState(null);
@@ -8,30 +8,46 @@ export function useMovieDetails(movieId) {
 
   useEffect(() => {
     if (!movieId) {
-      setError(null);
-      setMovie(null);
       setLoading(false);
+      setMovie(null);
+      setError(null);
       return;
     }
 
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
     const fetchMovieDetails = async () => {
+      setLoading(true);
+      setError(null);
+      setMovie(null);
+
       try {
-        setLoading(true);
-        setError(null);
+        const movieData = await apiService.getMovieDetails(movieId, signal);
         
-        const movieData = await omdbService.getMovieById(movieId);
-        const formattedMovie = omdbService.formatMovie(movieData);
-        
-        setMovie(formattedMovie);
+        if (!signal.aborted) {
+          if (movieData && movieData.id) {
+            setMovie(movieData);
+          } else {
+            throw new Error('Movie not found or data is invalid');
+          }
+        }
       } catch (err) {
-        console.error('Failed to fetch movie details:', err);
-        setError(err.message || 'Failed to load movie details');
+        if (!signal.aborted) {
+          setError(err.message || 'Failed to load movie details');
+        }
       } finally {
-        setLoading(false);
+        if (!signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchMovieDetails();
+
+    return () => {
+      abortController.abort();
+    };
   }, [movieId]);
 
   return { movie, loading, error };

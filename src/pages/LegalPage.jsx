@@ -28,17 +28,17 @@ function LegalPage({ type }) {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-white hover:text-red-400 transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-white/80 hover:text-white hover:neon-text transition-all mb-8"
         >
           <ArrowLeft className="w-5 h-5" />
           Back to Home
         </Link>
         
-        <div className="bg-gray-800/50 rounded-xl p-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6">{title}</h1>
-          <div className="text-gray-300 leading-relaxed">
-            <p className="mb-4">{text}</p>
-            <p className="text-sm text-gray-400">
+        <div className="glass-morphism rounded-3xl p-8 lg:p-12">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6 neon-text">{title}</h1>
+          <div className="text-white/70 leading-relaxed">
+            <p className="mb-6 text-lg">{text}</p>
+            <p className="text-sm text-white/50">
               Last updated: {new Date().toLocaleDateString()}
             </p>
           </div>

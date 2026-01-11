@@ -1,104 +1,61 @@
-import { useState, useEffect, useRef } from 'react';
-import { omdbService } from '../services/omdb';
+import { useState, useCallback, useRef } from 'react';
+import { apiService } from '../services/apiService.js';
 
 export function useSearch() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
 
-  useEffect(() => {
-    // Cancel previous request
+  const searchMovies = useCallback(async (query) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      abortControllerRef.current = null;
     }
 
-    // Clear results if query is empty
     if (!query.trim()) {
-      setResults([]);
+      setSearchResults([]);
       setLoading(false);
       setError(null);
       return;
     }
-
-    // Don't search for very short queries
-    if (query.trim().length < 2) {
-      setResults([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
+    
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
 
     setLoading(true);
     setError(null);
 
-    // Debounce search
-    const timeoutId = setTimeout(async () => {
-      try {
-        // Create new controller after timeout
-        abortControllerRef.current = new AbortController();
-        const currentController = abortControllerRef.current;
-        
-        const searchResult = await omdbService.searchMovies(query.trim(), 1, currentController.signal);
-        
-        // Check if this request is still current
-        if (currentController !== abortControllerRef.current || currentController.signal.aborted) {
-          return;
-        }
-
-        const formattedResults = (searchResult.Search || [])
-          .map(omdbService.formatMovie)
-          .filter(movie => movie !== null)
-          .slice(0, 8); // Limit results
-
-        setResults(formattedResults);
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          return; // Request was cancelled
-        }
-        
-        console.error('Search error:', err);
-        setError(err.message || 'Search failed');
-        setResults([]);
-      } finally {
-        // Only update loading if this is still the current request
-        if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
-          setLoading(false);
-        }
+    try {
+      const result = await apiService.searchMovies(query, 1, signal);
+      if (!signal.aborted) {
+        setSearchResults(result.Search || []);
       }
-    }, 300); // 300ms debounce
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
+    } catch (err) {
+      if (!signal.aborted) {
+        setError(err.message);
+        setSearchResults([]);
       }
-    };
-  }, [query]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-        abortControllerRef.current = null;
+    } finally {
+      if (!signal.aborted) {
+        setLoading(false);
       }
-    };
+    }
+  }, []);
+
+  const clearResults = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setSearchResults([]);
+    setError(null);
+    setLoading(false);
   }, []);
 
   return {
-    query,
-    setQuery,
-    results,
+    searchResults,
     loading,
     error,
-    clearResults: () => {
-      setQuery('');
-      setResults([]);
-      setError(null);
-    }
+    searchMovies,
+    clearResults
   };
 }

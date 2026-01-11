@@ -1,111 +1,90 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { Github, Twitter, Instagram, Mail } from "lucide-react";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Footer() {
+  const navigate = useNavigate();
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer 
-      className="bg-[#0f1014] border-t border-gray-800 text-gray-400 py-8 md:py-10"
-      aria-label="Site footer"
-      role="contentinfo"
-    >
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-          <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <span className="text-lg sm:text-xl md:text-2xl font-bold text-white tracking-wide">myFlix</span>
-          </div>
-          
-          <div className="flex gap-4" role="list" aria-label="Social media links">
-            <FooterLink href="https://github.com" label="GitHub" icon={<Github className="w-5 h-5" />} />
-            <FooterLink href="https://twitter.com" label="Twitter" icon={<Twitter className="w-5 h-5" />} />
-            <FooterLink href="https://instagram.com" label="Instagram" icon={<Instagram className="w-5 h-5" />} />
-          </div>
-        </div>
-
-        <div className="border-t border-gray-800 mb-8"></div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div>
-            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Browse</h3>
-            <ul className="space-y-2" role="list">
-              <FooterItem to="/movies">Movies</FooterItem>
-              <FooterItem to="/series">TV Shows</FooterItem>
-              <FooterItem to="/anime">Anime</FooterItem>
-              <FooterItem to="/new-releases">New Releases</FooterItem>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Support</h3>
-            <ul className="space-y-2" role="list">
-              <FooterItem to="/page/help-center">Help Center</FooterItem>
-              <FooterItem to="/page/account">Account</FooterItem>
-              <FooterItem to="/page/contact-us">Contact Us</FooterItem>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Company</h3>
-            <ul className="space-y-2" role="list">
-              <FooterItem to="/page/about">About</FooterItem>
-              <FooterItem to="/page/careers">Careers</FooterItem>
-              <FooterItem to="/page/press">Press</FooterItem>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-white font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider leading-tight">Legal</h3>
-            <ul className="space-y-2" role="list">
-              <FooterItem to="/privacy">Privacy Policy</FooterItem>
-              <FooterItem to="/terms">Terms of Use</FooterItem>
-              <FooterItem to="/cookies">Cookie Preferences</FooterItem>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row justify-between items-center pt-6 border-t border-gray-800">
-          <p className="text-xs sm:text-sm leading-relaxed">&copy; {new Date().getFullYear()} myFlix. All rights reserved.</p>
-          <div className="flex items-center gap-2 mt-4 md:mt-0">
-            <Mail className="w-4 h-4 text-gray-500" />
-            <a 
-              href="mailto:support@myflix.example" 
-              className="text-xs sm:text-sm hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm leading-relaxed"
-              aria-label="Email support"
+    <footer className="relative mt-20 glass-morphism border-t border-white/10">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="md:col-span-2">
+            <button
+              onClick={() => navigate('/')}
+              className="text-3xl font-bold text-white hover:scale-105 transition-transform mb-4"
             >
-              support@myflix.example
-            </a>
+              myFlix
+            </button>
+            <p className="text-white/60 text-lg mb-6 max-w-md">
+              Your ultimate destination for discovering and enjoying the best movies and series from around the world.
+            </p>
+            <div className="flex space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full flex items-center justify-center neon-glow">
+                <span className="text-white font-bold">🎬</span>
+              </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center neon-glow">
+                <span className="text-white font-bold">🍿</span>
+              </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-red-600 rounded-full flex items-center justify-center neon-glow">
+                <span className="text-white font-bold">⭐</span>
+              </div>
+            </div>
           </div>
+
+          <div>
+            <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
+            <nav className="space-y-3">
+              {[
+                { name: 'Home', path: '/' },
+                { name: 'Movies', path: '/movies' },
+                { name: 'Series', path: '/series' },
+                { name: 'Anime', path: '/anime' },
+                { name: 'New Releases', path: '/new-releases' }
+              ].map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.path)}
+                  className="block text-white/70 hover:text-white hover:neon-text transition-all duration-300"
+                >
+                  {item.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h3 className="text-white font-bold text-lg mb-4">Legal</h3>
+            <nav className="space-y-3">
+              {[
+                { name: 'Privacy Policy', path: '/privacy' },
+                { name: 'Terms of Service', path: '/terms' },
+                { name: 'Cookie Policy', path: '/cookies' }
+              ].map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.path)}
+                  className="block text-white/70 hover:text-white hover:neon-text transition-all duration-300"
+                >
+                  {item.name}
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center">
+          <p className="text-white/50 text-sm">
+            © {currentYear} myFlix. All rights reserved.
+          </p>
+          <p className="text-white/50 text-sm mt-4 sm:mt-0">
+            Made with ❤️ for movie lovers everywhere
+          </p>
         </div>
       </div>
     </footer>
-  );
-}
-
-function FooterItem({ to, children }) {
-  return (
-    <li role="listitem">
-      <Link 
-        to={to}
-        className="hover:text-white transition-colors text-xs sm:text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-white/50 rounded-sm"
-      >
-        {children}
-      </Link>
-    </li>
-  );
-}
-
-function FooterLink({ href, label, icon }) {
-  return (
-    <a
-      href={href}
-      className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-white/50"
-      aria-label={label}
-      target="_blank"
-      rel="noopener noreferrer"
-      role="listitem"
-    >
-      {icon}
-    </a>
   );
 }
 

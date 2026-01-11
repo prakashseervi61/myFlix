@@ -1,5 +1,5 @@
 import React, { createContext, useContext } from 'react';
-import { useMovieCategories } from '../hooks/useMovieCategories';
+import { useMovieCategories } from '../hooks/useMovieCategories.js';
 
 const MovieContext = createContext();
 

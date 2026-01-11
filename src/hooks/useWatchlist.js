@@ -1,115 +1,118 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from './useAuth.jsx';
+import { useState, useEffect, useCallback } from 'react';
 
-export function useWatchlist() {
-  const [watchlist, setWatchlist] = useState([]);
-  const { user } = useAuth();
-  
-  const getWatchlistKey = () => {
-    return user ? `myflix-watchlist-${user.id}` : 'myflix-watchlist-guest';
-  };
+const getUserDataKey = (user) => 
+  user ? `myflix-userdata-${user.id}` : 'myflix-userdata-guest';
 
-  // Load watchlist from localStorage on mount or user change
-  useEffect(() => {
-    if (!user) {
-      setWatchlist([]);
-      return;
+const loadDataFromStorage = (user) => {
+  try {
+    const saved = localStorage.getItem(getUserDataKey(user));
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        watchlist: parsed.watchlist || [],
+        watched: parsed.watched || [],
+        progress: parsed.progress || {},
+      };
     }
+  } catch (error) {
     
-    try {
-      const saved = localStorage.getItem(getWatchlistKey());
-      if (saved) {
-        setWatchlist(JSON.parse(saved));
-      } else {
-        setWatchlist([]);
-      }
-    } catch (error) {
-      console.error('Failed to load watchlist:', error);
-      setWatchlist([]);
-    }
+  }
+  return { watchlist: [], watched: [], progress: {} };
+};
+
+const saveDataToStorage = (user, data) => {
+  try {
+    localStorage.setItem(getUserDataKey(user), JSON.stringify(data));
+  } catch (error) {
+    
+  }
+};
+
+export function useWatchlist(user) {
+  const [data, setData] = useState(() => loadDataFromStorage(user));
+
+  useEffect(() => {
+    setData(loadDataFromStorage(user));
   }, [user]);
 
-  // Save to localStorage whenever watchlist changes
   useEffect(() => {
-    if (!user) return;
-    
-    try {
-      const data = JSON.stringify(watchlist);
-      // Check if data is too large (rough estimate)
-      if (data.length > 1024 * 1024) { // 1MB limit
-        console.warn('Watchlist data too large, truncating oldest items');
-        const truncated = watchlist.slice(-50); // Keep last 50 items
-        localStorage.setItem(getWatchlistKey(), JSON.stringify(truncated));
-        setWatchlist(truncated);
-      } else {
-        localStorage.setItem(getWatchlistKey(), data);
-      }
-    } catch (error) {
-      if (error.name === 'QuotaExceededError') {
-        console.warn('localStorage quota exceeded, clearing old data');
-        try {
-          // Try to save a smaller version
-          const essential = watchlist.slice(-20).map(movie => ({
-            id: movie.id,
-            title: movie.title,
-            poster: movie.poster,
-            addedAt: movie.addedAt
-          }));
-          localStorage.setItem(getWatchlistKey(), JSON.stringify(essential));
-          setWatchlist(essential);
-        } catch (fallbackError) {
-          console.error('Failed to save even essential watchlist data:', fallbackError);
-          // Continue without localStorage
-        }
-      } else {
-        console.error('Failed to save watchlist:', error);
-      }
+    if (user) {
+      saveDataToStorage(user, data);
     }
-  }, [watchlist, user]);
+  }, [user, data]);
 
-  const addToWatchlist = (movie) => {
-    if (!movie || !movie.id) {
-      console.warn('Cannot add invalid movie to watchlist:', movie);
-      return;
-    }
-    setWatchlist(prev => {
-      const exists = prev.find(item => item.id === movie.id);
-      if (exists) return prev;
-      return [...prev, { ...movie, addedAt: Date.now() }];
+  const addToWatchlist = useCallback((movie) => {
+    if (!movie?.id) return;
+    setData(prev => {
+      if (prev.watchlist.some(item => item.id === movie.id)) {
+        return prev;
+      }
+      return { ...prev, watchlist: [...prev.watchlist, { ...movie, addedAt: Date.now() }] };
     });
-  };
+  }, []);
 
-  const removeFromWatchlist = (movieId) => {
-    if (!movieId) {
-      console.warn('Cannot remove movie without ID from watchlist');
-      return;
-    }
-    setWatchlist(prev => prev.filter(item => item.id !== movieId));
-  };
+  const removeFromWatchlist = useCallback((movieId) => {
+    if (!movieId) return;
+    setData(prev => ({
+      ...prev,
+      watchlist: prev.watchlist.filter(item => item.id !== movieId),
+    }));
+  }, []);
 
-  const isInWatchlist = (movieId) => {
+  const isInWatchlist = useCallback((movieId) => {
     if (!movieId) return false;
-    return watchlist.some(item => item.id === movieId);
-  };
+    return data.watchlist.some(item => item.id === movieId);
+  }, [data.watchlist]);
 
-  const toggleWatchlist = (movie) => {
-    if (!movie || !movie.id) {
-      console.warn('Cannot toggle invalid movie in watchlist:', movie);
-      return;
-    }
-    if (isInWatchlist(movie.id)) {
-      removeFromWatchlist(movie.id);
-    } else {
-      addToWatchlist(movie);
-    }
-  };
+  const toggleWatchlist = useCallback((movie) => {
+    if (!movie?.id) return;
+    setData(prev => {
+      const exists = prev.watchlist.some(item => item.id === movie.id);
+      if (exists) {
+        return { ...prev, watchlist: prev.watchlist.filter(item => item.id !== movie.id) };
+      }
+      return { ...prev, watchlist: [...prev.watchlist, { ...movie, addedAt: Date.now() }] };
+    });
+  }, []);
+
+  const markAsWatched = useCallback((movie) => {
+    if (!movie?.id) return;
+    setData(prev => {
+      if (prev.watched.some(item => item.id === movie.id)) {
+        return prev;
+      }
+      return { ...prev, watched: [...prev.watched, { ...movie, watchedAt: Date.now() }] };
+    });
+  }, []);
+  
+  const updateProgress = useCallback((movieId, progress) => {
+    if (!movieId) return;
+    setData(prev => ({
+      ...prev,
+      progress: {
+        ...prev.progress,
+        [movieId]: { ...progress, updatedAt: Date.now() }
+      }
+    }));
+  }, []);
+
+  const continueWatching = Object.entries(data.progress)
+    .filter(([, p]) => p.currentTime > 0 && p.currentTime / p.duration < 0.95)
+    .sort((a, b) => b[1].updatedAt - a[1].updatedAt)
+    .map(([movieId, progress]) => {
+      const movie = data.watchlist.find(m => m.id === movieId) || data.watched.find(m => m.id === movieId);
+      return movie ? { ...movie, ...progress } : null;
+    })
+    .filter(Boolean);
 
   return {
-    watchlist,
-    addToWatchlist,
-    removeFromWatchlist,
+    watchlist: data.watchlist,
+    watchedMovies: data.watched,
+    continueWatching,
     isInWatchlist,
     toggleWatchlist,
-    count: watchlist.length
+    markAsWatched,
+    updateProgress,
+    count: data.watchlist.length
   };
 }

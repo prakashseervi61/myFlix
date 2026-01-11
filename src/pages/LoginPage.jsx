@@ -33,67 +33,76 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),rgba(255,255,255,0))]"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-gray-400 hover:text-white transition-colors"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 text-gray-400 hover:text-white transition-all duration-300 z-10 p-2 rounded-full hover:bg-white/10"
       >
         <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
-      <div className="bg-gray-900 rounded-xl p-6 sm:p-8 w-full max-w-md">
+
+      <div className="futuristic-card rounded-2xl p-8 sm:p-10 w-full max-w-md relative z-10 fade-in-up">
         <div className="text-center mb-8">
-          <Link to="/" className="text-3xl font-bold text-white">myFlix</Link>
-          <h1 className="text-2xl font-bold text-white mt-4">Welcome Back</h1>
-          <p className="text-gray-400 mt-2">Sign in to your account</p>
+          <Link to="/" className="text-4xl font-bold neon-text bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">myFlix</Link>
+          <h1 className="text-2xl font-bold text-white mt-6">Welcome Back</h1>
+          <p className="text-gray-400 mt-2">Access your cinematic universe</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
+          <div className="space-y-2">
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-[#ff6f61] focus:outline-none"
+              className="w-full p-4 bg-slate-800/50 text-white rounded-xl border border-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 placeholder:text-slate-400"
             />
           </div>
 
-          <div className="relative">
+          <div className="relative space-y-2">
             <input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 bg-gray-800 text-white rounded-lg border border-gray-700 focus:border-[#ff6f61] focus:outline-none pr-12"
+              className="w-full p-4 bg-slate-800/50 text-white rounded-xl border border-slate-600 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 transition-all duration-300 placeholder:text-slate-400 pr-12"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-cyan-400 transition-colors"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm">{error}</p>
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#ff6f61] text-white py-4 rounded-lg font-semibold hover:bg-[#ff523d] transition-colors disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-cyan-500 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-cyan-400 hover:to-purple-500 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed neon-glow"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Accessing...' : 'Access Account'}
           </button>
         </form>
 
-        <p className="text-center text-gray-400 mt-6">
-          Don't have an account?{' '}
-          <Link to="/signup" className="text-[#ff6f61] hover:underline">
-            Sign up
-          </Link>
-        </p>
+        <div className="text-center mt-8">
+          <p className="text-slate-400">
+            New to myFlix?{' '}
+            <Link to="/signup" className="text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+              Create Account
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

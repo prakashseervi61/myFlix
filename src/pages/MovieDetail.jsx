@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Clock, Calendar, User, Plus, Check } from 'lucide-react';
-import { useMovieDetails } from '../hooks/useMovieDetails';
+import { ArrowLeft, Star, Clock, Calendar, Plus, Check, Film, AlertTriangle } from 'lucide-react';
+import { useMovieDetails } from '../hooks/useMovieDetails.js';
 import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 
@@ -9,201 +9,147 @@ function MovieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { movie, loading, error } = useMovieDetails(id);
-  const { isInWatchlist, toggleWatchlist } = useWatchlist();
   const { user } = useAuth();
+  const watchlistContext = useWatchlist();
+  
+  const isInWatchlist = useMemo(() => 
+    watchlistContext ? watchlistContext.isInWatchlist(id) : false, 
+    [watchlistContext, id]
+  );
 
   const handleWatchlistClick = () => {
     if (!user) {
       navigate('/login');
       return;
     }
-    toggleWatchlist(movie);
+    if (movie && watchlistContext) {
+      watchlistContext.toggleWatchlist(movie);
+    }
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-700 rounded w-32 mb-8"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-1">
-                <div className="aspect-[2/3] bg-gray-700 rounded-xl"></div>
-              </div>
-              <div className="lg:col-span-2 space-y-4">
-                <div className="h-12 bg-gray-700 rounded w-3/4"></div>
-                <div className="h-6 bg-gray-800 rounded w-1/2"></div>
-                <div className="space-y-2">
-                  <div className="h-4 bg-gray-800 rounded"></div>
-                  <div className="h-4 bg-gray-800 rounded"></div>
-                  <div className="h-4 bg-gray-800 rounded w-3/4"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !movie) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
-        <div className="text-center px-4">
-          <h1 className="text-2xl font-bold text-white mb-4">Movie Not Found</h1>
-          <p className="text-gray-400 mb-6">{error || 'The requested movie could not be found.'}</p>
-          <button
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-[#ff6f61] text-white rounded-lg hover:bg-[#ff523d] transition-colors"
-          >
-            Back to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const inWatchlist = isInWatchlist(movie.id);
+  if (loading) return <LoadingSkeleton />;
+  if (error) return <ErrorDisplay error={error} navigate={navigate} />;
+  if (!movie) return <ErrorDisplay error="Movie not found." navigate={navigate} />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-20">
-      <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-black pt-16 md:pt-24">
+      <div 
+        className="absolute top-0 left-0 w-full h-1/2 bg-cover bg-center"
+        style={{ backgroundImage: `url(${movie.backdrop})`, maskImage: 'linear-gradient(to bottom, black, transparent)' }}
+      />
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-16 left-4 sm:top-20 sm:left-6 text-gray-400 hover:text-white transition-colors z-10 p-2 sm:p-3 rounded-full border border-gray-600 hover:border-gray-400"
+          className="absolute top-0 left-4 text-white bg-black/50 p-2 rounded-full hover:bg-black/80 transition-colors"
         >
-          <ArrowLeft className="w-6 h-6 sm:w-8 sm:h-8" />
+          <ArrowLeft size={24} />
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Movie Poster */}
-          <div className="lg:col-span-1 ml-2">
-            <div className="sticky top-6">
-              {movie.poster ? (
-                <img
-                  src={movie.poster}
-                  alt={movie.title}
-                  className="w-full aspect-[2/3] object-cover rounded-xl shadow-2xl select-none pointer-events-none"
-                />
-              ) : (
-                <div className="w-full aspect-[2/3] bg-gradient-to-br from-gray-700 to-gray-800 rounded-xl flex items-center justify-center">
-                  <div className="text-center text-white/60">
-                    <div className="text-6xl mb-4">🎬</div>
-                    <p className="text-lg font-medium">{movie.title}</p>
-                  </div>
-                </div>
-              )}
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
+          <div className="md:col-span-1 lg:col-span-1">
+            <MoviePoster poster={movie.poster} title={movie.title} />
           </div>
 
-          {/* Movie Details */}
-          <div className="lg:col-span-2">
-            <div className="space-y-6">
-              {/* Title and Basic Info */}
-              <div>
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-                  {movie.title}
-                </h1>
-                
-                <div className="flex flex-wrap items-center gap-4 text-gray-300 mb-6">
-                  {movie.year && (
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{movie.year}</span>
-                    </div>
-                  )}
-                  {movie.runtime && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{movie.runtime}</span>
-                    </div>
-                  )}
-                  {movie.rating && (
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span>{movie.rating}/10</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Genres */}
-                {movie.genre && (
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {movie.genre.split(', ').map((genre, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-white/10 text-white rounded-full text-sm"
-                      >
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Action Button */}
-                <div className="mb-8">
-                  <button
-                    onClick={handleWatchlistClick}
-                    className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all touch-manipulation ${
-                      inWatchlist
-                        ? 'bg-green-600 text-white hover:bg-green-700'
-                        : 'bg-white/20 text-white hover:bg-white/30'
-                    }`}
-                  >
-                    {inWatchlist ? (
-                      <>
-                        <Check className="w-5 h-5" />
-                        <span>In My List</span>
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-5 h-5" />
-                        <span>Add to List</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Plot */}
-              {movie.plot && (
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-4">Plot</h2>
-                  <p className="text-gray-300 leading-relaxed text-lg">
-                    {movie.plot}
-                  </p>
-                </div>
-              )}
-
-              {/* Additional Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {movie.director && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                      <User className="w-5 h-5" />
-                      Director
-                    </h3>
-                    <p className="text-gray-300">{movie.director}</p>
-                  </div>
-                )}
-
-                {movie.actors && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Cast</h3>
-                    <p className="text-gray-300">{movie.actors}</p>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="md:col-span-2 lg:col-span-3 space-y-6">
+            <MovieDetailsHeader movie={movie} />
+            <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
+            <MoviePlot plot={movie.plot} />
+            <MovieDetailsGrid movie={movie} />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+const LoadingSkeleton = () => (
+  <div className="min-h-screen bg-black pt-24">
+    <div className="container mx-auto px-4 py-8">
+      <div className="animate-pulse grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="md:col-span-1 lg:col-span-1">
+          <div className="aspect-[2/3] bg-gray-800 rounded-lg"></div>
+        </div>
+        <div className="md:col-span-2 lg:col-span-3 space-y-6">
+          <div className="h-10 bg-gray-800 rounded w-3/4"></div>
+          <div className="h-6 bg-gray-800 rounded w-1/2"></div>
+          <div className="h-24 bg-gray-800 rounded"></div>
+          <div className="h-12 bg-gray-800 rounded-lg w-40"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const ErrorDisplay = ({ error, navigate }) => (
+  <div className="min-h-screen bg-black flex items-center justify-center text-center px-4">
+    <div className="glass-morphism p-8 rounded-xl max-w-md">
+      <AlertTriangle className="mx-auto text-red-500 mb-4" size={48} />
+      <h1 className="text-2xl font-bold text-white mb-2">Movie Not Found</h1>
+      <p className="text-gray-400 mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
+      <button
+        onClick={() => navigate('/')}
+        className="px-6 py-2 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors"
+      >
+        Back to Home
+      </button>
+    </div>
+  </div>
+);
+
+const MoviePoster = ({ poster, title }) => (
+  <div className="sticky top-24">
+    {poster ? (
+      <img src={poster} alt={title} className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" />
+    ) : (
+      <div className="w-full aspect-[2/3] bg-gray-800 rounded-lg flex items-center justify-center">
+        <Film className="text-gray-500" size={64} />
+      </div>
+    )}
+  </div>
+);
+
+const MovieDetailsHeader = ({ movie }) => (
+  <div>
+    <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">{movie.title}</h1>
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-gray-400">
+      {movie.year && <span className="flex items-center gap-1"><Calendar size={14} /> {movie.year}</span>}
+      {movie.runtime && <span className="flex items-center gap-1"><Clock size={14} /> {movie.runtime}</span>}
+      {movie.rating && <span className="flex items-center gap-1"><Star size={14} className="text-yellow-400" /> {movie.rating}/10</span>}
+    </div>
+    {movie.genre && <div className="mt-4 flex flex-wrap gap-2">{movie.genre.split(', ').map(g => <span key={g} className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-xs">{g}</span>)}</div>}
+  </div>
+);
+
+const WatchlistButton = ({ inWatchlist, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all w-full sm:w-auto ${
+      inWatchlist
+        ? 'bg-green-600 text-white hover:bg-green-700'
+        : 'bg-white/10 text-white hover:bg-white/20'
+    }`}
+  >
+    {inWatchlist ? <Check size={20} /> : <Plus size={20} />}
+    <span>{inWatchlist ? 'In My List' : 'Add to List'}</span>
+  </button>
+);
+
+const MoviePlot = ({ plot }) => plot && (
+  <div>
+    <h2 className="text-xl font-bold text-white mb-2">Plot</h2>
+    <p className="text-gray-300 leading-relaxed">{plot}</p>
+  </div>
+);
+
+const MovieDetailsGrid = ({ movie }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-800">
+    {movie.director && <div><h3 className="font-semibold text-white">Director</h3><p className="text-gray-400">{movie.director}</p></div>}
+    {movie.actors && <div><h3 className="font-semibold text-white">Cast</h3><p className="text-gray-400">{movie.actors}</p></div>}
+  </div>
+);
 
 export default MovieDetail;

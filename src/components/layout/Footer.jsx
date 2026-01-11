@@ -9,7 +9,7 @@ function Footer() {
     <footer className="relative mt-20 glass-morphism border-t border-white/10">
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <button
@@ -75,7 +75,7 @@ function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center">
+        <div className="border-t border-white/10 mt-8 pt-6 md:mt-12 md:pt-8 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-white/50 text-sm">
             © {currentYear} myFlix. All rights reserved.
           </p>

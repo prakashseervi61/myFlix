@@ -8,12 +8,6 @@ class TMDBService {
   constructor() {
     this.cache = new Map();
     this.cacheTimeout = 10 * 60 * 1000;
-    this.requestCount = 0;
-    this.lastRequestTime = 0;
-  }
-
-  isAvailable() {
-    return apiConfig.hasTmdbKeys();
   }
 
   buildUrl(endpoint, params = {}) {
@@ -30,16 +24,6 @@ class TMDBService {
     return url.toString();
   }
 
-  async throttleRequest() {
-    const now = Date.now();
-    const timeSinceLastRequest = now - this.lastRequestTime;
-    if (timeSinceLastRequest < 50) {
-      await new Promise(resolve => setTimeout(resolve, 50 - timeSinceLastRequest));
-    }
-    this.lastRequestTime = Date.now();
-    this.requestCount++;
-  }
-
   async request(url, cacheKey, signal) {
     if (cacheKey && this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
@@ -48,31 +32,15 @@ class TMDBService {
       }
     }
 
-    await this.throttleRequest();
-
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
     const combinedSignal = signal ? this.combineAbortSignals([signal, controller.signal]) : controller.signal;
 
     try {
-      const response = await fetch(url, { 
-        signal: combinedSignal,
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'myFlix/1.0'
-        }
-      });
-      
+      const response = await fetch(url, { signal: combinedSignal });
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        if (response.status === 401) {
-          apiConfig.rotateTmdbKey();
-          throw new Error('Invalid API key');
-        }
-        if (response.status === 429) {
-          throw new Error('Rate limit exceeded');
-        }
         throw new Error(`TMDB API error: ${response.status}`);
       }
 
@@ -83,9 +51,7 @@ class TMDBService {
       return data;
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        throw new Error('Request cancelled');
-      }
+      if (error.name === 'AbortError') return { results: [] };
       throw error;
     }
   }
@@ -102,58 +68,49 @@ class TMDBService {
     return controller.signal;
   }
 
+  normalizeMovieData(movie) {
+    if (!movie || !movie.poster_path || !movie.title || movie.popularity === 0) {
+      return null;
+    }
+    return {
+      id: movie.id.toString(),
+      title: movie.title,
+      year: movie.release_date ? movie.release_date.split('-')[0] : 'N/A',
+      poster: `${IMAGE_BASE_URL}${movie.poster_path}`,
+      rating: movie.vote_average.toFixed(1),
+      plot: movie.overview,
+    };
+  }
+
+  async getTrendingMovies(signal) {
+    const url = this.buildUrl('/trending/movie/week');
+    const data = await this.request(url, 'trending_movies', signal);
+    return data.results.map(this.normalizeMovieData).filter(Boolean);
+  }
+
+  async getMoviesByGenre(genreId, signal) {
+    const params = {
+      with_genres: genreId,
+      sort_by: 'popularity.desc',
+      include_adult: false,
+      page: 1,
+    };
+    const url = this.buildUrl('/discover/movie', params);
+    const cacheKey = `genre_${genreId}`;
+    const data = await this.request(url, cacheKey, signal);
+    return data.results.map(this.normalizeMovieData).filter(Boolean);
+  }
+
   async searchMovies(query, page = 1, signal) {
-    if (!this.isAvailable()) {
-      return { results: [], total_results: 0 };
-    }
-    
     const url = this.buildUrl('/search/movie', { query, page });
-    const cacheKey = `tmdb_search_${query}_${page}`;
-    
-    try {
-      const data = await this.request(url, cacheKey, signal);
-      return {
-        results: data.results || [],
-        total_results: data.total_results || 0
-      };
-    } catch (error) {
-      console.warn('TMDB search failed:', error.message);
-      return { results: [], total_results: 0 };
-    }
+    const data = await this.request(url, `search_${query}_${page}`, signal);
+    return data.results.map(this.normalizeMovieData).filter(Boolean);
   }
 
   async getMovieById(id, signal) {
-    if (!this.isAvailable()) {
-      throw new Error('TMDB API not available');
-    }
-    
-    const url = this.buildUrl(`/movie/${id}`);
-    const cacheKey = `tmdb_movie_${id}`;
-    
-    try {
-      return await this.request(url, cacheKey, signal);
-    } catch (error) {
-      console.warn('TMDB movie fetch failed:', error.message);
-      throw error;
-    }
-  }
-
-  formatMovie(movie) {
-    if (!movie) return null;
-    
-    return {
-      id: movie.id?.toString(),
-      title: movie.title || movie.original_title,
-      year: movie.release_date ? new Date(movie.release_date).getFullYear().toString() : null,
-      poster: movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : null,
-      genre: movie.genres ? movie.genres.map(g => g.name).join(', ') : null,
-      rating: movie.vote_average ? parseFloat(movie.vote_average.toFixed(1)) : null,
-      plot: movie.overview || null,
-      runtime: movie.runtime ? `${movie.runtime} min` : null,
-      director: null,
-      actors: null,
-      type: 'movie'
-    };
+    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos' });
+    const data = await this.request(url, `movie_${id}`, signal);
+    return this.normalizeMovieData(data);
   }
 }
 

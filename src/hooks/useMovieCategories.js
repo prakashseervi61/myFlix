@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { apiService } from '../services/apiService.js';
 
 const CATEGORIES = {
-  trending: ['avengers', 'marvel'],
-  action: ['action', 'fast and furious'],
-  comedy: ['comedy', 'lol'],
-  drama: ['drama', 'oscar winner'],
-  horror: ['horror', 'scary'],
-  romance: ['romance', 'love story']
+  'Trending Now': null,
+  Action: 28,
+  Comedy: 35,
+  Drama: 18,
+  Horror: 27,
+  Romance: 10749,
 };
 
 const initialState = Object.keys(CATEGORIES).reduce((acc, key) => {
@@ -20,15 +20,18 @@ export function useMovieCategories() {
 
   useEffect(() => {
     const abortController = new AbortController();
-    const signal = abortController.signal;
+    const { signal } = abortController;
 
-    const fetchCategory = async (key, searchTerms) => {
+    const fetchCategory = async (categoryName, genreId) => {
       try {
-        const term = searchTerms[0];
-        const result = await apiService.searchMovies(term, 1, signal);
-        const movies = (result.Search || []).slice(0, 10);
+        let movies;
+        if (categoryName === 'Trending Now') {
+          movies = await apiService.getTrendingMovies(signal);
+        } else {
+          movies = await apiService.getMoviesByGenre(genreId, signal);
+        }
         return {
-          key,
+          key: categoryName,
           data: {
             movies,
             loading: false,
@@ -38,7 +41,7 @@ export function useMovieCategories() {
       } catch (error) {
         if (signal.aborted) return null;
         return {
-          key,
+          key: categoryName,
           data: {
             movies: [],
             loading: false,
@@ -49,8 +52,8 @@ export function useMovieCategories() {
     };
 
     const fetchAllCategories = async () => {
-      const promises = Object.entries(CATEGORIES).map(([key, searchTerms]) =>
-        fetchCategory(key, searchTerms)
+      const promises = Object.entries(CATEGORIES).map(([name, id]) =>
+        fetchCategory(name, id)
       );
       
       const results = await Promise.all(promises);

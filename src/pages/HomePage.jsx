@@ -5,12 +5,12 @@ import Row from '../components/sections/Row';
 import { useMovies } from '../contexts/MovieContext';
 
 const MOVIE_CATEGORIES = [
-  { key: 'trending', title: 'Trending Now' },
-  { key: 'action', title: 'Action & Adventure' },
-  { key: 'comedy', title: 'Comedy' },
-  { key: 'drama', title: 'Drama' },
-  { key: 'horror', title: 'Horror' },
-  { key: 'romance', title: 'Romance' },
+  { key: 'Trending Now', title: 'Trending Now' },
+  { key: 'Action', title: 'Action' },
+  { key: 'Comedy', title: 'Comedy' },
+  { key: 'Drama', title: 'Drama' },
+  { key: 'Horror', title: 'Horror' },
+  { key: 'Romance', title: 'Romance' },
 ];
 
 function HomePage() {
@@ -33,7 +33,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen">
-      <HeroSection movies={categories.trending?.movies || []} />
+      <HeroSection movies={categories['Trending Now']?.movies || []} />
       <main className="relative z-10 bg-gray-900 pt-8">
         {hasError ? <ErrorDisplay /> : <MovieRows categories={categories} onMovieClick={handleMovieClick} />}
       </main>

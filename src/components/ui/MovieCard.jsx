@@ -1,15 +1,24 @@
 import React, { useState, useCallback } from "react";
-import { Star, Plus, Check, Play, Film } from "lucide-react";
+import { Plus, Check, Play, Film, Info, Eye } from "lucide-react";
 import { useMovieCardLogic } from '../../hooks/useMovieCardLogic.js';
+import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
 
 function MovieCard({ movie, onClick }) {
   const { inWatchlist, handleWatchlistClick } = useMovieCardLogic(movie);
+  const { openModal } = usePreviewModal();
   const [imageError, setImageError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const handleCardClick = useCallback((e) => {
     e.preventDefault();
     if (onClick) onClick(movie);
   }, [movie, onClick]);
+
+  const handlePreviewClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openModal(movie);
+  }, [movie, openModal]);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -21,28 +30,94 @@ function MovieCard({ movie, onClick }) {
 
   return (
     <div
-      className="relative w-full aspect-[2/3] rounded-lg overflow-hidden cursor-pointer bg-gray-800 shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 hover:z-10 focus-within:scale-105 focus-within:z-10"
+      className="group/card relative w-full aspect-[2/3] rounded-lg sm:rounded-xl bg-gray-900 shadow-sm ring-1 ring-white/5 
+        transition-all duration-300 ease-out will-change-transform
+        md:hover:scale-105 md:hover:z-20 md:hover:shadow-2xl md:hover:ring-white/20 md:hover:-translate-y-1.5
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:scale-105 focus-visible:z-20"
       onClick={handleCardClick}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="button"
       aria-label={`View details for ${movie.title}`}
     >
-      <Image poster={movie.poster} title={movie.title} imageError={imageError} setImageError={setImageError} />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-      <CardContent movie={movie} inWatchlist={inWatchlist} onWatchlistClick={handleWatchlistClick} onPlayClick={handleCardClick} />
+      <div className={`w-full h-full bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden relative isolate`}>
+         {/* Image Container */}
+        <div className={`w-full h-full transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+          <Image 
+            poster={movie.poster} 
+            title={movie.title} 
+            imageError={imageError} 
+            setImageError={setImageError}
+            onLoad={() => setIsLoaded(true)}
+          />
+        </div>
+        
+        {/* Skeleton/Loader while image loads - reduces perceived latency */}
+        {!isLoaded && !imageError && (
+          <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+        )}
+      </div>
+
+      {/* Desktop Hover Overlay - Gradient & Actions */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-300 rounded-lg sm:rounded-xl flex flex-col justify-end p-4">
+        <div className="transform translate-y-4 md:group-hover/card:translate-y-0 transition-transform duration-300 will-change-transform">
+           <h3 className="font-bold text-white text-base mb-1 line-clamp-2 leading-tight">{movie.title}</h3>
+           <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
+             <span className="text-green-400 font-semibold">{movie.rating ? `${(parseFloat(movie.rating) * 10).toFixed(0)}% Match` : ''}</span>
+             <span className="border border-gray-600 px-1 rounded text-[10px] uppercase">{movie.year || 'N/A'}</span>
+           </div>
+           
+           <div className="flex items-center gap-2">
+             <button 
+               onClick={handlePreviewClick}
+               className="flex-1 bg-white text-black py-2 rounded-md font-bold text-xs flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
+               tabIndex={-1}
+             >
+               <Eye size={14} className="stroke-black" /> Quick View
+             </button>
+             <button
+                onClick={(e) => { e.stopPropagation(); handleWatchlistClick(e); }}
+                className="p-2 border border-gray-500 rounded-full hover:border-white hover:bg-white/10 text-white transition-colors"
+                title={inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+                tabIndex={-1}
+             >
+               {inWatchlist ? <Check size={16} /> : <Plus size={16} />}
+             </button>
+           </div>
+        </div>
+      </div>
+
+      {/* Mobile/Touch Content - Always Visible */}
+      <div className="md:hidden absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-100 rounded-lg sm:rounded-xl pointer-events-none">
+        <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end h-full">
+           <h3 className="font-bold text-xs text-white mb-1 line-clamp-1 text-shadow">{movie.title}</h3>
+           <div className="flex items-center gap-2 pointer-events-auto">
+             <button 
+               onClick={handlePreviewClick}
+               className="flex-1 bg-white/10 backdrop-blur-md text-white text-[10px] px-2 py-1.5 rounded border border-white/20 flex items-center justify-center gap-1 font-medium"
+             >
+               <Info size={12} /> Info
+             </button>
+             <button 
+               onClick={(e) => { e.stopPropagation(); handleWatchlistClick(e); }}
+               className={`w-8 h-8 flex items-center justify-center rounded border backdrop-blur-md transition-colors ${inWatchlist ? 'bg-green-600 border-green-600 text-white' : 'bg-black/40 border-white/30 text-white'}`}
+               aria-label={inWatchlist ? "Remove from Watchlist" : "Add to Watchlist"}
+             >
+               {inWatchlist ? <Check size={14} /> : <Plus size={14} />}
+             </button>
+           </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-const Image = ({ poster, title, imageError, setImageError }) => {
+const Image = ({ poster, title, imageError, setImageError, onLoad }) => {
   if (imageError || !poster) {
     return (
-      <div className="w-full h-full flex items-center justify-center text-center text-gray-400 p-4">
-        <div>
-          <Film size={40} className="mx-auto mb-2" />
-          <p className="text-sm font-semibold">{title}</p>
-        </div>
+      <div className="w-full h-full flex flex-col items-center justify-center text-center text-gray-500 p-2 bg-gray-800">
+        <Film size={24} className="mb-1 opacity-50" />
+        <p className="text-[10px] font-medium line-clamp-2">{title}</p>
       </div>
     );
   }
@@ -50,49 +125,14 @@ const Image = ({ poster, title, imageError, setImageError }) => {
     <img
       src={poster}
       alt={title}
+      loading="lazy"
+      decoding="async"
+      onLoad={onLoad}
       onError={() => setImageError(true)}
-      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+      className="w-full h-full object-cover"
       draggable={false}
     />
   );
 };
-
-const CardContent = ({ movie, inWatchlist, onWatchlistClick, onPlayClick }) => (
-  <div className="absolute inset-0 p-4 flex flex-col justify-end opacity-0 hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
-    <div className="transform transition-transform duration-300 hover:translate-y-0 focus-within:translate-y-0 translate-y-4">
-      <h3 className="font-bold text-lg text-white mb-1 line-clamp-2">{movie.title}</h3>
-      <div className="flex items-center gap-2 text-xs text-gray-300 mb-3">
-        {movie.rating && (
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
-            <span>{movie.rating}</span>
-          </div>
-        )}
-        {movie.year && <span>{movie.year}</span>}
-      </div>
-      <div className="flex items-center gap-2">
-        <button
-          onClick={(e) => { e.stopPropagation(); onWatchlistClick(e); }}
-          aria-label={inWatchlist ? "Remove from watchlist" : "Add to watchlist"}
-          className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
-            inWatchlist 
-              ? 'bg-green-600 text-white hover:bg-green-700' 
-              : 'bg-white/20 text-white hover:bg-white/30'
-          }`}
-        >
-          {inWatchlist ? <Check size={18} /> : <Plus size={18} />}
-        </button>
-        <button
-          onClick={onPlayClick}
-          aria-label={`Play ${movie.title}`}
-          className="flex-1 flex items-center justify-center gap-2 h-9 px-4 bg-red-600 text-white rounded-full text-sm font-semibold hover:bg-red-700 transition-colors"
-        >
-          <Play size={16} fill="currentColor"/>
-          <span>Play</span>
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 export default React.memo(MovieCard);

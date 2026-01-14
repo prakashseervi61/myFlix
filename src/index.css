@@ -8,16 +8,6 @@
   --bg-primary: #0a101f;
   --bg-secondary: #1a2233;
   --bg-tertiary: #2a3447;
-  --bg-overlay: rgba(10, 16, 31, 0.95);
-
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-disabled: #64748b;
-
-  --border-color: rgba(148, 163, 184, 0.2);
-  --hover-bg: rgba(203, 213, 225, 0.1);
-  --focus-ring: rgba(6, 182, 212, 0.6);
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -28,44 +18,17 @@
   --font-size-3xl: 1.875rem;
   --font-size-4xl: 2.25rem;
 
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
+}
+
+body {
+  background-color: #0f172a; /* Slate-950 fallback */
+  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--text-primary);
   font-weight: 600;
   line-height: 1.2;
-}
-
-p, span, div {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.text-muted {
-  color: var(--text-muted);
-}
-
-.skip-link {
-  position: absolute;
-  top: -4rem;
-  left: 0.5rem;
-  background: var(--color-primary);
-  color: var(--bg-primary);
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  border-radius: 0.25rem;
-  z-index: 9999;
-  font-weight: 600;
-  transition: top 0.3s ease-in-out;
-}
-
-.skip-link:focus {
-  top: 0.5rem;
 }
 
 .scrollbar-hide {
@@ -77,119 +40,56 @@ p, span, div {
 }
 
 .glass-morphism {
-  background: rgba(26, 34, 51, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-*:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-  border-radius: 0.25rem;
-}
-
-button, .interactive {
-  transition: all 0.2s ease-in-out;
-}
-
-button:hover:not(:disabled),
-.interactive:hover {
-  background-color: var(--hover-bg);
-  transform: translateY(-2px);
-}
-
-button:active,
-.interactive:active {
-  transform: translateY(0);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .fade-in-up {
-    animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(1rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.loading-skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-secondary) 25%,
-    var(--bg-tertiary) 50%,
-    var(--bg-secondary) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-@media (max-width: 768px) {
-  input[type="text"], 
-  input[type="search"], 
-  input[type="email"], 
-  input[type="password"] {
-    font-size: 16px !important;
-  }
-  
-  button, .interactive {
-    min-height: 48px;
-    min-width: 48px;
-  }
-}
-
+/* Custom Scrollbar for non-hidden areas */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary);
+  background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--bg-tertiary);
-  border-radius: 5px;
-  border: 2px solid var(--bg-primary);
+  background-color: #334155;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-primary);
+  background-color: #475569;
 }
 
-@media (prefers-contrast: high) {
-  :root {
-    --text-primary: #ffffff;
-    --text-secondary: #ffffff;
-    --text-muted: #e6e6e6;
-    --border-color: rgba(255, 255, 255, 0.6);
-    --bg-primary: #000000;
-    --bg-secondary: #1a1a1a;
-  }
-  
-  .glass-morphism {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid var(--color-primary);
-  }
+/* Animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
 
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--color-primary);
-  }
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-bottom {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-in {
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+.fade-in {
+  animation-name: fade-in;
+}
+
+.slide-in-from-bottom-4 {
+  animation-name: slide-in-bottom;
 }

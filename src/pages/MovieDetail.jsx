@@ -35,28 +35,47 @@ function MovieDetail() {
   if (error) return <ErrorDisplay error={error} navigate={navigate} />;
   if (!movie) return <ErrorDisplay error="Movie not found." navigate={navigate} />;
 
+  const backdropUrl = movie.backdrop || movie.poster;
+
   return (
-    <div className="min-h-screen bg-black pt-16 md:pt-24">
-      <div 
-        className="absolute top-0 left-0 w-full h-1/2 bg-cover bg-center"
-        style={{ backgroundImage: `url(${movie.backdrop})`, maskImage: 'linear-gradient(to bottom, black, transparent)' }}
-      />
-      <div className="container mx-auto px-4 py-8 relative z-10">
+    <div className="min-h-screen bg-black pt-0">
+      {/* Mobile-first Hero Header */}
+      <div className="relative w-full aspect-video md:aspect-[21/9] lg:h-[50vh]">
+         <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${backdropUrl})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+        </div>
+        
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-0 left-4 text-white bg-black/50 p-2 rounded-full hover:bg-black/80 transition-colors"
+          className="absolute top-4 left-4 z-20 text-white bg-black/40 backdrop-blur-md p-2 rounded-full hover:bg-black/60 transition-colors border border-white/10"
         >
-          <ArrowLeft size={24} />
+          <ArrowLeft size={20} />
         </button>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 md:gap-12">
-          <div className="md:col-span-1 lg:col-span-1">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-12 md:-mt-32">
+        <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+          {/* Poster - Hidden on very small screens, shown on md+ */}
+          <div className="hidden md:block w-48 lg:w-64 flex-shrink-0">
             <MoviePoster poster={movie.poster} title={movie.title} />
           </div>
 
-          <div className="md:col-span-2 lg:col-span-3 space-y-6">
+          {/* Mobile Poster (smaller, overlapping header) */}
+          <div className="md:hidden w-28 -mt-16 mb-2 rounded-lg shadow-2xl ring-2 ring-black ml-2">
+             <img src={movie.poster} alt={movie.title} className="w-full rounded-lg" />
+          </div>
+
+          <div className="flex-1 space-y-4 md:space-y-6 pb-12">
             <MovieDetailsHeader movie={movie} />
-            <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
+            
+            <div className="flex items-center gap-3">
+               <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
+            </div>
+
             <MoviePlot plot={movie.plot} />
             <MovieDetailsGrid movie={movie} />
           </div>
@@ -67,17 +86,15 @@ function MovieDetail() {
 }
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-black pt-24">
+  <div className="min-h-screen bg-black pt-20">
+    <div className="w-full aspect-video bg-gray-900 animate-pulse" />
     <div className="container mx-auto px-4 py-8">
-      <div className="animate-pulse grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        <div className="md:col-span-1 lg:col-span-1">
-          <div className="aspect-[2/3] bg-gray-800 rounded-lg"></div>
-        </div>
-        <div className="md:col-span-2 lg:col-span-3 space-y-6">
-          <div className="h-10 bg-gray-800 rounded w-3/4"></div>
-          <div className="h-6 bg-gray-800 rounded w-1/2"></div>
-          <div className="h-24 bg-gray-800 rounded"></div>
-          <div className="h-12 bg-gray-800 rounded-lg w-40"></div>
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="hidden md:block w-48 h-72 bg-gray-900 rounded-lg animate-pulse" />
+        <div className="flex-1 space-y-4">
+          <div className="h-8 bg-gray-900 rounded w-3/4 animate-pulse" />
+          <div className="h-4 bg-gray-900 rounded w-1/2 animate-pulse" />
+          <div className="h-24 bg-gray-900 rounded animate-pulse" />
         </div>
       </div>
     </div>
@@ -86,13 +103,13 @@ const LoadingSkeleton = () => (
 
 const ErrorDisplay = ({ error, navigate }) => (
   <div className="min-h-screen bg-black flex items-center justify-center text-center px-4">
-    <div className="glass-morphism p-8 rounded-xl max-w-md">
-      <AlertTriangle className="mx-auto text-red-500 mb-4" size={48} />
-      <h1 className="text-2xl font-bold text-white mb-2">Movie Not Found</h1>
-      <p className="text-gray-400 mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
+    <div className="glass-morphism p-6 md:p-8 rounded-xl max-w-md w-full border border-white/10">
+      <AlertTriangle className="mx-auto text-red-500 mb-4" size={40} />
+      <h1 className="text-xl md:text-2xl font-bold text-white mb-2">Movie Not Found</h1>
+      <p className="text-gray-400 text-sm md:text-base mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
       <button
         onClick={() => navigate('/')}
-        className="px-6 py-2 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors"
+        className="w-full px-6 py-3 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-500 transition-colors"
       >
         Back to Home
       </button>
@@ -101,12 +118,12 @@ const ErrorDisplay = ({ error, navigate }) => (
 );
 
 const MoviePoster = ({ poster, title }) => (
-  <div className="sticky top-24">
+  <div className="relative rounded-lg shadow-2xl ring-1 ring-white/10 overflow-hidden bg-gray-800">
     {poster ? (
-      <img src={poster} alt={title} className="w-full aspect-[2/3] object-cover rounded-lg shadow-lg" />
+      <img src={poster} alt={title} className="w-full aspect-[2/3] object-cover" />
     ) : (
-      <div className="w-full aspect-[2/3] bg-gray-800 rounded-lg flex items-center justify-center">
-        <Film className="text-gray-500" size={64} />
+      <div className="w-full aspect-[2/3] flex items-center justify-center">
+        <Film className="text-gray-600" size={48} />
       </div>
     )}
   </div>
@@ -114,41 +131,61 @@ const MoviePoster = ({ poster, title }) => (
 
 const MovieDetailsHeader = ({ movie }) => (
   <div>
-    <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight">{movie.title}</h1>
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-gray-400">
-      {movie.year && <span className="flex items-center gap-1"><Calendar size={14} /> {movie.year}</span>}
-      {movie.runtime && <span className="flex items-center gap-1"><Clock size={14} /> {movie.runtime}</span>}
-      {movie.rating && <span className="flex items-center gap-1"><Star size={14} className="text-yellow-400" /> {movie.rating}/10</span>}
+    <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-2">{movie.title}</h1>
+    
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-400">
+      {movie.year && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-cyan-500" /> {movie.year}</span>}
+      {movie.runtime && <span className="flex items-center gap-1.5"><Clock size={14} className="text-cyan-500" /> {movie.runtime}</span>}
+      {movie.rating && <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-500 fill-yellow-500" /> {movie.rating}</span>}
     </div>
-    {movie.genre && <div className="mt-4 flex flex-wrap gap-2">{movie.genre.split(', ').map(g => <span key={g} className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-xs">{g}</span>)}</div>}
+    
+    {movie.genre && (
+      <div className="mt-4 flex flex-wrap gap-2">
+        {movie.genre.split(', ').map(g => (
+          <span key={g} className="px-2.5 py-1 bg-gray-800 border border-gray-700 text-gray-300 rounded-md text-[10px] sm:text-xs font-medium uppercase tracking-wide">
+            {g}
+          </span>
+        ))}
+      </div>
+    )}
   </div>
 );
 
 const WatchlistButton = ({ inWatchlist, onClick }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all w-full sm:w-auto ${
+    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all w-full md:w-auto active:scale-95 ${
       inWatchlist
-        ? 'bg-green-600 text-white hover:bg-green-700'
-        : 'bg-white/10 text-white hover:bg-white/20'
+        ? 'bg-green-600 text-white hover:bg-green-500 shadow-lg shadow-green-900/20'
+        : 'bg-white text-black hover:bg-gray-200'
     }`}
   >
-    {inWatchlist ? <Check size={20} /> : <Plus size={20} />}
-    <span>{inWatchlist ? 'In My List' : 'Add to List'}</span>
+    {inWatchlist ? <Check size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
+    <span>{inWatchlist ? 'In Your List' : 'Add to List'}</span>
   </button>
 );
 
 const MoviePlot = ({ plot }) => plot && (
-  <div>
-    <h2 className="text-xl font-bold text-white mb-2">Plot</h2>
-    <p className="text-gray-300 leading-relaxed">{plot}</p>
+  <div className="bg-gray-900/50 p-4 rounded-xl border border-white/5">
+    <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">Plot</h2>
+    <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{plot}</p>
   </div>
 );
 
 const MovieDetailsGrid = ({ movie }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 pt-4 border-t border-gray-800">
-    {movie.director && <div><h3 className="font-semibold text-white">Director</h3><p className="text-gray-400">{movie.director}</p></div>}
-    {movie.actors && <div><h3 className="font-semibold text-white">Cast</h3><p className="text-gray-400">{movie.actors}</p></div>}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+    {movie.director && (
+      <div className="bg-gray-900/30 p-3 rounded-lg border border-white/5">
+        <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-1">Director</h3>
+        <p className="text-white font-medium">{movie.director}</p>
+      </div>
+    )}
+    {movie.actors && (
+      <div className="bg-gray-900/30 p-3 rounded-lg border border-white/5">
+        <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-1">Cast</h3>
+        <p className="text-white font-medium">{movie.actors}</p>
+      </div>
+    )}
   </div>
 );
 

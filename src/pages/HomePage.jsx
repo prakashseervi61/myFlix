@@ -27,10 +27,6 @@ function HomePage() {
   const hasData = Object.values(categories).some(cat => cat.movies.length > 0);
   const hasError = Object.values(categories).some(cat => cat.error && cat.error !== 'No movies found.');
 
-  if (isLoading && !hasData) {
-    return <LoadingSkeleton />;
-  }
-
   return (
     <div className="min-h-screen">
       <HeroSection movies={categories['Trending Now']?.movies || []} />
@@ -52,26 +48,6 @@ const MovieRows = ({ categories, onMovieClick }) => (
         onMovieClick={onMovieClick}
       />
     ))}
-  </div>
-);
-
-const LoadingSkeleton = () => (
-  <div className="min-h-screen">
-    <div className="h-screen bg-gray-900 animate-pulse"></div>
-    <div className="space-y-8 md:space-y-12 py-12 -mt-24">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div key={index} className="px-4 sm:px-6 lg:px-8">
-          <div className="h-8 bg-gray-800 rounded-md w-1/4 mb-4"></div>
-          <div className="flex gap-4 overflow-hidden">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="w-40 sm:w-48 md:w-56 flex-shrink-0">
-                <div className="w-full aspect-[2/3] rounded-lg bg-gray-800"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
   </div>
 );
 

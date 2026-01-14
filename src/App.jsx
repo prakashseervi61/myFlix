@@ -1,21 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
-import MovieDetail from './pages/MovieDetail';
-import BrowsePage from './pages/BrowsePage.jsx';
-import SearchPage from './pages/SearchPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
-import PlaceholderPage from './pages/PlaceholderPage';
-import LegalPage from './pages/LegalPage';
 import ErrorBoundary from './components/ErrorBoundary';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import WatchlistPage from './pages/WatchlistPage';
-import HomePage from './pages/HomePage';
 import { AuthProvider } from './hooks/useAuth.jsx';
 import { MovieProvider } from './contexts/MovieContext.jsx';
 import { WatchlistProvider } from './contexts/WatchlistContext.jsx';
+import { PreviewModalProvider } from './contexts/PreviewModalContext.jsx';
+import MoviePreviewModal from './components/ui/MoviePreviewModal.jsx';
+
+// Lazy load pages for performance (Code Splitting)
+const HomePage = lazy(() => import('./pages/HomePage'));
+const BrowsePage = lazy(() => import('./pages/BrowsePage'));
+const SearchPage = lazy(() => import('./pages/SearchPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const MovieDetail = lazy(() => import('./pages/MovieDetail'));
+const WatchlistPage = lazy(() => import('./pages/WatchlistPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage'));
+const LegalPage = lazy(() => import('./pages/LegalPage'));
+const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
+
+const PageLoader = () => (
+  <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+    <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+  </div>
+);
 
 function App() {
   const location = useLocation();
@@ -30,26 +40,31 @@ function App() {
       <AuthProvider>
         <MovieProvider>
           <WatchlistProvider>
-            <div className="min-h-screen bg-gray-900 text-white">
-              {!isAuthPage && <Header />}
-              <main>
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/browse" element={<BrowsePage />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/movie/:id" element={<MovieDetail />} />
-                  <Route path="/watchlist" element={<WatchlistPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/signup" element={<SignupPage />} />
-                  <Route path="/privacy" element={<LegalPage type="privacy" />} />
-                  <Route path="/terms" element={<LegalPage type="terms" />} />
-                  <Route path="/cookies" element={<LegalPage type="cookies" />} />
-                  <Route path="*" element={<PlaceholderPage />} />
-                </Routes>
-              </main>
-              {!isAuthPage && <Footer />}
-            </div>
+            <PreviewModalProvider>
+              <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+                {!isAuthPage && <Header />}
+                <main className="flex-1">
+                  <Suspense fallback={<PageLoader />}>
+                    <Routes>
+                      <Route path="/" element={<HomePage />} />
+                      <Route path="/browse" element={<BrowsePage />} />
+                      <Route path="/search" element={<SearchPage />} />
+                      <Route path="/profile" element={<ProfilePage />} />
+                      <Route path="/movie/:id" element={<MovieDetail />} />
+                      <Route path="/watchlist" element={<WatchlistPage />} />
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/signup" element={<SignupPage />} />
+                      <Route path="/privacy" element={<LegalPage type="privacy" />} />
+                      <Route path="/terms" element={<LegalPage type="terms" />} />
+                      <Route path="/cookies" element={<LegalPage type="cookies" />} />
+                      <Route path="*" element={<PlaceholderPage />} />
+                    </Routes>
+                  </Suspense>
+                </main>
+                {!isAuthPage && <Footer />}
+                <MoviePreviewModal />
+              </div>
+            </PreviewModalProvider>
           </WatchlistProvider>
         </MovieProvider>
       </AuthProvider>

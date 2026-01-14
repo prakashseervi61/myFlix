@@ -1,91 +1,97 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Github, Twitter, Facebook, Instagram, Mail } from 'lucide-react';
 
 function Footer() {
   const navigate = useNavigate();
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-20 glass-morphism border-t border-white/10">
-      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none"></div>
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <button
-              onClick={() => navigate('/')}
-              className="text-3xl font-bold text-white hover:scale-105 transition-transform mb-4"
-            >
-              myFlix
-            </button>
-            <p className="text-white/60 text-lg mb-6 max-w-md">
-              Your ultimate destination for discovering and enjoying the best movies and series from around the world.
+    <footer className="relative mt-auto bg-gray-950 border-t border-white/5 pt-10 pb-6 text-sm">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8 mb-8">
+          
+          <div className="col-span-2 lg:col-span-2">
+            <div className="flex items-center gap-2 mb-3">
+               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+                 <span className="font-bold text-white text-base sm:text-lg">m</span>
+               </div>
+               <span className="text-lg sm:text-xl font-bold text-white tracking-tight">myFlix</span>
+            </div>
+            <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 max-w-sm">
+              Your premium destination for streaming entertainment.
             </p>
-            <div className="flex space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-full flex items-center justify-center neon-glow">
-                <span className="text-white font-bold">🎬</span>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center neon-glow">
-                <span className="text-white font-bold">🍿</span>
-              </div>
-              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-red-600 rounded-full flex items-center justify-center neon-glow">
-                <span className="text-white font-bold">⭐</span>
-              </div>
+            <div className="flex gap-3">
+              <SocialLink icon={Twitter} href="#" label="Twitter" />
+              <SocialLink icon={Facebook} href="#" label="Facebook" />
+              <SocialLink icon={Instagram} href="#" label="Instagram" />
+              <SocialLink icon={Github} href="#" label="GitHub" />
             </div>
           </div>
 
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">Quick Links</h3>
-            <nav className="space-y-3">
-              {[
-                { name: 'Home', path: '/' },
-                { name: 'Movies', path: '/movies' },
-                { name: 'Series', path: '/series' },
-                { name: 'Anime', path: '/anime' },
-                { name: 'New Releases', path: '/new-releases' }
-              ].map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => navigate(item.path)}
-                  className="block text-white/70 hover:text-white hover:neon-text transition-all duration-300"
-                >
-                  {item.name}
-                </button>
-              ))}
-            </nav>
+            <h4 className="font-semibold text-white mb-3">Browse</h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              <FooterLink to="/" label="Home" />
+              <FooterLink to="/browse" label="Movies" />
+              <FooterLink to="/browse?category=trending" label="Trending" />
+            </ul>
           </div>
 
           <div>
-            <h3 className="text-white font-bold text-lg mb-4">Legal</h3>
-            <nav className="space-y-3">
-              {[
-                { name: 'Privacy Policy', path: '/privacy' },
-                { name: 'Terms of Service', path: '/terms' },
-                { name: 'Cookie Policy', path: '/cookies' }
-              ].map((item) => (
-                <button
-                  key={item.name}
-                  onClick={() => navigate(item.path)}
-                  className="block text-white/70 hover:text-white hover:neon-text transition-all duration-300"
-                >
-                  {item.name}
-                </button>
-              ))}
-            </nav>
+            <h4 className="font-semibold text-white mb-3">Account</h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              <FooterLink to="/profile" label="Profile" />
+              <FooterLink to="/watchlist" label="Watchlist" />
+              <FooterLink to="/login" label="Sign In" />
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold text-white mb-3">Support</h4>
+            <ul className="space-y-2 text-xs sm:text-sm">
+              <FooterLink to="/help" label="Help Center" />
+              <FooterLink to="/terms" label="Terms of Service" />
+              <FooterLink to="/privacy" label="Privacy Policy" />
+            </ul>
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-8 pt-6 md:mt-12 md:pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-white/50 text-sm">
-            © {currentYear} myFlix. All rights reserved.
-          </p>
-          <p className="text-white/50 text-sm mt-4 sm:mt-0">
-            Made with ❤️ for movie lovers everywhere
-          </p>
+        <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs sm:text-sm">
+          <p>© {currentYear} myFlix. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <button className="hover:text-cyan-400 transition-colors">Privacy</button>
+            <button className="hover:text-cyan-400 transition-colors">Terms</button>
+            <button className="hover:text-cyan-400 transition-colors">Cookies</button>
+          </div>
         </div>
       </div>
     </footer>
   );
 }
+
+const FooterLink = ({ to, label }) => {
+  const navigate = useNavigate();
+  return (
+    <li>
+      <button 
+        onClick={() => navigate(to)} 
+        className="text-gray-400 hover:text-cyan-400 transition-colors text-left"
+      >
+        {label}
+      </button>
+    </li>
+  );
+};
+
+const SocialLink = ({ icon: Icon, href, label }) => (
+  <a 
+    href={href} 
+    aria-label={label}
+    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white hover:border-gray-700 transition-all"
+  >
+    <Icon size={16} />
+  </a>
+);
 
 export default Footer;

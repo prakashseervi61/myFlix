@@ -10,15 +10,36 @@ const CATEGORIES = {
   Romance: 10749,
 };
 
+const CACHE_KEY = 'myflix_categories_cache';
+const CACHE_DURATION = 1000 * 60 * 30; // 30 minutes
+
 const initialState = Object.keys(CATEGORIES).reduce((acc, key) => {
   acc[key] = { movies: [], loading: true, error: null };
   return acc;
 }, {});
 
 export function useMovieCategories() {
-  const [categories, setCategories] = useState(initialState);
+  const [categories, setCategories] = useState(() => {
+    // Check session storage for valid cache to prevent duplicate fetches on reload
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { timestamp, data } = JSON.parse(cached);
+        if (Date.now() - timestamp < CACHE_DURATION) {
+          return data;
+        }
+      }
+    } catch (e) {
+      // Ignore cache errors
+    }
+    return initialState;
+  });
 
   useEffect(() => {
+    // If we have data loaded from cache, don't refetch
+    const hasData = Object.values(categories).some(cat => cat.movies.length > 0);
+    if (hasData) return;
+
     const abortController = new AbortController();
     const { signal } = abortController;
 
@@ -61,12 +82,26 @@ export function useMovieCategories() {
       if (!signal.aborted) {
         setCategories(prev => {
           const newState = { ...prev };
+          let hasUpdates = false;
+          
           results.forEach(result => {
             if (result) {
               newState[result.key] = result.data;
+              hasUpdates = true;
             }
           });
-          return newState;
+
+          if (hasUpdates) {
+             // Update cache
+             try {
+               sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                 timestamp: Date.now(),
+                 data: newState
+               }));
+             } catch (e) {}
+             return newState;
+          }
+          return prev;
         });
       }
     };
@@ -76,7 +111,7 @@ export function useMovieCategories() {
     return () => {
       abortController.abort();
     };
-  }, []);
+  }, []); // Empty dependency array ensures run once on mount
 
   return categories;
 }

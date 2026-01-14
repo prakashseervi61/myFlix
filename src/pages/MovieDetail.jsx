@@ -38,7 +38,7 @@ function MovieDetail() {
   const backdropUrl = movie.backdrop || movie.poster;
 
   return (
-    <div className="min-h-screen bg-black pt-0">
+    <div className="min-h-screen bg-black pt-14 md:pt-20">
       {/* Mobile-first Hero Header */}
       <div className="relative w-full aspect-video md:aspect-[21/9] lg:h-[50vh]">
          <div 
@@ -51,9 +51,10 @@ function MovieDetail() {
         
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 z-20 text-white bg-black/40 backdrop-blur-md p-2 rounded-full hover:bg-black/60 transition-colors border border-white/10"
+          className="absolute top-4 left-4 z-20 flex items-center justify-center p-3 rounded-full text-white bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl transition-all duration-300 hover:bg-black/80 hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 focus:ring-offset-black group"
+          aria-label="Go back"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
         </button>
       </div>
 
@@ -86,7 +87,7 @@ function MovieDetail() {
 }
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-black pt-20">
+  <div className="min-h-screen bg-black pt-14 md:pt-20">
     <div className="w-full aspect-video bg-gray-900 animate-pulse" />
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">

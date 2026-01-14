@@ -17,7 +17,7 @@ function PlaceholderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black flex items-center justify-center pt-14 md:pt-20">
       <div className="text-center px-4 max-w-md">
         <div className="glass-morphism rounded-3xl p-12">
           <div className="text-6xl mb-6 opacity-60">🚀</div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ChevronDown, ChevronUp, Filter as FilterIcon, RotateCcw } from 'lucide-react';
+import { X, ChevronDown, Filter as FilterIcon, RotateCcw, Check } from 'lucide-react';
 
 const SORT_OPTIONS = [
   { value: 'popularity.desc', label: 'Most Popular' },
@@ -32,175 +32,190 @@ export default function FilterPanel({ filters, onChange, onReset, genres, classN
 
   return (
     <>
-      {/* Mobile Toggle */}
+      {/* Mobile Toggle Button */}
       <button
-        className="md:hidden flex items-center gap-2 px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 mb-4 w-full"
-        onClick={() => setIsOpen(!isOpen)}
+        className="md:hidden flex items-center justify-between px-4 py-3 bg-gray-800 text-white rounded-xl border border-gray-700 mb-6 w-full shadow-lg active:scale-[0.98] transition-all"
+        onClick={() => setIsOpen(true)}
       >
-        <FilterIcon size={18} />
-        <span>{isOpen ? 'Hide Filters' : 'Show Filters'}</span>
+        <div className="flex items-center gap-2">
+          <FilterIcon size={18} className="text-cyan-400" />
+          <span className="font-bold tracking-tight">Filters & Sort</span>
+        </div>
         {Object.values(filters).some(v => v && (Array.isArray(v) ? v.length > 0 : v !== 0 && v !== false && v !== 'popularity.desc')) && (
-          <span className="ml-auto w-2 h-2 bg-cyan-500 rounded-full"></span>
+          <span className="flex items-center justify-center bg-cyan-500 text-white text-[10px] font-black w-5 h-5 rounded-full shadow-sm">
+             !
+          </span>
         )}
       </button>
 
-      {/* Panel */}
-      <div className={`
-        bg-gray-900 border-r border-gray-800 p-4 sm:p-6 w-full md:w-80 h-full overflow-y-auto
-        fixed md:relative inset-0 z-40 transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-        ${className}
-      `}>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <FilterIcon size={20} /> Filters
-          </h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="md:hidden p-1 text-gray-400 hover:text-white"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="space-y-6">
-          {/* Sort By */}
-          <section>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Sort By</label>
-            <div className="relative">
-              <select
-                value={filters.sort_by}
-                onChange={(e) => onChange('sort_by', e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm appearance-none focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-              >
-                {SORT_OPTIONS.map(opt => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-2.5 text-gray-400 pointer-events-none" size={16} />
-            </div>
-          </section>
-
-          {/* Genres */}
-          <section>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Genres</label>
-            <div className="flex flex-wrap gap-2">
-              {genres.map(genre => (
-                <button
-                  key={genre.id}
-                  onClick={() => toggleGenre(genre.id)}
-                  className={`
-                    px-3 py-1 text-xs rounded-full border transition-colors
-                    ${(filters.with_genres || []).includes(genre.id)
-                      ? 'bg-cyan-600 border-cyan-500 text-white'
-                      : 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-700'}
-                  `}
-                >
-                  {genre.name}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {/* Year Range */}
-          <section>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Release Year</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                placeholder="From"
-                value={filters.year_min}
-                onChange={(e) => onChange('year_min', e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-              />
-              <span className="text-gray-500">-</span>
-              <input
-                type="number"
-                placeholder="To"
-                value={filters.year_max}
-                onChange={(e) => onChange('year_max', e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-              />
-            </div>
-          </section>
-
-          {/* Minimum Rating */}
-          <section>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-400">Min Rating</label>
-              <span className="text-sm text-cyan-400 font-bold">{filters.min_rating}+</span>
-            </div>
-            <input
-              type="range"
-              min="0"
-              max="9"
-              step="1"
-              value={filters.min_rating}
-              onChange={(e) => onChange('min_rating', Number(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>0</span>
-              <span>10</span>
-            </div>
-          </section>
-
-          {/* Language */}
-          <section>
-            <label className="block text-sm font-medium text-gray-400 mb-2">Language</label>
-            <div className="relative">
-              <select
-                value={filters.with_original_language}
-                onChange={(e) => onChange('with_original_language', e.target.value)}
-                className="w-full bg-gray-800 text-white border border-gray-700 rounded-lg px-3 py-2 text-sm appearance-none focus:ring-2 focus:ring-cyan-500 focus:outline-none"
-              >
-                {LANGUAGES.map(lang => (
-                  <option key={lang.value} value={lang.value}>{lang.label}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-2.5 text-gray-400 pointer-events-none" size={16} />
-            </div>
-          </section>
-
-          {/* Only with Trailer */}
-          <section className="flex items-center gap-3">
-             <div className="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
-                <input 
-                  type="checkbox" 
-                  name="toggle" 
-                  id="trailer-toggle"
-                  checked={filters.only_with_trailer}
-                  onChange={(e) => onChange('only_with_trailer', e.target.checked)}
-                  className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer transition-all duration-300 ease-in-out left-1 top-1 checked:left-5 checked:border-cyan-500 checked:bg-cyan-500"
-                  style={filters.only_with_trailer ? { left: '1.25rem', borderColor: '#06b6d4', backgroundColor: '#06b6d4' } : {}}
-                />
-                <label 
-                  htmlFor="trailer-toggle" 
-                  className={`toggle-label block overflow-hidden h-6 rounded-full cursor-pointer border ${filters.only_with_trailer ? 'bg-gray-700 border-cyan-500' : 'bg-gray-800 border-gray-700'}`}
-                ></label>
-            </div>
-            <label htmlFor="trailer-toggle" className="text-sm font-medium text-gray-300 cursor-pointer">
-              Only with Trailer
-            </label>
-          </section>
-
-          {/* Reset */}
-          <button
-            onClick={onReset}
-            className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors border border-gray-700"
-          >
-            <RotateCcw size={16} /> Reset Filters
-          </button>
-        </div>
-      </div>
-      
-      {/* Overlay for mobile */}
+      {/* Backdrop Overlay for Mobile */}
       {isOpen && (
         <div 
-          className="md:hidden fixed inset-0 bg-black/50 z-30"
+          className="md:hidden fixed inset-0 bg-black/90 z-[60] transition-opacity duration-300 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
+
+      {/* Main Panel Content - Drawer on Mobile / Sticky on Desktop */}
+      <div className={`
+        fixed inset-y-0 left-0 z-[70] w-[280px] bg-gray-950 border-r border-gray-800 transform transition-transform duration-300 ease-out shadow-2xl
+        md:translate-x-0 md:static md:w-full md:bg-transparent md:border-0 md:shadow-none md:z-auto
+        ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        ${className}
+      `}>
+        <div className="h-full flex flex-col md:h-auto md:block">
+          
+          {/* Mobile Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-800 md:hidden bg-gray-900">
+            <h2 className="text-xl font-black text-white flex items-center gap-2 tracking-tighter">
+              <FilterIcon size={20} className="text-cyan-500" /> FILTERS
+            </h2>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="p-2 text-gray-400 hover:text-white bg-gray-800 rounded-full transition-colors active:scale-90"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Content Area */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-8 md:bg-gray-900 md:border md:border-gray-800 md:rounded-2xl md:sticky md:top-24 scrollbar-thin scrollbar-thumb-gray-800 bg-gray-950 md:bg-gray-900">
+            
+            {/* Desktop Section Header */}
+            <div className="hidden md:flex items-center justify-between mb-4">
+               <h2 className="text-sm font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                 <FilterIcon size={14} className="text-cyan-500" /> Filters
+               </h2>
+               <button onClick={onReset} className="text-[10px] font-black text-cyan-500 hover:text-cyan-400 uppercase tracking-tighter transition-colors">
+                 Reset All
+               </button>
+            </div>
+
+            {/* Sort By */}
+            <section className="space-y-3">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Sort Results</label>
+              <div className="relative">
+                <select
+                  value={filters.sort_by}
+                  onChange={(e) => onChange('sort_by', e.target.value)}
+                  className="w-full bg-gray-900 text-white border border-gray-800 rounded-xl pl-4 pr-10 py-3 text-sm appearance-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 focus:outline-none transition-all cursor-pointer font-medium"
+                >
+                  {SORT_OPTIONS.map(opt => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
+              </div>
+            </section>
+
+            {/* Genres */}
+            <section className="space-y-3">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Genres</label>
+              <div className="flex flex-wrap gap-2">
+                {genres.map(genre => {
+                  const isActive = (filters.with_genres || []).includes(genre.id);
+                  return (
+                    <button
+                      key={genre.id}
+                      onClick={() => toggleGenre(genre.id)}
+                      className={`
+                        px-3 py-1.5 text-[11px] font-bold rounded-lg border transition-all duration-200
+                        ${isActive
+                          ? 'bg-cyan-600 border-cyan-500 text-white shadow-lg shadow-cyan-900/40 scale-105'
+                          : 'bg-gray-900 border-gray-800 text-gray-400 hover:bg-gray-800 hover:text-gray-200'}
+                      `}
+                    >
+                      {genre.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+
+            <div className="h-px bg-gray-800/50" />
+
+            {/* Year Range */}
+            <section className="space-y-3">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Release Year</label>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="number"
+                  placeholder="From"
+                  value={filters.year_min}
+                  onChange={(e) => onChange('year_min', e.target.value)}
+                  className="w-full bg-gray-900 text-white border border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 focus:outline-none transition-all font-medium placeholder:text-gray-700"
+                />
+                <input
+                  type="number"
+                  placeholder="To"
+                  value={filters.year_max}
+                  onChange={(e) => onChange('year_max', e.target.value)}
+                  className="w-full bg-gray-900 text-white border border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 focus:outline-none transition-all font-medium placeholder:text-gray-700"
+                />
+              </div>
+            </section>
+
+            {/* Minimum Rating */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Min Rating</label>
+                <span className="text-xs font-black text-cyan-500 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">{filters.min_rating}+</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="10"
+                step="1"
+                value={filters.min_rating}
+                onChange={(e) => onChange('min_rating', Number(e.target.value))}
+                className="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+              />
+            </section>
+
+            {/* Language */}
+            <section className="space-y-3">
+              <label className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Language</label>
+              <div className="relative">
+                <select
+                  value={filters.with_original_language}
+                  onChange={(e) => onChange('with_original_language', e.target.value)}
+                  className="w-full bg-gray-900 text-white border border-gray-800 rounded-xl pl-4 pr-10 py-3 text-sm appearance-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 focus:outline-none transition-all cursor-pointer font-medium"
+                >
+                  {LANGUAGES.map(lang => (
+                    <option key={lang.value} value={lang.value}>{lang.label}</option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
+              </div>
+            </section>
+
+            {/* Only with Trailer */}
+            <section className="flex items-center gap-3 p-4 bg-gray-900 rounded-xl border border-gray-800 hover:border-gray-700 transition-all cursor-pointer group active:scale-[0.98]" onClick={() => onChange('only_with_trailer', !filters.only_with_trailer)}>
+               <div className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all ${filters.only_with_trailer ? 'bg-cyan-600 border-cyan-500' : 'bg-gray-800 border-gray-700'}`}>
+                 {filters.only_with_trailer && <Check size={14} className="text-white stroke-[3]" />} 
+               </div>
+               <span className="text-xs font-bold text-gray-200 uppercase tracking-wider">Only with Trailer</span>
+            </section>
+
+            {/* Mobile Action Buttons */}
+            <div className="pt-4 pb-12 md:hidden">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-full py-4 bg-cyan-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-cyan-900/40 active:scale-95 transition-all"
+              >
+                Apply Filters
+              </button>
+              <button
+                onClick={() => { onReset(); setIsOpen(false); }}
+                className="w-full py-4 mt-4 text-gray-500 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 active:text-white transition-all"
+              >
+                <RotateCcw size={14} /> Reset Everything
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </>
   );
 }

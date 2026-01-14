@@ -167,23 +167,25 @@ function SearchPage() {
           </aside>
 
           <div className="flex-1">
-            <div className="relative mb-6">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search for movies..."
-                className="w-full pl-12 pr-10 py-3 bg-gray-800 text-white border border-gray-700 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-cyan-500"
-              />
-              {query && (
-                <button
-                  onClick={() => setQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
-                >
-                  <X size={20} />
-                </button>
-              )}
+            <div className="relative mb-10 group">
+              <div className="flex items-center bg-transparent border-b-2 border-gray-800 group-focus-within:border-cyan-500 transition-all duration-300 pb-2">
+                <Search className="text-gray-500 mr-4 shrink-0 group-focus-within:text-cyan-500 transition-colors" size={24} />
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search for movies..."
+                  className="flex-1 bg-transparent border-none text-xl md:text-2xl text-white placeholder:text-gray-600 focus:outline-none focus:ring-0 p-0 font-medium"
+                />
+                {query && (
+                  <button
+                    onClick={() => setQuery('')}
+                    className="ml-4 p-1.5 text-gray-500 hover:text-white transition-colors"
+                  >
+                    <X size={20} />
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="flex justify-end mb-4">

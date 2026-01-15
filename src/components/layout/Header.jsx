@@ -59,9 +59,10 @@ export default function Header() {
     setSearchExpanded(false);
   }, [location.pathname]);
 
-  // Robust Scroll Locking for Mobile Menu (iOS/Android compatible)
+  // Robust Scroll Locking for Mobile Menu and Search (iOS/Android compatible)
   useEffect(() => {
-    if (!isMenuOpen) return;
+    const shouldLock = isMenuOpen || searchExpanded;
+    if (!shouldLock) return;
 
     // Capture current scroll position
     const scrollY = window.scrollY;
@@ -99,13 +100,12 @@ export default function Header() {
       // Restore scroll position instantly
       window.scrollTo(0, scrollY);
       
-      // Restore smooth scrolling after a minimal delay to ensure the scroll happened instantly
-      // Using requestAnimationFrame or setTimeout ensures it applies after the paint
+      // Restore smooth scrolling after a minimal delay
       requestAnimationFrame(() => {
           document.documentElement.style.scrollBehavior = originalStyles.scrollBehavior;
       });
     };
-  }, [isMenuOpen]);
+  }, [isMenuOpen, searchExpanded]);
 
   const handleMovieClick = (movie) => {
     navigate(`/movie/${movie.id}`);

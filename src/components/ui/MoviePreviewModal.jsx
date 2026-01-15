@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Play, Plus, Check, Info, Volume2, VolumeX } from 'lucide-react';
 import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
-import { useWatchlist } from '../../hooks/useWatchlist.js';
+import { useWatchlist } from '../../contexts/WatchlistContext.jsx';
 import { tmdbService } from '../../services/tmdbService.js';
 
 export default function MoviePreviewModal() {

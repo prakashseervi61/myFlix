@@ -38,9 +38,9 @@ function MovieDetail() {
   const backdropUrl = movie.backdrop || movie.poster;
 
   return (
-    <div className="min-h-screen bg-black pt-14 md:pt-20">
+    <div className="min-h-screen bg-black">
       {/* Mobile-first Hero Header */}
-      <div className="relative w-full aspect-video md:aspect-[21/9] lg:h-[50vh]">
+      <div className="relative w-full aspect-video md:aspect-[21/9] lg:h-[60vh]">
          <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${backdropUrl})` }}
@@ -51,14 +51,14 @@ function MovieDetail() {
         
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 z-20 flex items-center justify-center p-3 rounded-full text-white bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl transition-all duration-300 hover:bg-black/80 hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 focus:ring-offset-black group"
+          className="absolute top-20 left-4 z-20 flex items-center justify-center p-3 rounded-full text-white bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl transition-all duration-300 hover:bg-black/80 hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 focus:ring-offset-black group"
           aria-label="Go back"
         >
           <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
         </button>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-12 md:-mt-32">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-20 md:-mt-32">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">
           {/* Poster - Hidden on very small screens, shown on md+ */}
           <div className="hidden md:block w-48 lg:w-64 flex-shrink-0">
@@ -66,11 +66,11 @@ function MovieDetail() {
           </div>
 
           {/* Mobile Poster (smaller, overlapping header) */}
-          <div className="md:hidden w-28 -mt-16 mb-2 rounded-lg shadow-2xl ring-2 ring-black ml-2">
-             <img src={movie.poster} alt={movie.title} className="w-full rounded-lg" />
+          <div className="md:hidden w-32 -mt-12 mb-4 rounded-lg shadow-2xl ring-2 ring-black ml-1">
+             <img src={movie.poster} alt={movie.title} className="w-full rounded-lg object-cover aspect-[2/3]" />
           </div>
 
-          <div className="flex-1 space-y-4 md:space-y-6 pb-12">
+          <div className="flex-1 space-y-4 md:space-y-6 pb-20 md:pb-12">
             <MovieDetailsHeader movie={movie} />
             
             <div className="flex items-center gap-3">
@@ -87,7 +87,7 @@ function MovieDetail() {
 }
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-black pt-14 md:pt-20">
+  <div className="min-h-screen bg-black">
     <div className="w-full aspect-video bg-gray-900 animate-pulse" />
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">

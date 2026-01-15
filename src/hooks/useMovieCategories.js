@@ -20,7 +20,6 @@ const initialState = Object.keys(CATEGORIES).reduce((acc, key) => {
 
 export function useMovieCategories() {
   const [categories, setCategories] = useState(() => {
-    // Check session storage for valid cache to prevent duplicate fetches on reload
     try {
       const cached = sessionStorage.getItem(CACHE_KEY);
       if (cached) {
@@ -36,8 +35,9 @@ export function useMovieCategories() {
   });
 
   useEffect(() => {
-    // If we have data loaded from cache, don't refetch
-    const hasData = Object.values(categories).some(cat => cat.movies.length > 0);
+    // If we have data loaded from cache (and it's not just the initial empty structure), don't refetch
+    // We check if "Trending Now" has movies as a proxy for valid data
+    const hasData = categories['Trending Now']?.movies?.length > 0;
     if (hasData) return;
 
     const abortController = new AbortController();
@@ -51,12 +51,13 @@ export function useMovieCategories() {
         } else {
           movies = await apiService.getMoviesByGenre(genreId, signal);
         }
+        
         return {
           key: categoryName,
           data: {
-            movies,
+            movies: movies || [],
             loading: false,
-            error: movies.length === 0 ? 'No movies found.' : null,
+            error: (!movies || movies.length === 0) ? 'No movies found.' : null,
           },
         };
       } catch (error) {
@@ -66,7 +67,7 @@ export function useMovieCategories() {
           data: {
             movies: [],
             loading: false,
-            error: error.message,
+            error: error.message || 'Failed to load category',
           },
         };
       }
@@ -92,7 +93,6 @@ export function useMovieCategories() {
           });
 
           if (hasUpdates) {
-             // Update cache
              try {
                sessionStorage.setItem(CACHE_KEY, JSON.stringify({
                  timestamp: Date.now(),
@@ -111,7 +111,7 @@ export function useMovieCategories() {
     return () => {
       abortController.abort();
     };
-  }, []); // Empty dependency array ensures run once on mount
+  }, []); // Run once on mount
 
   return categories;
 }

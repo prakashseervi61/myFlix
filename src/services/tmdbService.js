@@ -2,6 +2,7 @@ import { apiConfig } from '../config/apiConfig.js';
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 const REQUEST_TIMEOUT = 15000;
 
 class TMDBService {
@@ -69,30 +70,40 @@ class TMDBService {
   }
 
   normalizeMovieData(movie) {
-    if (!movie || !movie.poster_path || !movie.title || movie.popularity === 0) {
+    // Basic validation: must have ID and title/original_title
+    if (!movie || !movie.id || (!movie.title && !movie.original_title)) {
       return null;
     }
+
+    const title = movie.title || movie.original_title;
+    
+    // Fallback for poster if needed (though UI might show placeholder)
+    const poster = movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : null;
+    const backdrop = movie.backdrop_path ? `${BACKDROP_BASE_URL}${movie.backdrop_path}` : null;
+
     return {
-      id: movie.id.toString(),
-      title: movie.title,
+      id: String(movie.id), // Ensure ID is string for consistency
+      title: title,
       year: movie.release_date ? movie.release_date.split('-')[0] : 'N/A',
-      release_date: movie.release_date,
-      poster: `${IMAGE_BASE_URL}${movie.poster_path}`,
-      backdrop: movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : null,
-      rating: movie.vote_average.toFixed(1),
-      plot: movie.overview,
-      genre_ids: movie.genre_ids || [],
-      genres: movie.genres ? movie.genres.map(g => g.name) : [],
-      runtime: movie.runtime,
-      original_language: movie.original_language,
-      popularity: movie.popularity
+      release_date: movie.release_date || null,
+      poster: poster,
+      backdrop: backdrop,
+      rating: typeof movie.vote_average === 'number' ? movie.vote_average.toFixed(1) : '0.0',
+      plot: movie.overview || 'No overview available.',
+      genre_ids: Array.isArray(movie.genre_ids) ? movie.genre_ids : [],
+      genres: Array.isArray(movie.genres) ? movie.genres.map(g => g.name) : [],
+      runtime: movie.runtime || null,
+      original_language: movie.original_language || 'en',
+      popularity: movie.popularity || 0,
+      director: movie.credits?.crew?.find(c => c.job === 'Director')?.name || null,
+      actors: movie.credits?.cast?.slice(0, 3).map(c => c.name).join(', ') || null
     };
   }
 
   async getTrendingMovies(signal) {
     const url = this.buildUrl('/trending/movie/week');
     const data = await this.request(url, 'trending_movies', signal);
-    return data.results.map(this.normalizeMovieData).filter(Boolean);
+    return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async getMoviesByGenre(genreId, signal) {
@@ -105,17 +116,19 @@ class TMDBService {
     const url = this.buildUrl('/discover/movie', params);
     const cacheKey = `genre_${genreId}`;
     const data = await this.request(url, cacheKey, signal);
-    return data.results.map(this.normalizeMovieData).filter(Boolean);
+    return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async searchMovies(query, page = 1, signal) {
+    if (!query) return [];
     const url = this.buildUrl('/search/movie', { query, page });
     const data = await this.request(url, `search_${query}_${page}`, signal);
-    return data.results.map(this.normalizeMovieData).filter(Boolean);
+    return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async getMovieById(id, signal) {
-    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos' });
+    // Append credits to get director/actors in one call
+    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits' });
     const data = await this.request(url, `movie_${id}`, signal);
     return this.normalizeMovieData(data);
   }
@@ -131,7 +144,7 @@ class TMDBService {
       page: params.page || 1,
       sort_by: params.sort_by || 'popularity.desc',
       include_adult: false,
-      include_video: true,
+      include_video: false, // Usually false for discover to get more results
       ...params
     };
     
@@ -141,19 +154,18 @@ class TMDBService {
     
     // Handle specific mappings
     if (params.min_rating) queryParams['vote_average.gte'] = params.min_rating;
-    if (params.with_genres) queryParams.with_genres = params.with_genres;
-    if (params.with_original_language) queryParams.with_original_language = params.with_original_language;
-
-    // Remove internal params that shouldn't go to API
+    
+    // Clean up internal keys
     delete queryParams.year_min;
     delete queryParams.year_max;
     delete queryParams.min_rating;
+    delete queryParams.only_with_trailer; // Handle externally or if API supports it (it doesn't directly)
 
     const url = this.buildUrl('/discover/movie', queryParams);
     // Create a specific cache key for the filter combination
     const cacheKey = `discover_${JSON.stringify(queryParams)}`;
     const data = await this.request(url, cacheKey, signal);
-    return data.results.map(this.normalizeMovieData).filter(Boolean);
+    return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async getMovieVideos(movieId, signal) {

@@ -5,15 +5,18 @@ import { movieService } from './movieService.js';
 
 class ApiService {
   async getTrendingMovies(signal) {
-    return tmdbService.getTrendingMovies(signal);
+    const results = await tmdbService.getTrendingMovies(signal);
+    return results || [];
   }
 
   async getMoviesByGenre(genreId, signal) {
-    return tmdbService.getMoviesByGenre(genreId, signal);
+    const results = await tmdbService.getMoviesByGenre(genreId, signal);
+    return results || [];
   }
 
   async searchMovies(query, page = 1, signal) {
-    return tmdbService.searchMovies(query, page, signal);
+    const results = await tmdbService.searchMovies(query, page, signal);
+    return results || [];
   }
 
   async getMovieDetails(id, signal) {

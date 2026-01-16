@@ -24,11 +24,12 @@
 
 | Icon | Feature | Description |
 | :---: | :--- | :--- |
-| 🎨 | **Cinematic UI/UX** | A dark-themed, immersive interface that makes movie artwork pop. |
-| 📱 | **Fully Responsive** | Flawless performance and layout on any device, from mobile to desktop. |
+| 🎨 | **Cinematic UI/UX** | A dark-themed, immersive interface with animated transitions and global scroll locking. |
+| 📱 | **Fully Responsive** | Flawless performance and layout on any device, from mobile to desktop, with global scroll lock for modals and menus. |
 | 🔍 | **Instant Search** | A powerful search engine that delivers results as you type. |
 | 🍿 | **Personal Watchlist** | Curate your own collection of films with one-click add/remove functionality. |
 | ℹ️ | **Detailed Info** | Access comprehensive movie details, including plot, cast, and ratings. |
+| 🎬 | **Animated Trailer Previews & List View** | Immersive trailers with autoplay and mute, plus flexible list display options. |
 | 🛡️ | **Secure Accounts** | Robust user authentication to keep your watchlist private and secure. |
 
 ---

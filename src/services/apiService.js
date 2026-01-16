@@ -3,6 +3,11 @@ import { omdbService } from './omdbService.js';
 import { movieService } from './movieService.js';
 
 
+/**
+ * Unified API service layer.
+ * Currently delegates to TMDB but designed to aggregate multiple sources.
+ * Extension point: Add fallback to OMDB/IMDB when TMDB fails.
+ */
 class ApiService {
   async getTrendingMovies(signal) {
     const results = await tmdbService.getTrendingMovies(signal);
@@ -20,7 +25,6 @@ class ApiService {
   }
 
   async getMovieDetails(id, signal) {
-    // This could be enhanced to aggregate data from multiple services
     return tmdbService.getMovieById(id, signal);
   }
 }

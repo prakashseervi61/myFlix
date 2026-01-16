@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../services/apiService.js';
 
+/**
+ * Fetches movie details with abort signal support.
+ * @param {string} movieId - TMDB movie ID
+ * @returns {Object} { movie, loading, error }
+ */
 export function useMovieDetails(movieId) {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);

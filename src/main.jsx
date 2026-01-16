@@ -4,6 +4,7 @@ import { HashRouter } from 'react-router-dom'
 import App from './App.jsx'
 import './index.css'
 
+/** Root element validation before React mount */
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Root element not found. Make sure there is a div with id="root" in your HTML.');

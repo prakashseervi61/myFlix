@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import { Grid, List, Loader2 } from 'lucide-react';
 import { tmdbService } from '../services/tmdbService.js';
@@ -8,9 +8,17 @@ import { useIntersectionObserver } from '../hooks/useIntersectionObserver.js';
 import FilterPanel from '../components/FilterPanel.jsx';
 import MovieCard from '../components/ui/MovieCard.jsx';
 import MovieCardSkeleton from '../components/ui/MovieCardSkeleton.jsx';
+import MovieListItem from '../components/ui/MovieListItem.jsx';
+import MovieListItemSkeleton from '../components/ui/MovieListItemSkeleton.jsx';
 
+/**
+ * Browse page with advanced filtering and infinite scroll.
+ * Filters are debounced to reduce API calls.
+ * Trailer filter requires client-side checking (not supported by TMDB API).
+ */
 function BrowsePage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { filters, updateFilter, resetFilters } = useFilters();
   const [debouncedFilters] = useDebounce(filters, 500);
   
@@ -18,10 +26,19 @@ function BrowsePage() {
   const [genres, setGenres] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState('grid');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  const viewMode = searchParams.get('view') || 'grid';
+
+  const handleViewModeChange = (mode) => {
+    setSearchParams(prev => {
+      prev.set('view', mode);
+      return prev;
+    }, { replace: true });
+  };
+
+  /** Sentinel element for infinite scroll trigger */
   const loadMoreRef = useIntersectionObserver({
     enabled: !loading && hasMore,
     onIntersect: () => setPage(p => p + 1)
@@ -39,13 +56,17 @@ function BrowsePage() {
     fetchGenres();
   }, []);
 
-  // Reset on filter change
   useEffect(() => {
     setPage(1);
     setMovies([]);
     setHasMore(true);
-    window.scrollTo(0, 0);
   }, [debouncedFilters]);
+
+  useEffect(() => {
+    if (page === 1) {
+      window.scrollTo(0, 0);
+    }
+  }, [debouncedFilters, page]);
 
   useEffect(() => {
     let isMounted = true;
@@ -64,6 +85,7 @@ function BrowsePage() {
 
         let results = await tmdbService.discoverMovies(params, controller.signal);
 
+        /** Client-side trailer filtering since TMDB API doesn't support it */
         if (debouncedFilters.only_with_trailer && results.length > 0) {
            const trailerChecks = await Promise.allSettled(
              results.map(movie => tmdbService.getMovieVideos(movie.id))
@@ -75,8 +97,12 @@ function BrowsePage() {
                moviesWithTrailers.add(results[index].id);
              }
            });
-           
-           results = results.filter(m => moviesWithTrailers.has(Number(m.id)));
+
+           results = results
+             .filter(m => moviesWithTrailers.has(Number(m.id)))
+             .map(m => ({ ...m, has_trailer: true }));
+        } else {
+          results = results.map(m => ({ ...m, has_trailer: false }));
         }
 
         if (isMounted) {
@@ -132,32 +158,37 @@ function BrowsePage() {
           <div className="flex-1">
             <div className="flex justify-end mb-4">
                <div className="flex items-center gap-2 bg-gray-900 p-1 rounded-lg border border-gray-800">
-                <ViewModeButton current={viewMode} mode="grid" setViewMode={setViewMode}><Grid size={18} /></ViewModeButton>
-                <ViewModeButton current={viewMode} mode="list" setViewMode={setViewMode}><List size={18} /></ViewModeButton>
+                <ViewModeButton current={viewMode} mode="grid" setViewMode={handleViewModeChange}><Grid size={18} /></ViewModeButton>
+                <ViewModeButton current={viewMode} mode="list" setViewMode={handleViewModeChange}><List size={18} /></ViewModeButton>
               </div>
             </div>
 
             {initialLoading ? (
-              <div className={`grid ${viewMode === 'grid' ? 'grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1 md:grid-cols-2'} gap-4`}>
-                {Array.from({ length: 10 }).map((_, i) => <MovieCardSkeleton key={i} />)}
+              <div className={viewMode === 'grid' ? 'grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4' : 'flex flex-col gap-4'}>
+                {Array.from({ length: 10 }).map((_, i) =>
+                  viewMode === 'grid' ? <MovieCardSkeleton key={i} /> : <MovieListItemSkeleton key={i} />
+                )}
               </div>
             ) : (
               <>
                 <div className={`transition-all duration-300 ${
                   viewMode === 'grid'
                     ? 'grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4'
-                    : 'grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4'
+                    : 'flex flex-col gap-3 sm:gap-4'
                 }`}>
-                  {movies.map((movie) => (
-                    <MovieCard key={movie.id} movie={movie} onClick={handleMovieClick} />
-                  ))}
+                  {movies.map((movie) =>
+                    viewMode === 'grid' ? (
+                      <MovieCard key={movie.id} movie={movie} onClick={handleMovieClick} />
+                    ) : (
+                      <MovieListItem key={movie.id} movie={movie} />
+                    )
+                  )}
                   
-                  {loading && !initialLoading && Array.from({ length: 5 }).map((_, i) => (
-                    <MovieCardSkeleton key={`skeleton-${i}`} />
-                  ))}
+                  {loading && !initialLoading && Array.from({ length: 5 }).map((_, i) =>
+                    viewMode === 'grid' ? <MovieCardSkeleton key={`skeleton-${i}`} /> : <MovieListItemSkeleton key={`skeleton-${i}`} />
+                  )}
                 </div>
 
-                {/* Sentinel for infinite scroll */}
                 <div ref={loadMoreRef} className="h-4 w-full" />
 
                 {error && page === 1 && (

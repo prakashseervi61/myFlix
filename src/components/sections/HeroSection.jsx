@@ -3,19 +3,55 @@ import { Play, Plus, Check, ChevronLeft, ChevronRight, Info } from "lucide-react
 import { useNavigate } from "react-router-dom";
 import { useWatchlist } from "../../contexts/WatchlistContext.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import "./HeroSection.css";
 
 const SLIDE_DURATION = 8000;
 
+/** Pagination dots with animated progress fill */
+const Pagination = React.memo(({ count, current, goToSlide, duration }) => (
+  <div 
+    className="absolute bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-12 md:translate-x-0 md:bottom-12 z-30 flex gap-2"
+    role="tablist"
+    aria-label="Slideshow controls"
+  >
+    {Array.from({ length: count }).map((_, index) => {
+      const isActive = index === current;
+      return (
+        <button
+          key={index}
+          onClick={() => goToSlide(index)}
+          className="group flex items-center justify-center p-1 outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full"
+          role="tab"
+          aria-selected={isActive}
+          aria-label={`Go to slide ${index + 1}`}
+          tabIndex={0}
+        >
+          <div
+            className={`pagination-dot ${isActive ? 'active' : ''}`}
+            style={{ '--duration': `${duration}ms` }}
+          >
+            {isActive && <div className="progress-fill" />}
+          </div>
+        </button>
+      );
+    })}
+  </div>
+));
+
+/**
+ * Hero carousel with auto-advance, swipe support, and animated pagination.
+ * Preloads next image for smooth transitions.
+ * Uses CSS transforms for GPU-accelerated animations.
+ */
 function HeroSection({ movies = [] }) {
   const navigate = useNavigate();
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
   const { user } = useAuth();
   
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  
   const touchStartRef = useRef(null);
 
+  /** Filters movies with backdrops and limits to 6 for performance */
   const featuredMovies = useMemo(() => {
      if (!Array.isArray(movies) || movies.length === 0) return [];
      const withBackdrops = movies.filter(m => m.backdrop);
@@ -37,12 +73,13 @@ function HeroSection({ movies = [] }) {
   }, []);
 
   useEffect(() => {
-    if (!isPaused && featuredMovies.length > 1) {
+    if (featuredMovies.length > 1) {
       const timer = setInterval(goToNext, SLIDE_DURATION);
       return () => clearInterval(timer);
     }
-  }, [isPaused, featuredMovies.length, goToNext]);
+  }, [featuredMovies.length, goToNext]);
 
+  /** Preloads next slide image for instant transition */
   useEffect(() => {
     if (featuredMovies.length > 1) {
       const nextIndex = (currentSlide + 1) % featuredMovies.length;
@@ -95,14 +132,11 @@ function HeroSection({ movies = [] }) {
 
   return (
     <section 
-      className="relative w-full h-[100vh] min-h-[100svh] overflow-hidden bg-black group contain-content"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      className="relative w-full h-[100vh] min-h-[100svh] overflow-hidden bg-black contain-content"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       aria-label="Featured Movies"
     >
-      {/* Background Images - Optimized */}
       {featuredMovies.map((movie, index) => {
          const isCurrent = index === currentSlide;
          return (
@@ -111,7 +145,6 @@ function HeroSection({ movies = [] }) {
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-opacity ${isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
             aria-hidden={!isCurrent}
           >
-             {/* Base dark layer */}
              <div className="absolute inset-0 bg-gray-900" />
              <picture className="absolute inset-0">
                <source media="(max-width: 640px)" srcSet={movie.poster || movie.backdrop} />
@@ -125,7 +158,6 @@ function HeroSection({ movies = [] }) {
                />
              </picture>
              
-             {/* Consolidated Gradient Overlay for Performance */}
              <div 
                className="absolute inset-0 translate-z-0"
                style={{
@@ -137,19 +169,18 @@ function HeroSection({ movies = [] }) {
          );
       })}
 
-      {/* Desktop Navigation Arrows */}
       {featuredMovies.length > 1 && (
         <>
           <button 
             onClick={goToPrev} 
-            className="hidden md:flex absolute left-8 top-1/2 -translate-y-1/2 z-30 p-4 rounded-full text-white/50 hover:text-white hover:bg-white/10 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-30 p-4 rounded-full text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             aria-label="Previous slide"
           >
             <ChevronLeft size={48} className="drop-shadow-lg" />
           </button>
           <button 
             onClick={goToNext} 
-            className="hidden md:flex absolute right-8 top-1/2 -translate-y-1/2 z-30 p-4 rounded-full text-white/50 hover:text-white hover:bg-white/10 backdrop-blur-sm transition-all opacity-0 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-30 p-4 rounded-full text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             aria-label="Next slide"
           >
             <ChevronRight size={48} className="drop-shadow-lg" />
@@ -157,7 +188,6 @@ function HeroSection({ movies = [] }) {
         </>
       )}
 
-      {/* Content - Normalized State */}
       <div className="absolute inset-0 z-20 flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 lg:pb-32 px-4 sm:px-8 md:px-12 lg:px-16 pointer-events-none">
         <div className="max-w-4xl w-full mx-auto md:mx-0 pointer-events-auto">
           
@@ -186,7 +216,7 @@ function HeroSection({ movies = [] }) {
           <div className="flex items-center gap-3 sm:gap-4 mt-2 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.7s_forwards]">
             <button
               onClick={() => navigate(`/movie/${activeMovie.id}`)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform hover:scale-105 active:scale-95 hover:bg-gray-100 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
               aria-label={`Watch ${activeMovie.title} now`}
             >
               <Play className="fill-black w-5 h-5" aria-hidden="true" />
@@ -194,7 +224,7 @@ function HeroSection({ movies = [] }) {
             </button>
             <button
               onClick={handleWatchlistClick}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-bold text-sm sm:text-base md:text-lg bg-black/40 hover:bg-black/60 text-white transition-all hover:scale-105 active:scale-95 border border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-bold text-sm sm:text-base md:text-lg bg-black/40 text-white transition-all active:scale-95 border border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               aria-label={isBookmarked ? `Remove ${activeMovie.title} from watchlist` : `Add ${activeMovie.title} to watchlist`}
             >
               {isBookmarked ? <Check className="w-5 h-5" aria-hidden="true" /> : <Plus className="w-5 h-5" aria-hidden="true" />}
@@ -202,7 +232,7 @@ function HeroSection({ movies = [] }) {
             </button>
             <button 
               onClick={() => navigate(`/movie/${activeMovie.id}`)}
-              className="hidden md:flex items-center justify-center w-14 h-14 rounded-full border border-gray-400 text-white hover:border-white hover:bg-black/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="hidden md:flex items-center justify-center w-14 h-14 rounded-full border border-gray-400 text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               title="More Info"
               aria-label={`More info about ${activeMovie.title}`}
             >
@@ -212,31 +242,13 @@ function HeroSection({ movies = [] }) {
         </div>
       </div>
 
-      {/* Pagination Indicators */}
       {featuredMovies.length > 1 && (
-        <div 
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-12 md:translate-x-0 md:bottom-12 z-30 flex gap-2"
-          role="tablist"
-          aria-label="Slideshow controls"
-        >
-          {featuredMovies.map((movie, index) => (
-            <button
-              key={`${movie.id}-${index}`}
-              onClick={() => goToSlide(index)}
-              className={`group flex flex-col gap-1 items-center justify-center p-2 outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full`}
-              role="tab"
-              aria-selected={index === currentSlide}
-              aria-label={`Go to slide ${index + 1}`}
-              tabIndex={0}
-            >
-               <div className={`transition-all duration-300 ease-out shadow-lg ${
-                 index === currentSlide
-                   ? 'w-8 h-1.5 bg-white' 
-                   : 'w-2 h-1.5 bg-white/30 hover:bg-white/60'
-               } rounded-full`} />
-            </button>
-          ))}
-        </div>
+        <Pagination
+          count={featuredMovies.length}
+          current={currentSlide}
+          goToSlide={goToSlide}
+          duration={SLIDE_DURATION}
+        />
       )}
     </section>
   );

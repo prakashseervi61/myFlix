@@ -3,6 +3,7 @@ import { apiConfig } from '../config/apiConfig.js';
 const BASE_URL = 'https://www.omdbapi.com';
 const REQUEST_TIMEOUT = 15000;
 
+/** LRU cache for API responses to minimize quota usage */
 class LRUCache {
   constructor(maxSize) {
     this.maxSize = maxSize;
@@ -37,11 +38,17 @@ class LRUCache {
 const cache = new LRUCache(50);
 const CACHE_DURATION = 10 * 60 * 1000;
 
+/** Sanitizes user input to prevent injection attacks */
 function sanitizeInput(input) {
   if (!input || typeof input !== 'string') return '';
   return input.replace(/[<>"'&]/g, '').trim().slice(0, 100);
 }
 
+/**
+ * OMDb API service with rate limiting, caching, and key rotation.
+ * Implements request throttling to stay within free tier limits.
+ * Falls back to mock data when API is unavailable.
+ */
 class OMDbService {
   constructor() {
     this.requestCount = 0;
@@ -66,6 +73,7 @@ class OMDbService {
     return url.toString();
   }
 
+  /** Throttles requests to 100ms minimum interval to avoid rate limits */
   async throttleRequest() {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;

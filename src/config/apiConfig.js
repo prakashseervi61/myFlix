@@ -1,3 +1,7 @@
+/**
+ * Parses comma-separated API keys from environment variables.
+ * Supports multiple keys for load balancing and failover.
+ */
 const parseApiKeys = (envValue) => {
   if (!envValue || typeof envValue !== 'string') return [];
   return envValue.split(',').map(key => key.trim()).filter(key => key.length > 0);
@@ -8,6 +12,10 @@ const getRandomKey = (keys) => {
   return keys[Math.floor(Math.random() * keys.length)];
 };
 
+/**
+ * Manages API keys with round-robin rotation for rate limit handling.
+ * Supports multiple keys per service to distribute load and handle quota limits.
+ */
 class ApiConfig {
   constructor() {
     this.omdbKeys = parseApiKeys(import.meta.env.VITE_OMDB_API_KEY);
@@ -34,6 +42,7 @@ class ApiConfig {
     return this.imdbKeys[this.currentImdbIndex % this.imdbKeys.length];
   }
 
+  /** Rotates to next key on rate limit or error. Returns new key. */
   rotateOmdbKey() {
     if (this.omdbKeys.length > 1) {
       this.currentOmdbIndex = (this.currentOmdbIndex + 1) % this.omdbKeys.length;

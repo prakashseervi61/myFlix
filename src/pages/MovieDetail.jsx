@@ -1,21 +1,37 @@
 import React, { useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Clock, Calendar, Plus, Check, Film, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Star, Clock, Calendar, Plus, Check, Film, AlertTriangle, Video } from 'lucide-react';
 import { useMovieDetails } from '../hooks/useMovieDetails.js';
+import { useMovieTrailers } from '../hooks/useMovieTrailers.js';
 import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
+import TrailerPlayer from '../components/ui/TrailerPlayer.jsx';
 
+/**
+ * Movie detail page with trailer, metadata, and watchlist actions.
+ * Fetches full movie details and available trailers.
+ */
 function MovieDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { movie, loading, error } = useMovieDetails(id);
+  const { trailers, loading: trailersLoading } = useMovieTrailers(id);
   const { user } = useAuth();
   const watchlistContext = useWatchlist();
   
+  /** Memoized to avoid recalculation on every render */
   const isInWatchlist = useMemo(() => 
     watchlistContext ? watchlistContext.isInWatchlist(id) : false, 
     [watchlistContext, id]
   );
+
+  /** Prioritizes official trailer, falls back to any YouTube video */
+  const officialTrailer = useMemo(() => {
+    if (!trailers || trailers.length === 0) return null;
+    const official = trailers.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+    const anyYoutube = trailers.find(v => v.site === 'YouTube');
+    return official || anyYoutube || null;
+  }, [trailers]);
 
   const handleWatchlistClick = () => {
     if (!user) {
@@ -39,7 +55,6 @@ function MovieDetail() {
 
   return (
     <div className="min-h-screen bg-black">
-      {/* Mobile-first Hero Header */}
       <div className="relative w-full aspect-video md:aspect-[21/9] lg:h-[60vh]">
          <div 
           className="absolute inset-0 bg-cover bg-center"
@@ -60,12 +75,10 @@ function MovieDetail() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-20 md:-mt-32">
         <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-          {/* Poster - Hidden on very small screens, shown on md+ */}
           <div className="hidden md:block w-48 lg:w-64 flex-shrink-0">
             <MoviePoster poster={movie.poster} title={movie.title} />
           </div>
 
-          {/* Mobile Poster (smaller, overlapping header) */}
           <div className="md:hidden w-32 -mt-12 mb-4 rounded-lg shadow-2xl ring-2 ring-black ml-1">
              <img src={movie.poster} alt={movie.title} className="w-full rounded-lg object-cover aspect-[2/3]" />
           </div>
@@ -78,6 +91,22 @@ function MovieDetail() {
             </div>
 
             <MoviePlot plot={movie.plot} />
+
+            <div className="bg-gray-900/50 p-4 rounded-xl border border-white/5">
+              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <Video size={18} className="text-cyan-400" /> Trailer
+              </h2>
+              {trailersLoading ? (
+                <div className="w-full aspect-video bg-gray-900 animate-pulse rounded-lg" />
+              ) : (
+                <TrailerPlayer 
+                  trailerKey={officialTrailer?.key}
+                  title={movie.title}
+                  posterUrl={backdropUrl}
+                />
+              )}
+            </div>
+
             <MovieDetailsGrid movie={movie} />
           </div>
         </div>

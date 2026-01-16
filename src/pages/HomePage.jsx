@@ -13,6 +13,10 @@ const MOVIE_CATEGORIES = [
   { key: 'Romance', title: 'Romance' },
 ];
 
+/**
+ * Homepage with hero carousel and categorized movie rows.
+ * Categories are fetched and cached by MovieContext.
+ */
 function HomePage() {
   const navigate = useNavigate();
   const categories = useMovies();

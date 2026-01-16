@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 const DEFAULT_KEY = 'myflix_filters_v1';
 
+/** Default filter state. Matches TMDB discover API parameters. */
 const DEFAULT_FILTERS = {
   sort_by: 'popularity.desc',
   with_genres: [],
@@ -12,6 +13,13 @@ const DEFAULT_FILTERS = {
   only_with_trailer: false
 };
 
+/**
+ * Manages filter state with sessionStorage persistence.
+ * Filters are debounced in consuming components to avoid excessive API calls.
+ * @param {string} storageKey - SessionStorage key for persistence
+ * @param {Object} initialOverrides - Override default filter values
+ * @returns {Object} { filters, updateFilter, resetFilters }
+ */
 export function useFilters(storageKey = DEFAULT_KEY, initialOverrides = {}) {
   const [filters, setFilters] = useState(() => {
     try {
@@ -26,7 +34,6 @@ export function useFilters(storageKey = DEFAULT_KEY, initialOverrides = {}) {
     try {
       sessionStorage.setItem(storageKey, JSON.stringify(filters));
     } catch (e) {
-      // Ignore storage errors
     }
   }, [filters, storageKey]);
 

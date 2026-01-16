@@ -19,9 +19,15 @@ const LANGUAGES = [
   { value: 'hi', label: 'Hindi' }
 ];
 
+/**
+ * Filter panel with mobile drawer and desktop sidebar modes.
+ * Supports genre, year, rating, language, and trailer filters.
+ * State managed by parent via controlled component pattern.
+ */
 export default function FilterPanel({ filters, onChange, onReset, genres, className = '' }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  /** Toggles genre in array filter */
   const toggleGenre = (genreId) => {
     const current = filters.with_genres || [];
     const updated = current.includes(genreId)

@@ -27,7 +27,7 @@ html {
 }
 
 body {
-  background-color: #0f172a; /* Slate-950 fallback */
+  background-color: #0f172a;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -60,15 +60,13 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
-/* Optimized Glass Effect */
 .glass-morphism {
-  background: rgba(15, 23, 42, 0.85); /* Increased opacity to reduce need for heavy blur */
-  backdrop-filter: blur(8px); /* Reduced blur radius */
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Custom Scrollbar for non-hidden areas */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -87,17 +85,22 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #475569;
 }
 
-/* Animations - GPU Optimized */
-@keyframes shimmer {
-  0% { transform: translateX(-100%) translateZ(0); }
-  100% { transform: translateX(100%) translateZ(0); }
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
 }
 
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 @keyframes slide-in-bottom {
   from { transform: translateY(20px) translateZ(0); opacity: 0; }
   to { transform: translateY(0) translateZ(0); opacity: 1; }
@@ -111,6 +114,15 @@ h1, h2, h3, h4, h5, h6 {
 
 .fade-in {
   animation-name: fade-in;
+}
+
+img {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 
 .slide-in-from-bottom-4 {

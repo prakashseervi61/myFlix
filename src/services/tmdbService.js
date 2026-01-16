@@ -5,6 +5,10 @@ const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 const REQUEST_TIMEOUT = 15000;
 
+/**
+ * TMDB API service with caching and request timeout.
+ * Normalizes movie data to consistent shape for UI consumption.
+ */
 class TMDBService {
   constructor() {
     this.cache = new Map();
@@ -57,6 +61,7 @@ class TMDBService {
     }
   }
 
+  /** Combines multiple abort signals for timeout + manual cancellation */
   combineAbortSignals(signals) {
     const controller = new AbortController();
     signals.forEach(signal => {
@@ -69,20 +74,23 @@ class TMDBService {
     return controller.signal;
   }
 
+  /**
+   * Normalizes TMDB movie data to consistent shape.
+   * Ensures all movies have required fields with fallbacks.
+   * @returns {Object|null} Normalized movie or null if invalid
+   */
   normalizeMovieData(movie) {
-    // Basic validation: must have ID and title/original_title
     if (!movie || !movie.id || (!movie.title && !movie.original_title)) {
       return null;
     }
 
     const title = movie.title || movie.original_title;
     
-    // Fallback for poster if needed (though UI might show placeholder)
     const poster = movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : null;
     const backdrop = movie.backdrop_path ? `${BACKDROP_BASE_URL}${movie.backdrop_path}` : null;
 
     return {
-      id: String(movie.id), // Ensure ID is string for consistency
+      id: String(movie.id),
       title: title,
       year: movie.release_date ? movie.release_date.split('-')[0] : 'N/A',
       release_date: movie.release_date || null,
@@ -127,7 +135,6 @@ class TMDBService {
   }
 
   async getMovieById(id, signal) {
-    // Append credits to get director/actors in one call
     const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits' });
     const data = await this.request(url, `movie_${id}`, signal);
     return this.normalizeMovieData(data);
@@ -139,30 +146,31 @@ class TMDBService {
     return data.genres || [];
   }
 
+  /**
+   * Discover movies with advanced filtering.
+   * Transforms filter params to TMDB API format.
+   * Note: only_with_trailer must be filtered client-side (not supported by API).
+   */
   async discoverMovies(params = {}, signal) {
     const queryParams = {
       page: params.page || 1,
       sort_by: params.sort_by || 'popularity.desc',
       include_adult: false,
-      include_video: false, // Usually false for discover to get more results
+      include_video: false,
       ...params
     };
     
-    // Handle year range
     if (params.year_min) queryParams['primary_release_date.gte'] = `${params.year_min}-01-01`;
     if (params.year_max) queryParams['primary_release_date.lte'] = `${params.year_max}-12-31`;
     
-    // Handle specific mappings
     if (params.min_rating) queryParams['vote_average.gte'] = params.min_rating;
     
-    // Clean up internal keys
     delete queryParams.year_min;
     delete queryParams.year_max;
     delete queryParams.min_rating;
-    delete queryParams.only_with_trailer; // Handle externally or if API supports it (it doesn't directly)
+    delete queryParams.only_with_trailer;
 
     const url = this.buildUrl('/discover/movie', queryParams);
-    // Create a specific cache key for the filter combination
     const cacheKey = `discover_${JSON.stringify(queryParams)}`;
     const data = await this.request(url, cacheKey, signal);
     return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
@@ -170,7 +178,6 @@ class TMDBService {
 
   async getMovieVideos(movieId, signal) {
     const url = this.buildUrl(`/movie/${movieId}/videos`);
-    // Cache videos for a movie
     const cacheKey = `videos_${movieId}`;
     const data = await this.request(url, cacheKey, signal);
     return data.results || [];

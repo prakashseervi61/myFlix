@@ -3,6 +3,12 @@ import { Plus, Check, Play, Film, Info, Eye } from "lucide-react";
 import { useMovieCardLogic } from '../../hooks/useMovieCardLogic.js';
 import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
 
+/**
+ * Movie card with hover effects (desktop) and tap actions (mobile).
+ * Lazy loads images with skeleton fallback.
+ * Desktop: Hover reveals details and actions
+ * Mobile: Always shows minimal info with action buttons
+ */
 function MovieCard({ movie, onClick }) {
   const { inWatchlist, handleWatchlistClick } = useMovieCardLogic(movie);
   const { openModal } = usePreviewModal();
@@ -40,7 +46,6 @@ function MovieCard({ movie, onClick }) {
       aria-label={`View details for ${movie.title}`}
     >
       <div className={`w-full h-full bg-gray-800 rounded-lg sm:rounded-xl overflow-hidden relative isolate transform-gpu transition-transform duration-300 ease-out md:group-hover/card:scale-105 md:group-hover/card:shadow-xl md:group-hover/card:z-20 md:group-hover/card:ring-1 md:group-hover/card:ring-white/20`}>
-         {/* Image Container */}
         <div className={`w-full h-full transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
           <Image 
             poster={movie.poster} 
@@ -51,12 +56,10 @@ function MovieCard({ movie, onClick }) {
           />
         </div>
         
-        {/* Skeleton/Loader while image loads - reduces perceived latency */}
         {!isLoaded && !imageError && (
           <div className="absolute inset-0 bg-gray-800 animate-pulse" />
         )}
 
-        {/* Desktop Hover Overlay - Gradient & Actions */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-0 md:group-hover/card:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4 pointer-events-none md:group-hover/card:pointer-events-auto">
           <div className="transform translate-y-4 md:group-hover/card:translate-y-0 transition-transform duration-300 will-change-transform">
              <h3 className="font-bold text-white text-sm sm:text-base mb-1 line-clamp-2 leading-snug tracking-tight">{movie.title}</h3>
@@ -86,7 +89,6 @@ function MovieCard({ movie, onClick }) {
         </div>
       </div>
 
-      {/* Mobile/Touch Content - Always Visible */}
       <div className="md:hidden absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-100 rounded-lg sm:rounded-xl pointer-events-none">
         <div className="absolute bottom-0 left-0 right-0 p-3 flex flex-col justify-end h-full">
            <h3 className="font-bold text-xs text-white mb-1 line-clamp-1 text-shadow tracking-tight leading-snug">{movie.title}</h3>

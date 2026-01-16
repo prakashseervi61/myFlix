@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
+/** Generates user-specific storage key. Guest users get separate storage. */
 const getUserDataKey = (user) => 
   user ? `myflix-userdata-${user.id}` : 'myflix-userdata-guest';
 
@@ -28,15 +29,19 @@ const saveDataToStorage = (user, data) => {
   }
 };
 
+/**
+ * User-specific watchlist with localStorage persistence.
+ * Data is keyed by user ID to support multi-user scenarios.
+ * @param {Object} user - Current user object with id
+ * @returns {Object} Watchlist state and actions
+ */
 export function useWatchlist(user) {
   const [data, setData] = useState(() => loadDataFromStorage(user));
 
-  // Reload data only when user ID changes (or user switches from null to object)
   useEffect(() => {
     setData(loadDataFromStorage(user));
-  }, [user?.id]); 
+  }, [user?.id]);
 
-  // Save data whenever it changes
   useEffect(() => {
     saveDataToStorage(user, data);
   }, [user, data]);
@@ -47,6 +52,7 @@ export function useWatchlist(user) {
     return data.watchlist.some(item => String(item.id) === targetId);
   }, [data.watchlist]);
 
+  /** Toggles movie in watchlist. IDs normalized to strings for consistency. */
   const toggleWatchlist = useCallback((movie) => {
     if (!movie?.id) return;
     const targetId = String(movie.id);
@@ -112,6 +118,7 @@ export function useWatchlist(user) {
     }));
   }, []);
 
+  /** Derives continue watching from progress (>0% and <95% complete) */
   const continueWatching = Object.entries(data.progress)
     .filter(([, p]) => p.currentTime > 0 && p.currentTime / p.duration < 0.95)
     .sort((a, b) => b[1].updatedAt - a[1].updatedAt)

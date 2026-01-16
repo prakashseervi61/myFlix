@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Error boundary for graceful error handling.
+ * Catches React errors and displays fallback UI.
+ */
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

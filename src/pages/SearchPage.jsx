@@ -10,6 +10,11 @@ import FilterPanel from '../components/FilterPanel.jsx';
 import MovieCard from '../components/ui/MovieCard.jsx';
 import MovieCardSkeleton from '../components/ui/MovieCardSkeleton.jsx';
 
+/**
+ * Search page with client-side filtering of results.
+ * Search is handled by useSearch hook, filters applied locally.
+ * Supports both grid and list view modes.
+ */
 function SearchPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
@@ -25,6 +30,7 @@ function SearchPage() {
   const [genres, setGenres] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
 
+  /** Sentinel for infinite scroll */
   const loadMoreRef = useIntersectionObserver({
     enabled: !searchLoading && searchHasMore && debouncedQuery.trim().length > 0,
     onIntersect: () => setPage(p => p + 1)
@@ -36,13 +42,11 @@ function SearchPage() {
         const genreList = await tmdbService.getGenres();
         setGenres(genreList);
       } catch (e) {
-        // Ignore
       }
     };
     fetchGenres();
   }, []);
 
-  // Reset page when query changes
   useEffect(() => {
     setPage(1);
   }, [debouncedQuery]);
@@ -69,14 +73,13 @@ function SearchPage() {
       try {
         let results = [...searchResults];
 
-        // 1. Genre Filter
+        /** Apply filters to search results */
         if (debouncedFilters.with_genres && debouncedFilters.with_genres.length > 0) {
           results = results.filter(movie => 
             movie.genre_ids && debouncedFilters.with_genres.some(g => movie.genre_ids.includes(g))
           );
         }
 
-        // 2. Year Filter
         if (debouncedFilters.year_min) {
           results = results.filter(movie => parseInt(movie.year) >= parseInt(debouncedFilters.year_min));
         }
@@ -84,17 +87,14 @@ function SearchPage() {
           results = results.filter(movie => parseInt(movie.year) <= parseInt(debouncedFilters.year_max));
         }
 
-        // 3. Rating Filter
         if (debouncedFilters.min_rating > 0) {
           results = results.filter(movie => parseFloat(movie.rating) >= debouncedFilters.min_rating);
         }
 
-        // 4. Language Filter
         if (debouncedFilters.with_original_language) {
           results = results.filter(movie => movie.original_language === debouncedFilters.with_original_language);
         }
 
-        // 5. Trailer Filter (Async)
         if (debouncedFilters.only_with_trailer) {
            const trailerChecks = await Promise.allSettled(
              results.map(movie => tmdbService.getMovieVideos(movie.id))
@@ -110,14 +110,13 @@ function SearchPage() {
            results = results.filter(m => moviesWithTrailers.has(Number(m.id)));
         }
 
-        // 6. Sort
         if (debouncedFilters.sort_by) {
           results.sort((a, b) => {
              switch (debouncedFilters.sort_by) {
                case 'popularity.desc': return (b.popularity || 0) - (a.popularity || 0);
                case 'vote_average.desc': return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
                case 'primary_release_date.desc': return new Date(b.release_date || 0) - new Date(a.release_date || 0);
-               case 'revenue.desc': return 0; // Not available in list results usually
+               case 'revenue.desc': return 0;
                default: return 0;
              }
           });
@@ -248,7 +247,6 @@ const RenderContent = ({ initialLoading, isLoadingMore, error, query, results, o
           ))}
         </div>
         
-        {/* Sentinel */}
         <div ref={loadMoreRef} className="h-4 w-full" />
         
         {!hasMore && !filtering && (

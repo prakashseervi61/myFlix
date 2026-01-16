@@ -2,6 +2,10 @@ import React, { createContext, useContext } from 'react';
 import { useWatchlist as useWatchlistHook } from '../hooks/useWatchlist.js';
 import { useAuth } from '../hooks/useAuth.jsx';
 
+/**
+ * Watchlist context providing user's saved movies.
+ * Returns null during auth loading to prevent flash of empty state.
+ */
 const WatchlistContext = createContext(null);
 
 export const useWatchlist = () => {

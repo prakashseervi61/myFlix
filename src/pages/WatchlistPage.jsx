@@ -5,6 +5,10 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import MovieCard from '../components/ui/MovieCard';
 import { Film } from 'lucide-react';
 
+/**
+ * User's watchlist page.
+ * Redirects to login if not authenticated.
+ */
 function WatchlistPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();

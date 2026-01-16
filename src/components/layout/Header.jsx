@@ -6,6 +6,7 @@ import { useAuth } from "../../hooks/useAuth.jsx";
 import { useWatchlist } from "../../contexts/WatchlistContext.jsx";
 import { useSearch } from "../../hooks/useSearch.js";
 import { useDebounce } from 'use-debounce';
+import { useGlobalScrollLock } from "../../hooks/useGlobalScrollLock.js";
 
 const NavItem = React.memo(({ to, children }) => (
   <Link 
@@ -34,6 +35,8 @@ export default function Header() {
   const { searchResults, loading, error, searchMovies, clearResults } = useSearch();
   const sentinelRef = useRef(null);
 
+  useGlobalScrollLock(isMenuOpen || searchExpanded);
+
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       setIsScrolled(!entry.isIntersecting);
@@ -59,54 +62,6 @@ export default function Header() {
     setSearchExpanded(false);
   }, [location.pathname]);
 
-  // Robust Scroll Locking for Mobile Menu and Search (iOS/Android compatible)
-  useEffect(() => {
-    const shouldLock = isMenuOpen || searchExpanded;
-    if (!shouldLock) return;
-
-    // Capture current scroll position
-    const scrollY = window.scrollY;
-    // Calculate scrollbar width to prevent layout shift
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-    
-    // Store original styles
-    const originalStyles = {
-        paddingRight: document.body.style.paddingRight,
-        overflow: document.body.style.overflow,
-        position: document.body.style.position,
-        top: document.body.style.top,
-        width: document.body.style.width,
-        scrollBehavior: document.documentElement.style.scrollBehavior
-    };
-
-    // Lock body
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
-    document.body.style.paddingRight = `${scrollbarWidth}px`;
-    document.body.style.overflow = 'hidden';
-
-    // Unlock on cleanup
-    return () => {
-      // Disable smooth scrolling temporarily to prevent jump animation
-      document.documentElement.style.scrollBehavior = 'auto';
-      
-      document.body.style.position = originalStyles.position;
-      document.body.style.top = originalStyles.top;
-      document.body.style.width = originalStyles.width;
-      document.body.style.paddingRight = originalStyles.paddingRight;
-      document.body.style.overflow = originalStyles.overflow;
-      
-      // Restore scroll position instantly
-      window.scrollTo(0, scrollY);
-      
-      // Restore smooth scrolling after a minimal delay
-      requestAnimationFrame(() => {
-          document.documentElement.style.scrollBehavior = originalStyles.scrollBehavior;
-      });
-    };
-  }, [isMenuOpen, searchExpanded]);
-
   const handleMovieClick = (movie) => {
     navigate(`/movie/${movie.id}`);
     setSearchQuery('');
@@ -128,10 +83,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-full">
             
             <div className="flex items-center gap-6 sm:gap-8">
-              <Link to="/" className="flex items-center gap-2 group shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-lg" aria-label="myFlix Home">
-                <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300 shadow-lg shadow-cyan-900/20">
-                  <Film className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                </div>
+              <Link to="/" className="flex items-center gap-2 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-lg" aria-label="myFlix Home">
                 <span className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 tracking-tight">
                   myFlix
                 </span>

@@ -1,0 +1,53 @@
+.pagination-dot {
+  position: relative;
+  height: 5px;
+  width: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 9999px;
+  transition: width 300ms ease-out, background-color 300ms ease-out;
+  overflow: hidden;
+}
+
+.pagination-dot.active {
+  width: 2rem;
+  background-color: white;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 100%;
+  background-color: #3b82f6; /* Blue fill */
+  border-radius: 9999px;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.pagination-dot.active .progress-fill {
+  animation: fill-progress var(--duration) linear forwards;
+}
+
+.pagination-dot.active .progress-fill.paused {
+   animation-play-state: paused;
+}
+
+@keyframes fill-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pagination-dot.active .progress-fill {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 768px) {
+  .pagination-dot.active {
+    width: 1.5rem;
+  }
+}

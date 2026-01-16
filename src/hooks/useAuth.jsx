@@ -1,5 +1,10 @@
 import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
 
+/**
+ * Authentication context with localStorage persistence.
+ * Provides login, signup, logout with simple email/password validation.
+ * Note: This is a demo implementation. Production should use secure backend auth.
+ */
 const AuthContext = createContext(null);
 
 export const useAuth = () => {
@@ -14,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  /** Restore user session from localStorage on mount */
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('myflix_user');

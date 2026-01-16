@@ -1,24 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Play, Plus, Check, Info, Volume2, VolumeX } from 'lucide-react';
+import { X, Play, Plus, Check, Info } from 'lucide-react';
 import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
 import { useWatchlist } from '../../contexts/WatchlistContext.jsx';
 import { tmdbService } from '../../services/tmdbService.js';
+import TrailerPlayer from './TrailerPlayer.jsx';
+import { useGlobalScrollLock } from '../../hooks/useGlobalScrollLock.js';
 
+/**
+ * Movie preview modal with trailer playback.
+ * Fetches trailer and full details on open.
+ * Uses global scroll lock to prevent background scrolling.
+ */
 export default function MoviePreviewModal() {
   const { isOpen, selectedMovie, closeModal } = usePreviewModal();
   const navigate = useNavigate();
   const [trailer, setTrailer] = useState(null);
   const [fullDetails, setFullDetails] = useState(null);
   const [loadingVideo, setLoadingVideo] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const modalRef = useRef(null);
+
+  useGlobalScrollLock(isOpen);
   
-  // Watchlist logic
   const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const inWatchlist = selectedMovie ? watchlist.some(m => m.id === selectedMovie.id) : false;
 
-  // Handle ESC key and Focus Trap
+  /** ESC key closes modal, focus trap keeps keyboard navigation inside */
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isOpen) return;
@@ -26,23 +33,19 @@ export default function MoviePreviewModal() {
     };
     
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
       setTimeout(() => modalRef.current?.focus(), 50);
     } else {
-      document.body.style.overflow = '';
       setTrailer(null);
       setFullDetails(null);
-      setIsMuted(true);
     }
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
     };
   }, [isOpen, closeModal]);
 
-  // Fetch Trailer & Details
+  /** Fetches trailer and full movie details in parallel */
   useEffect(() => {
     if (isOpen && selectedMovie?.id) {
       setLoadingVideo(true);
@@ -54,13 +57,11 @@ export default function MoviePreviewModal() {
              tmdbService.getMovieById(selectedMovie.id)
           ]);
 
-          // Prioritize Youtube Trailers
           const official = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
           const anyYoutube = videos.find(v => v.site === 'YouTube');
           setTrailer(official || anyYoutube || null);
           setFullDetails(details);
         } catch (e) {
-          // Fallback
         } finally {
           setLoadingVideo(false);
         }
@@ -91,7 +92,6 @@ export default function MoviePreviewModal() {
 
   if (!isOpen || !selectedMovie) return null;
 
-  // Use fullDetails if available, otherwise fallback to selectedMovie (which has basics)
   const displayMovie = fullDetails || selectedMovie;
 
   return (
@@ -117,51 +117,26 @@ export default function MoviePreviewModal() {
         </button>
 
         {/* Hero / Video Section */}
-        <div className="relative aspect-video w-full bg-black group">
+        <div className="relative w-full bg-black group">
           {loadingVideo ? (
-             <div className="absolute inset-0 flex items-center justify-center">
+             <div className="relative w-full aspect-video bg-black flex items-center justify-center">
                <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
              </div>
-          ) : trailer ? (
-            <div className="absolute inset-0 w-full h-full">
-              <iframe
-                className="w-full h-full"
-                src={`https://www.youtube.com/embed/${trailer.key}?autoplay=1&mute=${isMuted ? 1 : 0}&controls=0&modestbranding=1&rel=0&loop=1&playlist=${trailer.key}`}
-                title={displayMovie.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-               <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent pointer-events-none"></div>
-               
-               {/* Mute Toggle */}
-               <button 
-                 onClick={() => setIsMuted(!isMuted)}
-                 className="absolute bottom-4 right-4 z-20 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white border border-white/20 hidden md:block"
-               >
-                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-               </button>
-            </div>
           ) : (
-             <>
-               <img 
-                 src={displayMovie.backdrop || displayMovie.poster} 
-                 alt={displayMovie.title}
-                 className="w-full h-full object-cover opacity-60"
-               />
-               <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent"></div>
-               <div className="absolute inset-0 flex items-center justify-center">
-                 <p className="text-gray-400 font-medium">No trailer available</p>
-               </div>
-             </>
+            <TrailerPlayer 
+              trailerKey={trailer?.key} 
+              title={displayMovie.title}
+              posterUrl={displayMovie.backdrop || displayMovie.poster}
+            />
           )}
 
           {/* Title Overlay on Hero */}
-          <div className="absolute bottom-0 left-0 p-6 w-full z-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2 text-shadow-lg leading-tight">
+          <div className="absolute bottom-0 left-0 p-6 w-full z-10 pointer-events-none">
+             <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent pointer-events-none"></div>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2 text-shadow-lg leading-tight relative z-10">
               {displayMovie.title}
             </h2>
-            <div className="flex items-center gap-3 text-sm font-semibold">
+            <div className="flex items-center gap-3 text-sm font-semibold relative z-10">
               <span className="text-green-400">{displayMovie.rating ? `${(parseFloat(displayMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
               <span className="text-gray-300">{displayMovie.year}</span>
               {displayMovie.runtime && (

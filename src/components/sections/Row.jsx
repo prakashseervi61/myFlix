@@ -3,11 +3,17 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import MovieCard from "../ui/MovieCard";
 import MovieCardSkeleton from "../ui/MovieCardSkeleton";
 
+/**
+ * Horizontal scrolling row with navigation buttons and infinite scroll support.
+ * Uses RAF for scroll position tracking to avoid layout thrashing.
+ * Buttons fade in on hover (desktop) and are hidden on mobile (swipe instead).
+ */
 function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
   const scrollRef = useRef(null);
   const [showButtons, setShowButtons] = useState({ left: false, right: false });
   const rafRef = useRef(null);
 
+  /** Memoized skeleton array to prevent recreation on every render */
   const skeletons = useMemo(() => 
     Array(8).fill(0).map((_, i) => (
       <li key={i} className="snap-start w-32 xs:w-36 sm:w-44 md:w-48 lg:w-56 flex-shrink-0">
@@ -17,6 +23,7 @@ function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
     []
   );
 
+  /** Debounced scroll handler using RAF to check button visibility */
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
     
@@ -27,7 +34,6 @@ function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
     rafRef.current = requestAnimationFrame(() => {
       if (!scrollRef.current) return;
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      // Buffer of 10px to avoid floating point issues
       const isAtStart = scrollLeft <= 10;
       const isAtEnd = scrollLeft >= scrollWidth - clientWidth - 10;
       
@@ -77,7 +83,6 @@ function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
       </div>
       
       <div className="relative">
-        {/* Desktop Navigation Buttons - Full Height Overlay */}
         <div className="hidden md:block">
           <button
             onClick={() => scroll('left')}
@@ -100,7 +105,6 @@ function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
           </button>
         </div>
         
-        {/* Scroll Container - Added padding y for hover scale effects */}
         <ul
           ref={scrollRef} 
           className="flex gap-3 sm:gap-4 md:gap-5 overflow-x-auto overflow-y-visible snap-x snap-mandatory scrollbar-hide px-4 sm:px-6 lg:px-8 py-4 -my-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
@@ -114,7 +118,6 @@ function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
               <MovieCard movie={movie} onClick={onMovieClick} />
             </li>
           ))}
-          {/* Spacer for end of list */}
           <li className="w-8 md:w-12 flex-shrink-0" aria-hidden="true" role="presentation" />
         </ul>
       </div>

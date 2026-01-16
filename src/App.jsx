@@ -9,7 +9,7 @@ import { WatchlistProvider } from './contexts/WatchlistContext.jsx';
 import { PreviewModalProvider } from './contexts/PreviewModalContext.jsx';
 import MoviePreviewModal from './components/ui/MoviePreviewModal.jsx';
 
-// Lazy load pages for performance (Code Splitting)
+/** Lazy-loaded pages for code splitting and faster initial load */
 const HomePage = lazy(() => import('./pages/HomePage'));
 const BrowsePage = lazy(() => import('./pages/BrowsePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));

@@ -13,9 +13,6 @@ function Footer() {
           
           <div className="col-span-2 lg:col-span-2">
             <div className="flex items-center gap-2 mb-3">
-               <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
-                 <span className="font-bold text-white text-base sm:text-lg">m</span>
-               </div>
                <span className="text-lg sm:text-xl font-bold text-white tracking-tight">myFlix</span>
             </div>
             <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4 max-w-sm">
@@ -88,7 +85,7 @@ const SocialLink = ({ icon: Icon, href, label }) => (
   <a 
     href={href} 
     aria-label={label}
-    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white hover:border-gray-700 transition-all"
+    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 transition-all"
   >
     <Icon size={16} />
   </a>

@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
-import { movieService } from '../services/movieService.js';
+import { tmdbService } from '../services/tmdbService.js';
 
+/**
+ * Fetches movie trailers/videos from TMDB.
+ * @param {string} id - TMDB movie ID
+ * @returns {Object} { trailers, loading, error }
+ */
 export function useMovieTrailers(id) {
   const [trailers, setTrailers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +26,7 @@ export function useMovieTrailers(id) {
       setLoading(true);
       setError(null);
       try {
-        const data = await movieService.getMovieTrailers(id, signal);
+        const data = await tmdbService.getMovieVideos(id, signal);
         if (!signal.aborted) {
           setTrailers(data || []);
         }

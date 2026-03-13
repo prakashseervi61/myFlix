@@ -10,6 +10,7 @@ function PlaceholderPage() {
   }, [section]);
   
   const formatTitle = (section) => {
+    if (!section) return 'Coming Soon';
     return section
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))

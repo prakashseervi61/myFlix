@@ -107,7 +107,7 @@ function SearchPage() {
              }
            });
            
-           results = results.filter(m => moviesWithTrailers.has(Number(m.id)));
+           results = results.filter(m => moviesWithTrailers.has(String(m.id)));
         }
 
         if (debouncedFilters.sort_by) {

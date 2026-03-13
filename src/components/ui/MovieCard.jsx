@@ -10,7 +10,7 @@ import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
  * Mobile: Always shows minimal info with action buttons
  */
 function MovieCard({ movie, onClick }) {
-  const { inWatchlist, handleWatchlistClick } = useMovieCardLogic(movie);
+  const { isMovieInWatchlist: inWatchlist, handleToggleWatchlist: handleWatchlistClick } = useMovieCardLogic(movie);
   const { openModal } = usePreviewModal();
   const [imageError, setImageError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);

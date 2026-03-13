@@ -6,6 +6,10 @@ import { useMovieTrailers } from '../hooks/useMovieTrailers.js';
 import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import TrailerPlayer from '../components/ui/TrailerPlayer.jsx';
+import ReviewSection from '../components/ReviewSection.jsx';
+import DiscussionSection from '../components/DiscussionSection.jsx';
+import CastSection from '../components/CastSection.jsx';
+import GallerySection from '../components/GallerySection.jsx';
 
 /**
  * Movie detail page with trailer, metadata, and watchlist actions.
@@ -54,77 +58,107 @@ function MovieDetail() {
   const backdropUrl = movie.backdrop || movie.poster;
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="relative w-full aspect-video md:aspect-[21/9] lg:h-[60vh]">
-         <div 
-          className="absolute inset-0 bg-cover bg-center"
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyan-500/30">
+      {/* 1. Movie Hero Section */}
+      <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
           style={{ backgroundImage: `url(${backdropUrl})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
+          <div className="absolute inset-0 bg-black/20" />
         </div>
         
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-20 left-4 z-20 flex items-center justify-center p-3 rounded-full text-white bg-black/60 backdrop-blur-md border border-white/20 shadow-2xl transition-all duration-300 hover:bg-black/80 hover:scale-110 active:scale-90 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:ring-offset-2 focus:ring-offset-black group"
+          className="absolute top-20 left-4 md:left-8 z-30 flex items-center justify-center p-3 rounded-full text-white bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl transition-all duration-300 hover:bg-black/60 hover:scale-110 active:scale-90"
           aria-label="Go back"
         >
-          <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft size={24} />
         </button>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 -mt-20 md:-mt-32">
-        <div className="flex flex-col md:flex-row gap-6 md:gap-8">
-          <div className="hidden md:block w-48 lg:w-64 flex-shrink-0">
+      {/* Main Content Container */}
+      <div className="max-w-[1300px] mx-auto px-4 md:px-8 pb-20 relative z-10 -mt-32 md:-mt-60">
+        
+        {/* 2. Movie Info Section (Poster + Title + Metadata) */}
+        <section className="flex flex-col md:flex-row gap-8 items-end md:items-start">
+          <div className="w-48 lg:w-64 flex-shrink-0 shadow-2xl shadow-black/50 rounded-2xl overflow-hidden ring-1 ring-white/10 group">
             <MoviePoster poster={movie.poster} title={movie.title} />
           </div>
 
-          <div className="md:hidden w-32 -mt-12 mb-4 rounded-lg shadow-2xl ring-2 ring-black ml-1">
-             <img src={movie.poster} alt={movie.title} className="w-full rounded-lg object-cover aspect-[2/3]" />
-          </div>
-
-          <div className="flex-1 space-y-4 md:space-y-6 pb-20 md:pb-12">
+          <div className="flex-1 space-y-6 pt-4 md:pt-20">
             <MovieDetailsHeader movie={movie} />
-            
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-4">
                <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
+               <div className="flex items-center gap-4 text-sm font-medium text-gray-400 border-l border-white/10 pl-4 h-10">
+                 <div className="flex items-center gap-1.5"><Star size={18} className="text-yellow-500 fill-yellow-500" /> {movie.rating}</div>
+                 <div className="hidden sm:block opacity-30">|</div>
+                 <div className="hidden sm:block">{movie.year}</div>
+               </div>
             </div>
-
             <MoviePlot plot={movie.plot} />
-
-            <div className="bg-gray-900/50 p-4 rounded-xl border border-white/5">
-              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <Video size={18} className="text-cyan-400" /> Trailer
-              </h2>
-              {trailersLoading ? (
-                <div className="w-full aspect-video bg-gray-900 animate-pulse rounded-lg" />
-              ) : (
-                <TrailerPlayer 
-                  trailerKey={officialTrailer?.key}
-                  title={movie.title}
-                  posterUrl={backdropUrl}
-                />
-              )}
-            </div>
-
             <MovieDetailsGrid movie={movie} />
           </div>
-        </div>
+        </section>
+
+        {/* 3. Trailer Section (Centered 16:9) */}
+        <section className="mt-16 md:mt-24 max-w-4xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <Video className="text-cyan-500" size={24} />
+            <h2 className="text-2xl font-bold uppercase tracking-tight">Official Trailer</h2>
+          </div>
+          <div className="bg-gray-900 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-white/10 aspect-video">
+            {trailersLoading ? (
+              <div className="w-full h-full bg-gray-900 animate-pulse" />
+            ) : (
+              <TrailerPlayer 
+                trailerKey={officialTrailer?.key}
+                title={movie.title}
+                posterUrl={backdropUrl}
+                showControls={true}
+              />
+            )}
+          </div>
+        </section>
+
+        {/* 4. Cast Section */}
+        <section className="mt-16 md:mt-24">
+          <CastSection cast={movie.cast} />
+        </section>
+
+        {/* 5. Gallery Section */}
+        <section className="mt-16 md:mt-24">
+          <GallerySection images={movie.images} />
+        </section>
+
+        {/* 6. Community Section (Reviews / Discussions side by side) */}
+        <section className="mt-16 md:mt-24 border-t border-white/5 pt-16">
+          <div className="community-section flex flex-col lg:flex-row gap-12">
+            <div className="flex-1 min-w-0">
+              <ReviewSection movieId={id} user={user} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <DiscussionSection movieId={id} user={user} />
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
   );
 }
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-black">
-    <div className="w-full aspect-video bg-gray-900 animate-pulse" />
-    <div className="container mx-auto px-4 py-8">
+  <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="w-full h-[50vh] bg-gray-900/50 animate-pulse" />
+    <div className="max-w-[1300px] mx-auto px-4 md:px-8 -mt-32 relative z-10">
       <div className="flex flex-col md:flex-row gap-8">
-        <div className="hidden md:block w-48 h-72 bg-gray-900 rounded-lg animate-pulse" />
-        <div className="flex-1 space-y-4">
-          <div className="h-8 bg-gray-900 rounded w-3/4 animate-pulse" />
-          <div className="h-4 bg-gray-900 rounded w-1/2 animate-pulse" />
-          <div className="h-24 bg-gray-900 rounded animate-pulse" />
+        <div className="w-48 lg:w-64 aspect-[2/3] bg-gray-900 rounded-2xl animate-pulse ring-1 ring-white/10" />
+        <div className="flex-1 space-y-4 pt-10 md:pt-20">
+          <div className="h-10 bg-gray-900 rounded-lg w-3/4 animate-pulse" />
+          <div className="h-6 bg-gray-900 rounded-lg w-1/2 animate-pulse" />
+          <div className="h-32 bg-gray-900 rounded-2xl animate-pulse" />
         </div>
       </div>
     </div>

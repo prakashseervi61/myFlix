@@ -29,7 +29,9 @@ class TMDBService {
     return url.toString();
   }
 
-  async request(url, cacheKey, signal) {
+  async request(url, cacheKey, signal, retryCount = 0) {
+    const MAX_RETRIES = apiConfig.tmdbKeys.length;
+
     if (cacheKey && this.cache.has(cacheKey)) {
       const cached = this.cache.get(cacheKey);
       if (Date.now() - cached.timestamp < this.cacheTimeout) {
@@ -39,13 +41,22 @@ class TMDBService {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-    const combinedSignal = signal ? this.combineAbortSignals([signal, controller.signal]) : controller.signal;
+    const combinedSignals = [controller.signal];
+    if (signal) combinedSignals.push(signal);
+    const combinedSignal = this.combineAbortSignals(combinedSignals);
 
     try {
       const response = await fetch(url, { signal: combinedSignal });
       clearTimeout(timeoutId);
       
       if (!response.ok) {
+        // Rotate key on rate limit or auth error
+        if ((response.status === 429 || response.status === 401) && retryCount < MAX_RETRIES) {
+          const newKey = apiConfig.rotateTmdbKey();
+          const newUrl = new URL(url);
+          newUrl.searchParams.set('api_key', newKey);
+          return this.request(newUrl.toString(), cacheKey, signal, retryCount + 1);
+        }
         throw new Error(`TMDB API error: ${response.status}`);
       }
 
@@ -56,7 +67,26 @@ class TMDBService {
       return data;
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error.name === 'AbortError') return { results: [] };
+      if (error.name === 'AbortError') {
+        if (signal?.aborted) return { results: [] };
+        // If it was our timeout, try another key
+        if (retryCount < MAX_RETRIES) {
+          const newKey = apiConfig.rotateTmdbKey();
+          const newUrl = new URL(url);
+          newUrl.searchParams.set('api_key', newKey);
+          return this.request(newUrl.toString(), cacheKey, signal, retryCount + 1);
+        }
+        return { results: [] };
+      }
+      
+      // For network errors (like ECONNRESET), also rotate and retry
+      if (retryCount < MAX_RETRIES) {
+        const newKey = apiConfig.rotateTmdbKey();
+        const newUrl = new URL(url);
+        newUrl.searchParams.set('api_key', newKey);
+        return this.request(newUrl.toString(), cacheKey, signal, retryCount + 1);
+      }
+      
       throw error;
     }
   }
@@ -104,7 +134,19 @@ class TMDBService {
       original_language: movie.original_language || 'en',
       popularity: movie.popularity || 0,
       director: movie.credits?.crew?.find(c => c.job === 'Director')?.name || null,
-      actors: movie.credits?.cast?.slice(0, 3).map(c => c.name).join(', ') || null
+      actors: movie.credits?.cast?.slice(0, 3).map(c => c.name).join(', ') || null,
+      cast: movie.credits?.cast?.slice(0, 15).map(c => ({
+        id: c.id,
+        name: c.name,
+        character: c.character,
+        profile_path: c.profile_path ? `https://image.tmdb.org/t/p/w185${c.profile_path}` : null
+      })) || [],
+      images: movie.images?.backdrops?.slice(0, 12).map(img => ({
+        file_path: img.file_path,
+        aspect_ratio: img.aspect_ratio,
+        url: `https://image.tmdb.org/t/p/w780${img.file_path}`,
+        full: `https://image.tmdb.org/t/p/original${img.file_path}`
+      })) || []
     };
   }
 
@@ -135,7 +177,7 @@ class TMDBService {
   }
 
   async getMovieById(id, signal) {
-    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits' });
+    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits,images', include_image_language: 'en,null' });
     const data = await this.request(url, `movie_${id}`, signal);
     return this.normalizeMovieData(data);
   }

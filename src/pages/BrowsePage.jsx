@@ -99,7 +99,7 @@ function BrowsePage() {
            });
 
            results = results
-             .filter(m => moviesWithTrailers.has(Number(m.id)))
+             .filter(m => moviesWithTrailers.has(String(m.id)))
              .map(m => ({ ...m, has_trailer: true }));
         } else {
           results = results.map(m => ({ ...m, has_trailer: false }));

@@ -25,7 +25,7 @@ const MovieListItem = ({ movie }) => {
   };
 
   return (
-    <div className="flex bg-gray-900/50 border border-gray-800 rounded-lg overflow-hidden transition-all duration-300 hover:bg-gray-800/60 hover:border-gray-700">
+    <div className="flex bg-[#5E4A65]/40 border border-[#C0927C]/20 rounded-xl overflow-hidden transition-all duration-300 hover:bg-[#5E4A65]/60 hover:border-[#C1372C]/40 shadow-lg backdrop-blur-sm group/item">
       <div className="w-24 sm:w-28 flex-shrink-0" onClick={handleNavigate}>
         <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover cursor-pointer" />
       </div>
@@ -33,36 +33,36 @@ const MovieListItem = ({ movie }) => {
         <div>
           <h3
             onClick={handleNavigate}
-            className="text-base sm:text-lg font-bold text-white cursor-pointer hover:text-cyan-400 transition-colors"
+            className="text-base sm:text-lg font-bold text-white cursor-pointer hover:text-[#C1372C] transition-colors"
           >
             {movie.title}
           </h3>
-          <div className="flex items-center text-xs sm:text-sm text-gray-400 mt-1 space-x-3">
+          <div className="flex items-center text-xs sm:text-sm text-[#C0927C] mt-1 space-x-3">
             <span>{year}</span>
             <div className="flex items-center">
               <Star size={14} className="text-yellow-500 mr-1" />
               <span>{rating}</span>
             </div>
           </div>
-          <p className="text-xs sm:text-sm text-gray-400 mt-2 sm:mt-3 line-clamp-2">
+          <p className="text-xs sm:text-sm text-[#C0927C]/80 mt-2 sm:mt-3 line-clamp-2">
             {movie.overview}
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
           <button
             onClick={handleToggleWatchlist}
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs rounded-md transition-colors ${
+            className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all active:scale-95 ${
               isMovieInWatchlist
-                ? 'bg-cyan-600 text-white hover:bg-cyan-700'
-                : 'bg-gray-700/70 text-gray-200 hover:bg-gray-700'
+                ? 'bg-[#C1372C] text-white shadow-lg shadow-[#C1372C]/20'
+                : 'bg-white/5 text-[#C0927C] hover:bg-white/10 border border-[#C0927C]/20'
             }`}
           >
-            <Bookmark size={14} />
+            <Bookmark size={14} className={isMovieInWatchlist ? 'fill-current' : ''} />
             <span className="hidden sm:inline">{isMovieInWatchlist ? 'Added' : 'Watchlist'}</span>
           </button>
           <button
             onClick={handleNavigate}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs bg-gray-700/70 text-gray-200 hover:bg-gray-700 rounded-md transition-colors"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold bg-white/5 text-[#C0927C] hover:bg-white/10 rounded-xl transition-all active:scale-95 border border-[#C0927C]/20"
           >
             <Eye size={14} />
             <span className="hidden sm:inline">Details</span>
@@ -70,7 +70,7 @@ const MovieListItem = ({ movie }) => {
           {movie.has_trailer && (
             <button
               onClick={handleOpenPreview}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-2 sm:px-3 py-1.5 text-xs bg-gray-700/70 text-gray-200 hover:bg-gray-700 rounded-md transition-colors"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold bg-white/5 text-[#C0927C] hover:bg-white/10 rounded-xl transition-all active:scale-95 border border-[#C0927C]/20"
             >
               <Play size={14} />
               <span className="hidden sm:inline">Trailer</span>

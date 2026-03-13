@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #021C4F;
-  --color-secondary: #C50337;
-  --color-accent: #C50337;
+  --color-primary: #C1372C;
+  --color-bg-main: #20151A;
+  --color-surface: #5E4A65;
+  --color-surface-secondary: #7B3A3C;
+  --color-border: #C0927C;
+  --color-accent: #C1372C;
   
-  --bg-dark: #010d26;
-  --bg-deep-navy: #021C4F;
-  --bg-crimson: #C50337;
+  --text-primary: #FFFFFF;
+  --text-secondary: #C0927C;
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -19,17 +21,20 @@
   --font-size-4xl: 2.25rem;
 
   --spacing-md: 1rem;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
 }
 
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
-  background-color: var(--bg-dark);
+  background-color: var(--color-bg-main);
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: #FFFFFF;
+  background-color: var(--color-bg-main);
+  color: var(--text-primary);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -62,11 +67,69 @@ h1, h2, h3, h4, h5, h6 {
   display: none;
 }
 
-.glass-morphism {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+@media (min-width: 768px) {
+  .glass-morphism, .navbar {
+    background: var(--color-bg-main);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(192, 146, 124, 0.1);
+  }
+}
+
+.navbar {
+  background: var(--color-bg-main);
+}
+
+.main-container {
+  background: transparent !important;
+}
+
+.movie-card,
+.review-card,
+.cast-card,
+.panel-surface {
+  background-color: var(--color-surface) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(192, 146, 124, 0.15);
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.movie-card:hover,
+.review-card:hover,
+.cast-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.secondary-panel {
+  background-color: var(--color-surface-secondary) !important;
+  border-radius: 12px;
+}
+
+.primary-button {
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  transition: all 0.2s ease-in-out;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.primary-button:hover {
+  background-color: #a82e25 !important;
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  background-color: transparent !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.2s ease-in-out;
+  border-radius: 8px;
+}
+
+.secondary-button:hover {
+  background-color: rgba(192, 146, 124, 0.1) !important;
 }
 
 ::-webkit-scrollbar {
@@ -87,21 +150,40 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #475569;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
   }
-  50% {
-    opacity: .5;
+  100% {
+    background-position: -200% 0;
   }
 }
 
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+.skeleton-loader {
+  background: linear-gradient(
+    90deg,
+    #2A1F25 25%,
+    #5E4A65 37%,
+    #2A1F25 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite linear;
+  border-radius: 12px;
 }
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: #2A1F25;
+  border-radius: 12px;
 }
 @keyframes slide-in-bottom {
   from { transform: translateY(20px) translateZ(0); opacity: 0; }
@@ -112,6 +194,11 @@ h1, h2, h3, h4, h5, h6 {
   animation-fill-mode: forwards;
   opacity: 0;
   will-change: opacity, transform;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .fade-in {

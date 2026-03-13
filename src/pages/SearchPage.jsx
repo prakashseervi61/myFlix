@@ -151,7 +151,7 @@ function SearchPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Search</h1>
-          <p className="text-lg text-gray-400 mt-1">Find your next favorite movie.</p>
+          <p className="text-lg text-[#C0927C] mt-1">Find your next favorite movie.</p>
         </header>
 
         <div className="flex flex-col md:flex-row gap-6">
@@ -161,25 +161,25 @@ function SearchPage() {
                onChange={updateFilter} 
                onReset={resetFilters} 
                genres={genres}
-               className="rounded-xl border border-gray-800"
+               className="rounded-xl border border-[#C0927C]/20"
             />
           </aside>
 
           <div className="flex-1">
             <div className="relative mb-10 group">
-              <div className="flex items-center bg-transparent border-b-2 border-gray-800 group-focus-within:border-cyan-500 transition-all duration-300 pb-2">
-                <Search className="text-gray-500 mr-4 shrink-0 group-focus-within:text-cyan-500 transition-colors" size={24} />
+              <div className="flex items-center bg-transparent border-b-2 border-[#C0927C]/30 group-focus-within:border-[#C1372C] transition-all duration-300 pb-2">
+                <Search className="text-[#C0927C]/40 mr-4 shrink-0 group-focus-within:text-[#C1372C] transition-colors" size={24} />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search for movies..."
-                  className="flex-1 bg-transparent border-none text-xl md:text-2xl text-white placeholder:text-gray-600 focus:outline-none focus:ring-0 p-0 font-medium"
+                  className="flex-1 bg-transparent border-none text-xl md:text-2xl text-white placeholder:text-[#C0927C]/40 focus:outline-none focus:ring-0 p-0 font-medium"
                 />
                 {query && (
                   <button
                     onClick={() => setQuery('')}
-                    className="ml-4 p-1.5 text-gray-500 hover:text-white transition-colors"
+                    className="ml-4 p-1.5 text-[#C0927C] hover:text-[#C1372C] transition-colors"
                   >
                     <X size={20} />
                   </button>
@@ -188,7 +188,7 @@ function SearchPage() {
             </div>
 
             <div className="flex justify-end mb-4">
-              <div className="flex items-center gap-2 bg-gray-900 p-1 rounded-lg border border-gray-800">
+              <div className="flex items-center gap-2 bg-[#5E4A65] p-1 rounded-lg border border-[#C0927C]/20">
                 <ViewModeButton current={viewMode} mode="grid" setViewMode={setViewMode}><Grid size={18} /></ViewModeButton>
                 <ViewModeButton current={viewMode} mode="list" setViewMode={setViewMode}><List size={18} /></ViewModeButton>
               </div>
@@ -249,9 +249,9 @@ const RenderContent = ({ initialLoading, isLoadingMore, error, query, results, o
         
         <div ref={loadMoreRef} className="h-4 w-full" />
         
-        {!hasMore && !filtering && (
-           <div className="text-center py-10 text-gray-500 text-sm">
-             End of results.
+        {!hasMore && results.length > 0 && (
+           <div className="text-center py-10 text-[#C0927C]/50 text-sm font-medium italic">
+             You've reached the end of the list.
            </div>
         )}
       </>
@@ -262,9 +262,9 @@ const RenderContent = ({ initialLoading, isLoadingMore, error, query, results, o
 };
 
 const StatusDisplay = ({ title, message }) => (
-  <div className="text-center py-16 bg-gray-900 rounded-xl border border-gray-800">
-    <h2 className="text-2xl font-semibold text-white">{title}</h2>
-    <p className="text-gray-400 mt-2">{message}</p>
+  <div className="text-center py-16 bg-[#5E4A65]/30 backdrop-blur-md rounded-xl border border-[#C0927C]/20 shadow-xl">
+    <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
+    <p className="text-[#C0927C] mt-2 font-medium">{message}</p>
   </div>
 );
 
@@ -273,8 +273,8 @@ const ViewModeButton = ({ current, mode, setViewMode, children }) => (
     onClick={() => setViewMode(mode)}
     className={`p-2 rounded-md transition-colors ${
       current === mode
-        ? 'bg-cyan-600 text-white shadow-sm'
-        : 'text-gray-400 hover:text-white hover:bg-gray-800'
+        ? 'bg-[#C1372C] text-white shadow-sm'
+        : 'text-[#C0927C] hover:text-white hover:bg-[#7B3A3C]'
     }`}
     aria-label={`Switch to ${mode} view`}
   >

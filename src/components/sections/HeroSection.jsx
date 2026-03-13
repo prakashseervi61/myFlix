@@ -111,16 +111,16 @@ function HeroSection({ movies = [] }) {
 
   if (!featuredMovies.length) {
     return (
-      <div className="relative w-full h-[100vh] min-h-[100svh] bg-gray-900 overflow-hidden">
-        <div className="absolute inset-0 bg-gray-800 animate-pulse" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-gray-950 to-transparent" />
+      <div className="relative w-full h-[100vh] min-h-[100svh] bg-[#20151A] overflow-hidden">
+        <div className="absolute inset-0 skeleton-loader opacity-20" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#20151A] to-transparent" />
         <div className="absolute bottom-20 left-12 space-y-4 max-w-xl">
-           <div className="h-4 w-24 bg-gray-700 rounded animate-pulse" />
-           <div className="h-16 w-3/4 bg-gray-700 rounded animate-pulse" />
-           <div className="h-6 w-full bg-gray-700 rounded animate-pulse" />
+           <div className="h-4 w-24 skeleton-loader opacity-30 rounded" />
+           <div className="h-16 w-3/4 skeleton-loader opacity-30 rounded" />
+           <div className="h-6 w-full skeleton-loader opacity-30 rounded" />
            <div className="flex gap-4 pt-4">
-             <div className="h-12 w-32 bg-gray-700 rounded animate-pulse" />
-             <div className="h-12 w-32 bg-gray-700 rounded animate-pulse" />
+             <div className="h-12 w-32 skeleton-loader opacity-30 rounded" />
+             <div className="h-12 w-32 skeleton-loader opacity-30 rounded" />
            </div>
         </div>
       </div>
@@ -145,13 +145,13 @@ function HeroSection({ movies = [] }) {
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-opacity ${isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
             aria-hidden={!isCurrent}
           >
-             <div className="absolute inset-0 bg-gray-900" />
+             <div className="absolute inset-0 bg-[#20151A]" />
              <picture className="absolute inset-0">
-               <source media="(max-width: 640px)" srcSet={movie.poster || movie.backdrop} />
+               <source media="(max-width: 768px)" srcSet={movie.poster_high || movie.poster || movie.backdrop} />
                <img
                  src={movie.backdrop || movie.poster}
                  alt=""
-                 className={`w-full h-full object-cover object-[center_20%] sm:object-center ${isCurrent ? 'sm:scale-105 scale-100' : 'scale-100'} sm:transition-transform sm:duration-[12s] ease-linear will-change-transform transform-gpu`}
+                 className={`w-full h-full object-cover sm:object-center ${isCurrent ? 'sm:scale-105 scale-100' : 'scale-100'} sm:transition-transform sm:duration-[12s] ease-linear will-change-transform transform-gpu`}
                  loading={index === 0 ? "eager" : "lazy"}
                  fetchPriority={isCurrent ? "high" : "low"}
                  decoding="async"
@@ -159,12 +159,12 @@ function HeroSection({ movies = [] }) {
              </picture>
              
              <div 
-               className="absolute inset-0 translate-z-0"
+               className="absolute inset-0 translate-z-0 opacity-60 sm:opacity-100"
                style={{
-                 background: 'radial-gradient(circle at center, transparent 0%, rgba(3, 7, 18, 0.4) 50%, rgba(3, 7, 18, 0.9) 100%), linear-gradient(to top, rgba(3, 7, 18, 1) 0%, rgba(3, 7, 18, 0.7) 40%, transparent 80%)'
+                 background: 'radial-gradient(circle at center, transparent 0%, rgba(32, 21, 26, 0.4) 50%, rgba(32, 21, 26, 0.9) 100%), linear-gradient(to top, rgba(32, 21, 26, 1) 0%, rgba(32, 21, 26, 0.7) 40%, transparent 80%)'
                }}
              />
-             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/20 to-transparent sm:from-black/80 sm:via-transparent opacity-90 sm:opacity-80 translate-z-0" />
+             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/10 to-transparent sm:from-black/90 sm:via-black/20 opacity-70 sm:opacity-90 translate-z-0" />
           </div>
          );
       })}
@@ -192,7 +192,7 @@ function HeroSection({ movies = [] }) {
         <div className="max-w-4xl w-full mx-auto md:mx-0 pointer-events-auto">
           
           <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-5 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.3s_forwards]">
-            <span className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-cyan-900/40">
+            <span className="bg-[#C1372C] text-white px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/40">
               #1 in Trending
             </span>
           </div>
@@ -202,7 +202,7 @@ function HeroSection({ movies = [] }) {
           </h1>
 
           <div className="flex items-center gap-3 text-sm md:text-base text-gray-300 mb-4 font-medium opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.5s_forwards]">
-             <span className="text-green-400 font-bold">{activeMovie.rating ? `${(parseFloat(activeMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
+             <span className="text-[#C1372C] font-bold">{activeMovie.rating ? `${(parseFloat(activeMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
              <span className="text-gray-400" aria-hidden="true">•</span>
              <span>{activeMovie.year}</span>
              <span className="text-gray-400" aria-hidden="true">•</span>
@@ -216,7 +216,7 @@ function HeroSection({ movies = [] }) {
           <div className="flex items-center gap-3 sm:gap-4 mt-2 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.7s_forwards]">
             <button
               onClick={() => navigate(`/movie/${activeMovie.id}`)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C1372C]"
               aria-label={`Watch ${activeMovie.title} now`}
             >
               <Play className="fill-black w-5 h-5" aria-hidden="true" />

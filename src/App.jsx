@@ -22,8 +22,15 @@ const LegalPage = lazy(() => import('./pages/LegalPage'));
 const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
 
 const PageLoader = () => (
-  <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-    <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+  <div className="min-h-screen bg-[#20151A] p-4 md:p-8">
+    <div className="max-w-[1280px] mx-auto space-y-8">
+      <div className="w-full h-[400px] skeleton-loader opacity-20" />
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="aspect-[2/3] skeleton-loader rounded-xl shadow-lg" />
+        ))}
+      </div>
+    </div>
   </div>
 );
 
@@ -41,7 +48,7 @@ function App() {
         <MovieProvider>
           <WatchlistProvider>
             <PreviewModalProvider>
-              <div className="min-h-screen bg-gray-900 text-white flex flex-col">
+              <div className="min-h-screen bg-[#20151A] text-white flex flex-col">
                 {!isAuthPage && <Header />}
                 <main className="flex-1">
                   <Suspense fallback={<PageLoader />}>

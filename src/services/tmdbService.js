@@ -2,6 +2,7 @@ import { apiConfig } from '../config/apiConfig.js';
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
+const POSTER_HIGH_URL = 'https://image.tmdb.org/t/p/w780';
 const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/original';
 const REQUEST_TIMEOUT = 15000;
 
@@ -117,6 +118,7 @@ class TMDBService {
     const title = movie.title || movie.original_title;
     
     const poster = movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : null;
+    const poster_high = movie.poster_path ? `${POSTER_HIGH_URL}${movie.poster_path}` : null;
     const backdrop = movie.backdrop_path ? `${BACKDROP_BASE_URL}${movie.backdrop_path}` : null;
 
     return {
@@ -126,6 +128,7 @@ class TMDBService {
       release_date: movie.release_date || null,
       poster: poster,
       backdrop: backdrop,
+      poster_high: poster_high,
       rating: typeof movie.vote_average === 'number' ? movie.vote_average.toFixed(1) : '0.0',
       plot: movie.overview || 'No overview available.',
       genre_ids: Array.isArray(movie.genre_ids) ? movie.genre_ids : [],

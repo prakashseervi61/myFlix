@@ -58,15 +58,15 @@ function MovieDetail() {
   const backdropUrl = movie.backdrop || movie.poster;
 
   return (
-    <div className="min-h-screen bg-[#010d26] text-white selection:bg-[#C50337]/30">
+    <div className="min-h-screen bg-[#20151A] text-white selection:bg-[#C1372C]/30">
       {/* 1. Movie Hero Section */}
       <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
           style={{ backgroundImage: `url(${backdropUrl})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-[#010d26] via-[#010d26]/40 to-transparent" />
-          <div className="absolute inset-0 bg-[#021C4F]/30 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#20151A] via-[#20151A]/40 to-transparent" />
+          <div className="absolute inset-0 bg-[#20151A]/30 mix-blend-multiply" />
         </div>
         
         <button
@@ -91,9 +91,9 @@ function MovieDetail() {
             <MovieDetailsHeader movie={movie} />
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
-               <div className="flex items-center gap-6 text-sm font-bold text-gray-400 border-l border-white/10 pl-6 h-12">
+               <div className="flex items-center gap-6 text-sm font-bold text-[#C0927C] border-l border-[#C0927C]/20 pl-6 h-12">
                  <div className="flex items-center gap-2">
-                   <Star size={20} className="text-[#C50337] fill-[#C50337]" /> 
+                   <Star size={20} className="text-[#C1372C] fill-[#C1372C]" /> 
                    <span className="text-white text-lg font-black italic">{movie.rating}</span>
                  </div>
                  <div className="opacity-30">|</div>
@@ -110,12 +110,12 @@ function MovieDetail() {
         {/* 3. Trailer Section (Centered 16:9, max-width optimized) */}
         <section className="mt-20 max-w-[950px] mx-auto scroll-mt-24">
           <div className="flex items-center gap-3 mb-8">
-            <Video className="text-[#C50337]" size={24} />
+            <Video className="text-[#C1372C]" size={24} />
             <h2 className="text-2xl font-bold uppercase tracking-widest">Official Trailer</h2>
           </div>
-          <div className="bg-gray-900 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-white/10 aspect-video group">
+          <div className="bg-[#5E4A65] shadow-2xl rounded-2xl overflow-hidden ring-1 ring-[#C0927C]/20 aspect-video group">
             {trailersLoading ? (
-              <div className="w-full h-full bg-gray-900 animate-pulse" />
+              <div className="w-full h-full skeleton-loader" />
             ) : (
               <TrailerPlayer 
                 trailerKey={officialTrailer?.key}
@@ -161,15 +161,48 @@ function MovieDetail() {
 }
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-[#0a0a0a]">
-    <div className="w-full h-[50vh] bg-gray-900/50 animate-pulse" />
-    <div className="max-w-[1300px] mx-auto px-4 md:px-8 -mt-32 relative z-10">
+  <div className="min-h-screen bg-[#20151A]">
+    <div className="w-full h-[50vh] skeleton-loader opacity-50" />
+    <div className="max-w-[1280px] mx-auto px-4 md:px-8 -mt-32 relative z-10">
       <div className="flex flex-col md:flex-row gap-8">
-        <div className="w-48 lg:w-64 aspect-[2/3] bg-gray-900 rounded-2xl animate-pulse ring-1 ring-white/10" />
+        <div className="w-48 lg:w-64 aspect-[2/3] skeleton-loader rounded-2xl ring-1 ring-white/10" />
         <div className="flex-1 space-y-4 pt-10 md:pt-20">
-          <div className="h-10 bg-gray-900 rounded-lg w-3/4 animate-pulse" />
-          <div className="h-6 bg-gray-900 rounded-lg w-1/2 animate-pulse" />
-          <div className="h-32 bg-gray-900 rounded-2xl animate-pulse" />
+          <div className="h-10 skeleton-loader rounded-lg w-3/4" />
+          <div className="h-6 skeleton-loader rounded-lg w-1/2" />
+          <div className="h-32 skeleton-loader rounded-2xl" />
+        </div>
+      </div>
+
+      {/* Trailer Skeleton */}
+      <div className="mt-20 max-w-[950px] mx-auto aspect-video skeleton-loader rounded-2xl" />
+
+      {/* Cast Skeleton */}
+      <div className="mt-20 space-y-6">
+        <div className="h-8 w-48 skeleton-loader rounded-md" />
+        <div className="flex gap-4 overflow-hidden">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="w-32 sm:w-40 aspect-[2/3] skeleton-loader rounded-xl flex-shrink-0" />
+          ))}
+        </div>
+      </div>
+
+      {/* Gallery Skeleton */}
+      <div className="mt-20 space-y-6">
+        <div className="h-8 w-48 skeleton-loader rounded-md" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="aspect-video skeleton-loader rounded-xl" />
+          ))}
+        </div>
+      </div>
+
+      {/* Reviews Skeleton */}
+      <div className="mt-0 space-y-6">
+        <div className="h-8 w-48 skeleton-loader rounded-md" />
+        <div className="space-y-4">
+          {Array.from({ length: 2 }).map((_, i) => (
+            <div key={i} className="h-32 w-full skeleton-loader rounded-2xl" />
+          ))}
         </div>
       </div>
     </div>
@@ -181,10 +214,10 @@ const ErrorDisplay = ({ error, navigate }) => (
     <div className="glass-morphism p-6 md:p-8 rounded-xl max-w-md w-full border border-white/10">
       <AlertTriangle className="mx-auto text-red-500 mb-4" size={40} />
       <h1 className="text-xl md:text-2xl font-bold text-white mb-2">Movie Not Found</h1>
-      <p className="text-gray-400 text-sm md:text-base mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
+      <p className="text-[#C0927C] text-sm md:text-base mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
       <button
         onClick={() => navigate('/')}
-        className="w-full px-6 py-3 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-500 transition-colors"
+        className="w-full px-6 py-3 bg-[#C1372C] text-white rounded-lg font-semibold hover:bg-[#C1372C]/90 transition-colors"
       >
         Back to Home
       </button>
@@ -193,7 +226,7 @@ const ErrorDisplay = ({ error, navigate }) => (
 );
 
 const MoviePoster = ({ poster, title }) => (
-  <div className="relative rounded-lg shadow-2xl ring-1 ring-white/10 overflow-hidden bg-gray-800">
+  <div className="relative rounded-lg shadow-2xl ring-1 ring-white/10 overflow-hidden bg-[#2A1F25]">
     {poster ? (
       <img src={poster} alt={title} className="w-full aspect-[2/3] object-cover" />
     ) : (
@@ -208,16 +241,16 @@ const MovieDetailsHeader = ({ movie }) => (
   <div>
     <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-2">{movie.title}</h1>
     
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-400">
-      {movie.year && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-cyan-500" /> {movie.year}</span>}
-      {movie.runtime && <span className="flex items-center gap-1.5"><Clock size={14} className="text-cyan-500" /> {movie.runtime}</span>}
-      {movie.rating && <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-500 fill-yellow-500" /> {movie.rating}</span>}
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-[#C0927C]">
+      {movie.year && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-[#C1372C]" /> {movie.year}</span>}
+      {movie.runtime && <span className="flex items-center gap-1.5"><Clock size={14} className="text-[#C1372C]" /> {movie.runtime}</span>}
+      {movie.rating && <span className="flex items-center gap-1.5"><Star size={14} className="text-[#C1372C] fill-[#C1372C]" /> {movie.rating}</span>}
     </div>
     
     {movie.genre && (
       <div className="mt-4 flex flex-wrap gap-2">
         {movie.genre.split(', ').map(g => (
-          <span key={g} className="px-2.5 py-1 bg-gray-800 border border-gray-700 text-gray-300 rounded-md text-[10px] sm:text-xs font-medium uppercase tracking-wide">
+          <span key={g} className="px-2.5 py-1 bg-[#5E4A65] border border-[#C0927C]/20 text-[#C0927C] rounded-md text-[10px] sm:text-xs font-medium uppercase tracking-wide">
             {g}
           </span>
         ))}
@@ -232,7 +265,7 @@ const WatchlistButton = ({ inWatchlist, onClick }) => (
     className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all w-full md:w-auto active:scale-95 ${
       inWatchlist
         ? 'bg-green-600 text-white hover:bg-green-500 shadow-lg shadow-green-900/20'
-        : 'bg-white text-black hover:bg-gray-200'
+        : 'bg-white text-black hover:bg-[#C0927C]/20'
     }`}
   >
     {inWatchlist ? <Check size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
@@ -241,23 +274,23 @@ const WatchlistButton = ({ inWatchlist, onClick }) => (
 );
 
 const MoviePlot = ({ plot }) => plot && (
-  <div className="bg-gray-900/50 p-4 rounded-xl border border-white/5">
+  <div className="bg-[#5E4A65]/50 p-4 rounded-xl border border-[#C0927C]/10">
     <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">Plot</h2>
-    <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{plot}</p>
+    <p className="text-sm sm:text-base text-[#C0927C] leading-relaxed">{plot}</p>
   </div>
 );
 
 const MovieDetailsGrid = ({ movie }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
     {movie.director && (
-      <div className="bg-gray-900/30 p-3 rounded-lg border border-white/5">
-        <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-1">Director</h3>
+      <div className="bg-[#5E4A65]/30 p-3 rounded-lg border border-[#C0927C]/10">
+        <h3 className="text-[#C0927C] text-xs uppercase tracking-wider mb-1">Director</h3>
         <p className="text-white font-medium">{movie.director}</p>
       </div>
     )}
     {movie.actors && (
-      <div className="bg-gray-900/30 p-3 rounded-lg border border-white/5">
-        <h3 className="text-gray-500 text-xs uppercase tracking-wider mb-1">Cast</h3>
+      <div className="bg-[#5E4A65]/30 p-3 rounded-lg border border-[#C0927C]/10">
+        <h3 className="text-[#C0927C] text-xs uppercase tracking-wider mb-1">Cast</h3>
         <p className="text-white font-medium">{movie.actors}</p>
       </div>
     )}

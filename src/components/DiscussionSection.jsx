@@ -57,30 +57,30 @@ const DiscussionSection = ({ movieId, user }) => {
         </span>
       </div>
 
-      <div className="bg-gray-900/20 border border-white/5 rounded-2xl overflow-hidden flex flex-col h-[500px]">
+      <div className="bg-gray-900/10 border border-white/5 rounded-2xl overflow-hidden flex flex-col h-[550px] shadow-2xl">
         {/* Messages List */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
           {messages.length > 0 ? (
             messages.map((msg, idx) => (
               <div 
                 key={msg.id} 
                 className={`flex flex-col ${msg.userId === user?.id ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-1 duration-300`}
               >
-                <div className={`flex items-end gap-2 max-w-[85%] ${msg.userId === user?.id ? 'flex-row-reverse' : 'flex-row'}`}>
-                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold ${
-                    msg.userId === user?.id ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'
+                <div className={`flex items-end gap-3 max-w-[85%] ${msg.userId === user?.id ? 'flex-row-reverse' : 'flex-row'}`}>
+                  <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold ${
+                    msg.userId === user?.id ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/20' : 'bg-gray-700 text-gray-300'
                   }`}>
                     {msg.username.charAt(0).toUpperCase()}
                   </div>
                   
-                  <div className={`p-3 rounded-2xl text-sm sm:text-base ${
+                  <div className={`p-3.5 rounded-2xl text-[13px] sm:text-sm leading-relaxed ${
                     msg.userId === user?.id 
-                      ? 'bg-purple-600/90 text-white rounded-br-none' 
-                      : 'bg-gray-800 text-gray-200 rounded-bl-none'
+                      ? 'bg-purple-600/20 text-purple-50 rounded-br-none border border-purple-500/20' 
+                      : 'bg-white/5 text-gray-200 rounded-bl-none border border-white/5'
                   }`}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                        msg.userId === user?.id ? 'text-purple-200' : 'text-gray-400'
+                    <div className="flex items-center gap-2 mb-1.5 pointer-events-none">
+                      <span className={`text-[9px] font-black uppercase tracking-widest ${
+                        msg.userId === user?.id ? 'text-purple-300' : 'text-gray-500'
                       }`}>
                         {msg.username}
                       </span>
@@ -88,16 +88,16 @@ const DiscussionSection = ({ movieId, user }) => {
                     {msg.text}
                   </div>
                 </div>
-                <div className="mt-1 px-10 flex items-center gap-1 text-[10px] text-gray-500">
+                <div className={`mt-1.5 flex items-center gap-1 text-[10px] font-medium text-gray-600 ${msg.userId === user?.id ? 'mr-1' : 'ml-11'}`}>
                   <Clock size={10} />
                   {msg.timestamp}
                 </div>
               </div>
             ))
           ) : (
-            <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-2 opacity-50">
-              <MessageCircle size={48} />
-              <p>No messages yet. Start the conversation!</p>
+            <div className="h-full flex flex-col items-center justify-center text-gray-500 space-y-3 opacity-30">
+              <MessageCircle size={40} strokeWidth={1.5} />
+              <p className="text-sm font-medium">No messages in this chat yet</p>
             </div>
           )}
           <div ref={scrollRef} />

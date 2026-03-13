@@ -4,6 +4,7 @@ import GalleryModal from './GalleryModal.jsx';
 
 const GallerySection = ({ images = [] }) => {
   const [selectedIdx, setSelectedIdx] = useState(null);
+  const [showAll, setShowAll] = useState(false);
 
   if (!images || images.length === 0) return null;
 
@@ -13,7 +14,7 @@ const GallerySection = ({ images = [] }) => {
   const handleNext = () => setSelectedIdx(prev => (prev === images.length - 1 ? 0 : prev + 1));
 
   return (
-    <div className="mt-0 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+    <div className="mt-0 space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
         <ImageIcon className="text-cyan-500" size={24} />
         <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Gallery</h2>
@@ -23,7 +24,7 @@ const GallerySection = ({ images = [] }) => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {images.map((img, idx) => (
+        {(showAll ? images : images.slice(0, 6)).map((img, idx) => (
           <div 
             key={idx}
             className="group relative aspect-video overflow-hidden rounded-xl bg-gray-900 border border-white/5 cursor-pointer"
@@ -43,6 +44,17 @@ const GallerySection = ({ images = [] }) => {
           </div>
         ))}
       </div>
+
+      {images.length > 6 && !showAll && (
+        <div className="flex justify-center pt-4">
+          <button 
+            onClick={() => setShowAll(true)}
+            className="px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-bold text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
+          >
+            Show All Images ({images.length})
+          </button>
+        </div>
+      )}
 
       <GalleryModal 
         isOpen={selectedIdx !== null}

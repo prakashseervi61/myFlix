@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, Send, User, MessageSquare, LogIn } from 'lucide-react';
+import { Star, Send, User, MessageSquare, LogIn, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ReviewSection = ({ movieId, user }) => {
@@ -27,6 +27,7 @@ const ReviewSection = ({ movieId, user }) => {
     const newReview = {
       id: Date.now(),
       userName: user.name || user.email.split('@')[0],
+      userId: user.id,
       rating,
       text: comment.trim(),
       date: new Date().toLocaleDateString(undefined, { 
@@ -45,6 +46,14 @@ const ReviewSection = ({ movieId, user }) => {
     setRating(5);
     
     setTimeout(() => setIsSubmitting(false), 500);
+  };
+
+  const handleDelete = (reviewId) => {
+    if (!window.confirm('Are you sure you want to delete this review?')) return;
+
+    const updatedReviews = reviews.filter(r => r.id !== reviewId);
+    setReviews(updatedReviews);
+    localStorage.setItem(`reviews_${movieId}`, JSON.stringify(updatedReviews));
   };
 
   return (
@@ -143,29 +152,40 @@ const ReviewSection = ({ movieId, user }) => {
           reviews.map((review) => (
             <div 
               key={review.id} 
-              className="bg-gray-900/30 border border-white/5 p-6 rounded-2xl space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500"
+              className="bg-white/[0.02] border border-white/5 p-6 rounded-2xl space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500 hover:bg-white/[0.04] transition-colors"
             >
               <div className="flex justify-between items-start">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-800 to-gray-900 border border-white/5 flex items-center justify-center text-gray-400">
                     <User size={20} />
                   </div>
                   <div>
-                    <h4 className="text-white font-bold">{review.userName}</h4>
-                    <div className="flex gap-0.5">
+                    <h4 className="text-white font-bold text-sm tracking-wide">{review.userName}</h4>
+                    <div className="flex gap-1 mt-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          size={12}
-                          className={star <= review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-700'}
+                          size={10}
+                          className={star <= review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-800'}
                         />
                       ))}
                     </div>
                   </div>
                 </div>
-                <span className="text-xs text-gray-500">{review.date}</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-gray-600">{review.date}</span>
+                  {user && user.id === review.userId && (
+                    <button 
+                      onClick={() => handleDelete(review.id)}
+                      className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                      title="Delete review"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
-              <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
+              <p className="text-gray-400 leading-relaxed text-sm sm:text-[15px]">
                 {review.text}
               </p>
             </div>

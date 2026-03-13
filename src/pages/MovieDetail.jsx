@@ -79,22 +79,25 @@ function MovieDetail() {
       </div>
 
       {/* Main Content Container */}
-      <div className="max-w-[1300px] mx-auto px-4 md:px-8 pb-20 relative z-10 -mt-32 md:-mt-60">
+      <div className="max-w-[1280px] mx-auto px-4 md:px-8 pb-32 relative z-10 -mt-32 md:-mt-64">
         
         {/* 2. Movie Info Section (Poster + Title + Metadata) */}
-        <section className="flex flex-col md:flex-row gap-8 items-end md:items-start">
-          <div className="w-48 lg:w-64 flex-shrink-0 shadow-2xl shadow-black/50 rounded-2xl overflow-hidden ring-1 ring-white/10 group">
+        <section className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center md:items-start text-center md:text-left">
+          <div className="w-48 lg:w-72 flex-shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden ring-1 ring-white/10 group transition-transform duration-500 hover:scale-[1.02]">
             <MoviePoster poster={movie.poster} title={movie.title} />
           </div>
 
-          <div className="flex-1 space-y-6 pt-4 md:pt-20">
+          <div className="flex-1 space-y-8 pt-4 md:pt-28">
             <MovieDetailsHeader movie={movie} />
-            <div className="flex flex-wrap items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
-               <div className="flex items-center gap-4 text-sm font-medium text-gray-400 border-l border-white/10 pl-4 h-10">
-                 <div className="flex items-center gap-1.5"><Star size={18} className="text-yellow-500 fill-yellow-500" /> {movie.rating}</div>
-                 <div className="hidden sm:block opacity-30">|</div>
-                 <div className="hidden sm:block">{movie.year}</div>
+               <div className="flex items-center gap-6 text-sm font-bold text-gray-400 border-l border-white/10 pl-6 h-12">
+                 <div className="flex items-center gap-2">
+                   <Star size={20} className="text-yellow-500 fill-yellow-500" /> 
+                   <span className="text-white text-lg">{movie.rating}</span>
+                 </div>
+                 <div className="opacity-30">|</div>
+                 <div className="uppercase tracking-widest">{movie.year}</div>
                </div>
             </div>
             <MoviePlot plot={movie.plot} />
@@ -102,13 +105,15 @@ function MovieDetail() {
           </div>
         </section>
 
-        {/* 3. Trailer Section (Centered 16:9) */}
-        <section className="mt-16 md:mt-24 max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="mt-20 border-t border-white/5" />
+
+        {/* 3. Trailer Section (Centered 16:9, max-width optimized) */}
+        <section className="mt-20 max-w-[950px] mx-auto scroll-mt-24">
+          <div className="flex items-center gap-3 mb-8">
             <Video className="text-cyan-500" size={24} />
-            <h2 className="text-2xl font-bold uppercase tracking-tight">Official Trailer</h2>
+            <h2 className="text-2xl font-bold uppercase tracking-widest">Official Trailer</h2>
           </div>
-          <div className="bg-gray-900 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-white/10 aspect-video">
+          <div className="bg-gray-900 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-white/10 aspect-video group">
             {trailersLoading ? (
               <div className="w-full h-full bg-gray-900 animate-pulse" />
             ) : (
@@ -122,23 +127,29 @@ function MovieDetail() {
           </div>
         </section>
 
+        <div className="mt-20 border-t border-white/5" />
+
         {/* 4. Cast Section */}
-        <section className="mt-16 md:mt-24">
+        <section className="mt-20">
           <CastSection cast={movie.cast} />
         </section>
 
+        <div className="mt-20 border-t border-white/5" />
+
         {/* 5. Gallery Section */}
-        <section className="mt-16 md:mt-24">
+        <section className="mt-20">
           <GallerySection images={movie.images} />
         </section>
 
+        <div className="mt-20 border-t border-white/5" />
+
         {/* 6. Community Section (Reviews / Discussions side by side) */}
-        <section className="mt-16 md:mt-24 border-t border-white/5 pt-16">
-          <div className="community-section flex flex-col lg:flex-row gap-12">
-            <div className="flex-1 min-w-0">
+        <section className="mt-20">
+          <div className="community-section grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div className="min-w-0">
               <ReviewSection movieId={id} user={user} />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0">
               <DiscussionSection movieId={id} user={user} />
             </div>
           </div>

@@ -141,12 +141,12 @@ class TMDBService {
         character: c.character,
         profile_path: c.profile_path ? `https://image.tmdb.org/t/p/w185${c.profile_path}` : null
       })) || [],
-      images: movie.images?.backdrops?.slice(0, 12).map(img => ({
+      images: (movie.images?.backdrops || []).slice(0, 12).map(img => ({
         file_path: img.file_path,
         aspect_ratio: img.aspect_ratio,
-        url: `https://image.tmdb.org/t/p/w780${img.file_path}`,
-        full: `https://image.tmdb.org/t/p/original${img.file_path}`
-      })) || []
+        url: `https://image.tmdb.org/t/p/w500${img.file_path}`,
+        full: `https://image.tmdb.org/t/p/w1280${img.file_path}`
+      }))
     };
   }
 
@@ -177,7 +177,7 @@ class TMDBService {
   }
 
   async getMovieById(id, signal) {
-    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits,images', include_image_language: 'en,null' });
+    const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits,images' });
     const data = await this.request(url, `movie_${id}`, signal);
     return this.normalizeMovieData(data);
   }

@@ -124,7 +124,6 @@ img {
   -ms-user-select: none; /* IE10+/Edge */
   user-select: none;
   -webkit-user-drag: none;
-  user-drag: none;
 }
 
 .slide-in-from-bottom-4 {

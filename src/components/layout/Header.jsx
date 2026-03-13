@@ -14,7 +14,7 @@ const NavItem = React.memo(({ to, children }) => (
     className="relative px-2 py-1 text-sm font-medium text-gray-300 hover:text-white transition-colors group focus-visible:outline-none focus-visible:text-white"
   >
     {children}
-    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-cyan-500 transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100 group-focus-visible:scale-x-100" />
+    <span className="absolute bottom-0 left-0 w-full h-0.5 bg-[#C50337] transform scale-x-0 transition-transform duration-300 group-hover:scale-x-100 group-focus-visible:scale-x-100" />
   </Link>
 ));
 
@@ -83,8 +83,8 @@ export default function Header() {
           <div className="flex items-center justify-between h-full">
             
             <div className="flex items-center gap-6 sm:gap-8">
-              <Link to="/" className="flex items-center gap-2 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-lg" aria-label="myFlix Home">
-                <span className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-300 tracking-tight">
+              <Link to="/" className="flex items-center gap-2 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C50337] rounded-lg" aria-label="myFlix Home">
+                <span className="text-xl sm:text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-[#C50337] tracking-tighter uppercase italic">
                   myFlix
                 </span>
               </Link>
@@ -108,15 +108,15 @@ export default function Header() {
                 
                 {searchExpanded ? (
                   <div className="flex items-center w-full gap-3 md:hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="flex-1 flex items-center h-11 bg-gray-900 rounded-xl border border-gray-800 focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500/50 transition-all px-3 shadow-inner">
-                      <Search className="w-5 h-5 text-gray-400 shrink-0" aria-hidden="true" />
+                    <div className="flex-1 flex items-center h-11 bg-[#010d26] rounded-xl border border-white/10 focus-within:border-[#C50337] focus-within:ring-1 focus-within:ring-[#C50337]/50 transition-all px-3 shadow-inner">
+                      <Search className="w-5 h-5 text-gray-500 shrink-0" aria-hidden="true" />
                       <input
                         type="search"
                         placeholder="Search movies..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         autoFocus
-                        className="flex-1 bg-transparent border-none text-base text-white placeholder-gray-500 focus:outline-none focus:ring-0 p-0 ml-3 h-full w-full appearance-none leading-normal"
+                        className="flex-1 bg-transparent border-none text-base text-white placeholder-gray-600 focus:outline-none focus:ring-0 p-0 ml-3 h-full w-full appearance-none leading-normal"
                         aria-label="Search movies"
                         onBlur={(e) => {
                           const related = e.relatedTarget;
@@ -131,7 +131,7 @@ export default function Header() {
                          <button 
                            onClick={() => setSearchQuery('')}
                            onMouseDown={(e) => e.preventDefault()}
-                           className="p-1.5 text-gray-400 hover:text-white transition-colors rounded-full active:bg-gray-800"
+                           className="p-1.5 text-gray-500 hover:text-white transition-colors rounded-full active:bg-gray-800"
                            aria-label="Clear search"
                          >
                            <X size={16} className="stroke-[3]" />
@@ -140,7 +140,7 @@ export default function Header() {
                     </div>
                     <button 
                       onClick={() => { setSearchExpanded(false); setSearchQuery(''); }}
-                      className="search-cancel-btn text-base font-semibold text-cyan-500 hover:text-cyan-400 px-2 py-2 active:scale-95 transition-transform"
+                      className="search-cancel-btn text-base font-semibold text-[#C50337] hover:text-[#e50442] px-2 py-2 active:scale-95 transition-transform"
                     >
                       Cancel
                     </button>
@@ -148,7 +148,7 @@ export default function Header() {
                 ) : (
                   <button 
                     onClick={() => setSearchExpanded(true)}
-                    className="p-3 text-gray-300 hover:text-white md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-full active:bg-gray-800 transition-colors"
+                    className="p-3 text-gray-400 hover:text-[#C50337] md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C50337] rounded-full active:bg-white/5 transition-colors"
                     aria-label="Open search"
                   >
                     <Search size={22} />
@@ -157,7 +157,7 @@ export default function Header() {
 
                 {/* Desktop Input - Persistent */}
                 <div className="hidden md:block w-64 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" aria-hidden="true" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" aria-hidden="true" />
                   <input
                     type="search"
                     placeholder="Search movies..."
@@ -169,7 +169,7 @@ export default function Header() {
                          setTimeout(() => setSearchExpanded(false), 200);
                       }
                     }}
-                    className="w-full bg-gray-800/50 border border-gray-700/50 rounded-full pl-10 pr-4 py-2 text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:bg-gray-800 transition-all"
+                    className="w-full bg-[#010d26]/80 border border-white/10 rounded-full pl-10 pr-4 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#C50337]/50 focus:bg-[#021C4F] transition-all"
                     aria-label="Search movies"
                   />
                 </div>
@@ -191,8 +191,8 @@ export default function Header() {
                     <UserMenu user={user} count={count} onLogout={handleLogout} />
                   ) : (
                     <div className="flex items-center gap-2">
-                       <Link to="/login" className="px-3 py-2 text-xs font-medium text-gray-300 hover:text-white transition-colors md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded">Sign In</Link>
-                       <Link to="/signup" className="px-3 py-2 text-xs font-medium text-white bg-cyan-600 hover:bg-cyan-500 rounded-full md:px-5 md:py-2 md:text-sm shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-gray-900">Sign Up</Link>
+                       <Link to="/login" className="px-3 py-2 text-xs font-medium text-gray-400 hover:text-white transition-colors md:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C50337] rounded">Sign In</Link>
+                       <Link to="/signup" className="px-3 py-2 text-xs font-bold text-white bg-[#C50337] hover:bg-[#e50442] rounded-full md:px-5 md:py-2 md:text-sm shadow-lg shadow-crimson-900/20 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#C50337] focus-visible:ring-offset-gray-900 border border-white/10">Sign Up</Link>
                     </div>
                   )}
                   
@@ -244,7 +244,7 @@ export default function Header() {
             {user ? (
               <div className="mt-auto space-y-4 pb-8">
                 <div className="flex items-center gap-4 p-4 bg-gray-900 rounded-2xl border border-gray-800">
-                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center font-bold text-white text-xl">
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#021C4F] to-[#C50337] rounded-full flex items-center justify-center font-bold text-white text-xl">
                     {user.name.charAt(0)}
                   </div>
                   <div className="overflow-hidden">
@@ -300,7 +300,7 @@ const SearchResultsDropdown = React.memo(({ results, loading, error, onMovieClic
                )}
             </div>
             <div className="flex-1 min-w-0 py-0.5">
-              <p className={`text-sm font-semibold truncate group-hover:text-cyan-400 transition-colors ${inList ? 'text-green-400' : 'text-gray-200'}`}>
+              <p className={`text-sm font-semibold truncate group-hover:text-[#C50337] transition-colors ${inList ? 'text-green-400' : 'text-gray-200'}`}>
                 {movie.title}
               </p>
               <div className="flex items-center gap-2 mt-1">
@@ -361,7 +361,7 @@ const UserMenu = ({ user, count, onLogout }) => {
             </Link>
             <Link to="/watchlist" onClick={() => setIsOpen(false)} className="flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg focus-visible:outline-none focus-visible:bg-gray-800 focus-visible:text-white" role="menuitem">
               <div className="flex items-center gap-3"><Heart size={16} /> Watchlist</div>
-              {count > 0 && <span className="bg-gray-800 text-cyan-400 text-xs font-bold px-2 py-0.5 rounded-full border border-gray-700">{count}</span>}
+              {count > 0 && <span className="bg-[#021C4F] text-[#C50337] text-xs font-bold px-2 py-0.5 rounded-full border border-white/10">{count}</span>}
             </Link>
             <div className="h-px bg-gray-800 my-1 mx-2" />
             <button onClick={onLogout} className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 rounded-lg focus-visible:outline-none focus-visible:bg-red-500/10 focus-visible:text-red-300" role="menuitem">

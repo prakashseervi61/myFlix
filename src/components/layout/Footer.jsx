@@ -7,7 +7,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative mt-auto bg-gray-950 border-t border-white/5 pt-10 pb-20 md:pb-6 text-sm">
+    <footer className="relative mt-auto bg-[#010d26] border-t border-white/5 pt-10 pb-20 md:pb-6 text-sm">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8 mb-8">
           
@@ -57,9 +57,9 @@ function Footer() {
         <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs sm:text-sm">
           <p>© {currentYear} myFlix. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <button className="hover:text-cyan-400 transition-colors">Privacy</button>
-            <button className="hover:text-cyan-400 transition-colors">Terms</button>
-            <button className="hover:text-cyan-400 transition-colors">Cookies</button>
+            <button className="hover:text-[#C50337] transition-colors">Privacy</button>
+            <button className="hover:text-[#C50337] transition-colors">Terms</button>
+            <button className="hover:text-[#C50337] transition-colors">Cookies</button>
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@ const FooterLink = ({ to, label }) => {
     <li>
       <button 
         onClick={() => navigate(to)} 
-        className="text-gray-400 hover:text-cyan-400 transition-colors text-left"
+        className="text-gray-400 hover:text-[#C50337] transition-colors text-left"
       >
         {label}
       </button>
@@ -85,7 +85,7 @@ const SocialLink = ({ icon: Icon, href, label }) => (
   <a 
     href={href} 
     aria-label={label}
-    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center text-gray-400 transition-all"
+    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#021C4F] border border-white/10 flex items-center justify-center text-gray-400 hover:text-[#C50337] hover:border-[#C50337]/30 transition-all shadow-lg"
   >
     <Icon size={16} />
   </a>

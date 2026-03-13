@@ -22,7 +22,7 @@ const CastSection = ({ cast = [] }) => {
     <div className="mt-0 space-y-6 animate-in fade-in duration-700">
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
-          <Users className="text-cyan-500" size={24} />
+          <Users className="text-[#C50337]" size={24} />
           <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Full Cast</h2>
           <span className="bg-white/10 text-white/60 px-2 py-0.5 rounded-full text-xs font-medium">
             {cast.length}
@@ -33,13 +33,13 @@ const CastSection = ({ cast = [] }) => {
         <div className="hidden md:flex items-center gap-2">
           <button 
             onClick={() => scroll('left')}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-all active:scale-90 border border-white/5"
+            className="p-2 bg-white/5 hover:bg-[#C50337] rounded-full text-white/40 hover:text-white transition-all active:scale-90 border border-white/5 shadow-lg group"
           >
             <ChevronLeft size={20} />
           </button>
           <button 
             onClick={() => scroll('right')}
-            className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/40 hover:text-white transition-all active:scale-90 border border-white/5"
+            className="p-2 bg-white/5 hover:bg-[#C50337] rounded-full text-white/40 hover:text-white transition-all active:scale-90 border border-white/5 shadow-lg group"
           >
             <ChevronRight size={20} />
           </button>

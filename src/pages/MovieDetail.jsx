@@ -58,15 +58,15 @@ function MovieDetail() {
   const backdropUrl = movie.backdrop || movie.poster;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-cyan-500/30">
+    <div className="min-h-screen bg-[#010d26] text-white selection:bg-[#C50337]/30">
       {/* 1. Movie Hero Section */}
       <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
           style={{ backgroundImage: `url(${backdropUrl})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
-          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#010d26] via-[#010d26]/40 to-transparent" />
+          <div className="absolute inset-0 bg-[#021C4F]/30 mix-blend-multiply" />
         </div>
         
         <button
@@ -93,8 +93,8 @@ function MovieDetail() {
                <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
                <div className="flex items-center gap-6 text-sm font-bold text-gray-400 border-l border-white/10 pl-6 h-12">
                  <div className="flex items-center gap-2">
-                   <Star size={20} className="text-yellow-500 fill-yellow-500" /> 
-                   <span className="text-white text-lg">{movie.rating}</span>
+                   <Star size={20} className="text-[#C50337] fill-[#C50337]" /> 
+                   <span className="text-white text-lg font-black italic">{movie.rating}</span>
                  </div>
                  <div className="opacity-30">|</div>
                  <div className="uppercase tracking-widest">{movie.year}</div>
@@ -110,7 +110,7 @@ function MovieDetail() {
         {/* 3. Trailer Section (Centered 16:9, max-width optimized) */}
         <section className="mt-20 max-w-[950px] mx-auto scroll-mt-24">
           <div className="flex items-center gap-3 mb-8">
-            <Video className="text-cyan-500" size={24} />
+            <Video className="text-[#C50337]" size={24} />
             <h2 className="text-2xl font-bold uppercase tracking-widest">Official Trailer</h2>
           </div>
           <div className="bg-gray-900 shadow-2xl rounded-2xl overflow-hidden ring-1 ring-white/10 aspect-video group">

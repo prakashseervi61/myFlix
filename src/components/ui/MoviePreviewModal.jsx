@@ -104,7 +104,7 @@ export default function MoviePreviewModal() {
       <div 
         ref={modalRef}
         tabIndex={-1}
-        className="w-full md:max-w-4xl bg-[#141414] text-white rounded-t-2xl md:rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:max-h-[90vh] animate-in slide-in-from-bottom-10 fade-in duration-300 outline-none"
+        className="w-full md:max-w-4xl bg-[#010d26] text-white rounded-t-2xl md:rounded-xl shadow-2xl overflow-hidden relative flex flex-col md:max-h-[90vh] animate-in slide-in-from-bottom-10 fade-in duration-300 outline-none border border-white/5"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -120,7 +120,7 @@ export default function MoviePreviewModal() {
         <div className="relative w-full bg-black group">
           {loadingVideo ? (
              <div className="relative w-full aspect-video bg-black flex items-center justify-center">
-               <div className="w-8 h-8 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+               <div className="w-8 h-8 border-2 border-[#C50337] border-t-transparent rounded-full animate-spin"></div>
              </div>
           ) : (
             <TrailerPlayer 
@@ -132,12 +132,12 @@ export default function MoviePreviewModal() {
 
           {/* Title Overlay on Hero */}
           <div className="absolute bottom-0 left-0 p-6 w-full z-10 pointer-events-none">
-             <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-transparent to-transparent pointer-events-none"></div>
+             <div className="absolute inset-0 bg-gradient-to-t from-[#010d26] via-transparent to-transparent pointer-events-none"></div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-2 text-shadow-lg leading-tight relative z-10">
               {displayMovie.title}
             </h2>
             <div className="flex items-center gap-3 text-sm font-semibold relative z-10">
-              <span className="text-green-400">{displayMovie.rating ? `${(parseFloat(displayMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
+              <span className="text-[#C50337] font-black">{displayMovie.rating ? `${(parseFloat(displayMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
               <span className="text-gray-300">{displayMovie.year}</span>
               {displayMovie.runtime && (
                  <span className="text-gray-400">{displayMovie.runtime} min</span>
@@ -156,13 +156,13 @@ export default function MoviePreviewModal() {
           {/* Left Column: Actions & Overview */}
           <div className="space-y-6">
              <div className="flex flex-wrap items-center gap-3">
-               <button className="flex items-center justify-center gap-2 bg-white text-black px-6 py-2.5 rounded font-bold hover:bg-gray-200 transition-colors">
-                 <Play size={20} className="fill-black" /> Play
+               <button className="flex items-center justify-center gap-2 bg-[#C50337] text-white px-6 py-2.5 rounded font-bold hover:bg-[#e50442] transition-colors shadow-lg shadow-[#C50337]/20 border border-white/10 active:scale-95">
+                 <Play size={20} className="fill-white" /> Play
                </button>
                
                <button 
                  onClick={handleWatchlistClick}
-                 className="flex items-center justify-center gap-2 bg-gray-600/60 hover:bg-gray-600/80 border border-white/20 text-white px-6 py-2.5 rounded font-semibold transition-colors"
+                 className="flex items-center justify-center gap-2 bg-[#021C4F] hover:bg-[#032a75] border border-white/20 text-white px-6 py-2.5 rounded font-semibold transition-colors shadow-lg active:scale-95"
                >
                  {inWatchlist ? <Check size={20} /> : <Plus size={20} />} 
                  {inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
@@ -189,7 +189,7 @@ export default function MoviePreviewModal() {
                <div className="flex flex-wrap gap-2">
                  {displayMovie.genres?.length > 0 ? (
                     displayMovie.genres.map(genre => (
-                      <span key={genre} className="text-gray-300 bg-gray-800 px-2 py-0.5 rounded text-xs border border-gray-700">
+                      <span key={genre} className="text-gray-100 bg-[#021C4F] px-2 py-0.5 rounded text-xs border border-white/5">
                         {genre}
                       </span>
                     ))

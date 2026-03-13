@@ -16,7 +16,7 @@ const GallerySection = ({ images = [] }) => {
   return (
     <div className="mt-0 space-y-6 animate-in fade-in duration-500">
       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-        <ImageIcon className="text-cyan-500" size={24} />
+        <ImageIcon className="text-[#C50337]" size={24} />
         <h2 className="text-2xl font-bold text-white uppercase tracking-tight">Gallery</h2>
         <span className="bg-white/10 text-white/60 px-2 py-0.5 rounded-full text-xs font-medium">
           {images.length}
@@ -27,7 +27,7 @@ const GallerySection = ({ images = [] }) => {
         {(showAll ? images : images.slice(0, 6)).map((img, idx) => (
           <div 
             key={idx}
-            className="group relative aspect-video overflow-hidden rounded-xl bg-gray-900 border border-white/5 cursor-pointer"
+            className="group relative aspect-video overflow-hidden rounded-xl bg-[#021C4F]/50 border border-white/5 cursor-pointer shadow-lg hover:shadow-[#C50337]/10 transition-all"
             onClick={() => handleOpen(idx)}
           >
             <img 
@@ -36,8 +36,8 @@ const GallerySection = ({ images = [] }) => {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <div className="bg-cyan-500 p-2 rounded-full text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+            <div className="absolute inset-0 bg-[#021C4F]/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+              <div className="bg-[#C50337] p-2 rounded-full text-white transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 shadow-lg shadow-[#C50337]/40">
                 <Maximize2 size={20} />
               </div>
             </div>
@@ -49,7 +49,7 @@ const GallerySection = ({ images = [] }) => {
         <div className="flex justify-center pt-4">
           <button 
             onClick={() => setShowAll(true)}
-            className="px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white font-bold text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
+            className="px-8 py-3 bg-[#021C4F]/50 hover:bg-[#C50337] border border-white/10 rounded-full text-white font-bold text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-xl hover:shadow-[#C50337]/20"
           >
             Show All Images ({images.length})
           </button>

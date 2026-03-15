@@ -170,7 +170,10 @@ function BrowsePage() {
     <div className="min-h-screen pt-20 md:pt-24 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-6 md:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Browse Movies</h1>
+          <div className="flex items-center gap-6 mb-4">
+            <button className="text-2xl sm:text-3xl md:text-4xl font-bold text-white border-b-4 border-primary pb-1">Movies</button>
+            <button onClick={() => navigate('/browse/tv')} className="text-2xl sm:text-3xl md:text-4xl font-bold text-white/50 hover:text-white transition-colors pb-1 border-b-4 border-transparent">TV Shows</button>
+          </div>
           <p className="text-sm sm:text-lg text-muted mt-1">Discover your next favorite film.</p>
         </header>
 

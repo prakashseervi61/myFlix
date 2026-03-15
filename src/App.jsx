@@ -13,6 +13,8 @@ import MoviePreviewModal from './components/ui/MoviePreviewModal.jsx';
 
 /** Lazy-loaded pages for code splitting and faster initial load */
 const HomePage = lazy(() => import('./pages/HomePage'));
+const MoviesHomePage = lazy(() => import('./pages/MoviesHomePage'));
+const TVHomePage = lazy(() => import('./pages/TVHomePage'));
 const BrowsePage = lazy(() => import('./pages/BrowsePage'));
 const TVBrowsePage = lazy(() => import('./pages/TVBrowsePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
@@ -60,8 +62,10 @@ function App() {
                     <Suspense fallback={<PageLoader />}>
                       <Routes>
                         <Route path="/" element={<HomePage />} />
+                        <Route path="/movies" element={<MoviesHomePage />} />
+                        <Route path="/tv" element={<TVHomePage />} />
                         <Route path="/browse" element={<BrowsePage />} />
-                        <Route path="/tvshows" element={<TVBrowsePage />} />
+                        <Route path="/browse/tv" element={<TVBrowsePage />} />
                         <Route path="/search" element={<SearchPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/movie/:id" element={<MovieDetail />} />

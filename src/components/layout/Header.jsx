@@ -107,8 +107,9 @@ export default function Header() {
             {/* 2. Navigation Links */}
             <nav className="hidden lg:flex items-center gap-4 xl:gap-8" aria-label="Main Navigation">
               <NavItem to="/" state={{ reset: true }}>Home</NavItem>
-              <NavItem to="/browse" state={{ reset: true }}>Movies</NavItem>
-              <NavItem to="/tvshows" state={{ reset: true }}>TV Shows</NavItem>
+              <NavItem to="/movies" state={{ reset: true }}>Movies</NavItem>
+              <NavItem to="/tv" state={{ reset: true }}>TV Shows</NavItem>
+              <NavItem to="/browse" state={{ reset: true }}>Browse</NavItem>
               <NavItem to="/watchlist">Watchlist</NavItem>
             </nav>
 
@@ -244,12 +245,16 @@ export default function Header() {
                 Home
                 <ChevronDown size={18} className="-rotate-90 text-muted/30" />
               </Link>
-              <Link to="/browse" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/movies" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Movies
                 <ChevronDown size={18} className="-rotate-90 text-gray-500" />
               </Link>
-              <Link to="/tvshows" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                TV Shows & Series
+              <Link to="/tv" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                TV Shows
+                <ChevronDown size={18} className="-rotate-90 text-gray-500" />
+              </Link>
+              <Link to="/browse" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                Browse
                 <ChevronDown size={18} className="-rotate-90 text-gray-500" />
               </Link>
               <Link to="/watchlist" className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>

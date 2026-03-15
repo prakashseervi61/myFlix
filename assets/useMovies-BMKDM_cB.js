@@ -1,0 +1,1 @@
+import{c as r,d as i}from"./index-DeJPw1ri.js";function o(){return r({queryKey:["movies","trending"],queryFn:({signal:e})=>i.getTrendingMovies(e),staleTime:1e3*60*30})}function t(e,n){return r({queryKey:["movies","genre",e,n],queryFn:({signal:s})=>i.getMoviesByGenre(e,s),staleTime:1e3*60*30,enabled:!!e})}export{t as a,o as u};

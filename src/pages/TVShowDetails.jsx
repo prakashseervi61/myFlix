@@ -119,7 +119,7 @@ export default function TVShowDetails() {
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12 pb-16">
           {/* Metadata Sidebar */}
           <div className="w-full md:w-[300px] lg:w-[350px] shrink-0">
-             <div className="rounded-2xl overflow-hidden shadow-2xl relative bg-surface border border-white/5">
+             <div className="rounded-2xl overflow-hidden shadow-2xl relative bg-surface border border-white/5" style={{ viewTransitionName: 'shared-movie-poster' }}>
                 {show.poster ? (
                   <img src={show.poster} alt={show.title} className="w-full h-auto object-cover" />
                 ) : (

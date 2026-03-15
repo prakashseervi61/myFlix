@@ -236,3 +236,23 @@ img {
 .slide-in-from-bottom-4 {
   animation-name: slide-in-bottom;
 }
+
+/* View Transitions API Customizations */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+::view-transition-old(shared-movie-poster),
+::view-transition-new(shared-movie-poster) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  mix-blend-mode: normal;
+}
+
+/* Only scale the active shared elements */
+::view-transition-group(shared-movie-poster) {
+  animation-duration: 0.5s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}

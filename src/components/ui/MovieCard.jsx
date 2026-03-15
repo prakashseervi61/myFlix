@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { Plus, Check, Play, Film, Info, Eye } from "lucide-react";
 import { useMovieCardLogic } from '../../hooks/useMovieCardLogic.js';
 import { useUIStore } from '../../store/uiStore.js';
+import { flushSync } from 'react-dom';
 
 /**
  * Movie card with hover effects (desktop) and tap actions (mobile).
@@ -17,7 +18,23 @@ function MovieCard({ movie, onClick }) {
 
   const handleCardClick = useCallback((e) => {
     e.preventDefault();
-    if (onClick) onClick(movie);
+    if (!onClick) return;
+
+    if (!document.startViewTransition) {
+      onClick(movie);
+      return;
+    }
+
+    const cardElement = e.currentTarget.querySelector('.card-poster-image');
+    if (cardElement) {
+      cardElement.style.viewTransitionName = 'shared-movie-poster';
+    }
+
+    document.startViewTransition(() => {
+      flushSync(() => {
+        onClick(movie);
+      });
+    });
   }, [movie, onClick]);
 
   const handlePreviewClick = useCallback((e) => {
@@ -45,7 +62,7 @@ function MovieCard({ movie, onClick }) {
       role="button"
       aria-label={`View details for ${movie.title}`}
     >
-      <div className={`w-full h-full bg-surface rounded-lg sm:rounded-xl overflow-hidden relative isolate transform-gpu transition-transform duration-300 ease-out md:group-hover/card:scale-105 md:group-hover/card:shadow-xl md:group-hover/card:shadow-black/40 md:group-hover/card:z-20 md:group-hover/card:ring-1 md:group-hover/card:ring-muted/20`}>
+      <div className={`w-full h-full bg-surface rounded-lg sm:rounded-xl overflow-hidden relative isolate transform-gpu transition-transform duration-300 ease-out md:group-hover/card:scale-105 md:group-hover/card:shadow-xl md:group-hover/card:shadow-black/40 md:group-hover/card:z-20 md:group-hover/card:ring-1 md:group-hover/card:ring-muted/20 card-poster-image`}>
         <div className={`w-full h-full transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
           <Image 
             poster={movie.poster} 

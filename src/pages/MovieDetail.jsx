@@ -83,7 +83,7 @@ function MovieDetail() {
         
         {/* 2. Movie Info Section (Poster + Title + Metadata) */}
         <section className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center md:items-start text-center md:text-left">
-          <div className="w-48 lg:w-72 flex-shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden ring-1 ring-white/10 group transition-transform duration-500 hover:scale-[1.02]">
+          <div className="w-48 lg:w-72 flex-shrink-0 shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-2xl overflow-hidden ring-1 ring-white/10 group transition-transform duration-500 hover:scale-[1.02]" style={{ viewTransitionName: 'shared-movie-poster' }}>
             <MoviePoster poster={movie.poster} title={movie.title} />
           </div>
 

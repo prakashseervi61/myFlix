@@ -172,7 +172,7 @@ function HeroSection({ movies = [] }) {
           
           <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-5 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.3s_forwards]">
             <span className="bg-primary text-white px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/40">
-              #1 in Trending
+              #{currentSlide + 1} in Trending
             </span>
           </div>
 

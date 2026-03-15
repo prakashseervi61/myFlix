@@ -81,7 +81,7 @@ function HeroSection({ movies = [] }) {
 
   if (!featuredMovies.length) {
     return (
-      <div className="relative w-full h-[65vh] min-h-[65svh] md:h-[100vh] md:min-h-[100svh] bg-background overflow-hidden">
+      <div className="relative w-full h-[75vh] min-h-[75svh] md:h-[100vh] md:min-h-[100svh] bg-background overflow-hidden">
         <div className="absolute inset-0 skeleton-loader opacity-20" />
         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute bottom-12 md:bottom-20 inset-x-4 md:inset-x-auto md:left-12 space-y-3 md:space-y-4 max-w-xl md:w-full">
@@ -102,7 +102,7 @@ function HeroSection({ movies = [] }) {
 
   return (
     <section 
-      className="relative w-full h-[65vh] min-h-[65svh] md:h-[100vh] md:min-h-[100svh] overflow-hidden bg-black contain-content"
+      className="relative w-full h-[75vh] min-h-[75svh] md:h-[100vh] md:min-h-[100svh] overflow-hidden bg-black contain-content"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       aria-label="Featured Movies"

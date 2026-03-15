@@ -94,7 +94,7 @@ export default function Header() {
           <div className="flex items-center h-full max-w-[1920px] mx-auto">
             
             {/* 1. Logo */}
-            <Link to="/" className="flex items-center gap-2 shrink-0 mr-12 focus-visible:outline-none group active:scale-95 transition-transform" aria-label="MYFLIX Home">
+            <Link to="/" state={{ reset: true }} className="flex items-center gap-2 shrink-0 mr-12 focus-visible:outline-none group active:scale-95 transition-transform" aria-label="MYFLIX Home">
               <span className="text-2xl font-black text-white px-2 py-1 tracking-[0.1em] uppercase">
                 MY<span className="text-primary transition-colors group-hover:text-white">FLIX</span>
               </span>
@@ -102,7 +102,7 @@ export default function Header() {
 
             {/* 2. Navigation Links */}
             <nav className="hidden lg:flex items-center gap-4 xl:gap-8" aria-label="Main Navigation">
-              <NavItem to="/">Home</NavItem>
+              <NavItem to="/" state={{ reset: true }}>Home</NavItem>
               <NavItem to="/browse" state={{ reset: true }}>Movies</NavItem>
               <NavItem to="/watchlist">Watchlist</NavItem>
             </nav>
@@ -228,14 +228,14 @@ export default function Header() {
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm data-[state=open]:animate-[dialog-fade-in_0.3s_ease-out_forwards] data-[state=closed]:animate-[dialog-fade-out_0.3s_ease-out_forwards]" style={{ top: '70px' }} />
           <Dialog.Content 
-            className="lg:hidden fixed right-0 bottom-0 z-[100] bg-background border-l border-white/5 shadow-2xl p-6 h-[calc(100vh-70px)] w-[85vw] max-w-[320px] flex flex-col data-[state=open]:animate-[slide-in-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards] data-[state=closed]:animate-[slide-out-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
+            className="lg:hidden fixed right-0 bottom-0 z-[100] bg-background border-l border-white/5 shadow-2xl p-6 h-[calc(100svh-70px)] w-[85vw] max-w-[320px] flex flex-col data-[state=open]:animate-[slide-in-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards] data-[state=closed]:animate-[slide-out-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
             style={{ top: '70px' }}
             aria-describedby={undefined}
           >
             <Dialog.Title className="sr-only">Mobile Navigation</Dialog.Title>
             
             <nav className="flex flex-col space-y-4 h-full overflow-y-auto scrollbar-hide">
-              <Link to="/" className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
                 Home
                 <ChevronDown size={18} className="-rotate-90 text-muted/30" />
               </Link>
@@ -254,7 +254,7 @@ export default function Header() {
               <div className="flex-1" />
               
               {user ? (
-                <div className="mt-auto space-y-4 pb-8">
+                <div className="mt-auto space-y-4 pb-2">
                   <div className="flex items-center gap-4 p-4 bg-surface/30 rounded-2xl border border-white/5">
                     <div className="w-12 h-12 bg-gradient-to-br from-surface to-primary rounded-full flex items-center justify-center font-bold text-white text-xl shadow-lg ring-2 ring-white/10">
                       {user.name.charAt(0)}
@@ -270,7 +270,7 @@ export default function Header() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-auto grid grid-cols-1 gap-3 pb-8">
+                <div className="mt-auto grid grid-cols-1 gap-3 pb-2">
                   <Link to="/login" className="py-4 text-center text-white bg-white/5 rounded-xl font-bold border border-white/10 outline-none focus-visible:ring-2 focus-visible:ring-primary" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
                   <Link to="/signup" className="py-4 text-center text-white bg-primary rounded-xl font-bold shadow-lg shadow-black/30 outline-none focus-visible:ring-2 focus-visible:ring-primary" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
                 </div>

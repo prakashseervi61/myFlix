@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import HeroSection from '../components/sections/HeroSection';
 import Row from '../components/sections/Row';
 import LandingSkeleton from '../components/ui/LandingSkeleton';
@@ -21,6 +21,7 @@ const MOVIE_CATEGORIES = [
  */
 function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const categories = useMovies();
   const { homeScrollPosition, setHomeScrollPosition } = useBrowseState();
 
@@ -44,13 +45,20 @@ function HomePage() {
 
   // Restore scroll position
   useEffect(() => {
+    if (location.state?.reset) {
+      setHomeScrollPosition(0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/', { replace: true, state: {} });
+      return;
+    }
+
     if (homeScrollPosition > 0 && hasData && !isLoading) {
       const timer = setTimeout(() => {
         window.scrollTo({ top: homeScrollPosition, behavior: 'auto' });
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [hasData, isLoading, homeScrollPosition]);
+  }, [hasData, isLoading, homeScrollPosition, location.state, navigate, setHomeScrollPosition]);
 
   // Save scroll on unmount
   useEffect(() => {

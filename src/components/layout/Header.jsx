@@ -11,6 +11,7 @@ import { useDebounce } from 'use-debounce';
 import { useGlobalScrollLock } from "../../hooks/useGlobalScrollLock.js";
 import SearchResultsDropdown from "./SearchResultsDropdown.jsx";
 import UserMenu from "./UserMenu.jsx";
+import "./Sidebar.css";
 
 const NavItem = React.memo(({ to, state, children }) => (
   <Link 
@@ -232,44 +233,43 @@ export default function Header() {
       {/* Mobile Menu Overlay - Radix UI Dialog */}
       <Dialog.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm data-[state=open]:animate-[dialog-fade-in_0.3s_ease-out_forwards] data-[state=closed]:animate-[dialog-fade-out_0.3s_ease-out_forwards]" style={{ top: '70px' }} />
+          <Dialog.Overlay className="sidebar-overlay data-[state=open]:animate-[dialog-fade-in_0.3s_ease-out_forwards] data-[state=closed]:animate-[dialog-fade-out_0.3s_ease-out_forwards]" />
           <Dialog.Content 
-            className="lg:hidden fixed right-0 bottom-0 z-[100] bg-background border-l border-white/5 shadow-2xl p-6 h-[calc(100svh-70px)] w-[85vw] max-w-[320px] flex flex-col data-[state=open]:animate-[slide-in-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards] data-[state=closed]:animate-[slide-out-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-            style={{ top: '70px' }}
+            className="lg:hidden sidebar"
             aria-describedby={undefined}
           >
             <Dialog.Title className="sr-only">Mobile Navigation</Dialog.Title>
             
-            <nav className="flex flex-col space-y-4 h-full overflow-y-auto scrollbar-hide">
-              <Link to="/" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                Home
-                <ChevronDown size={18} className="-rotate-90 text-muted/30" />
+            <nav className="flex flex-col h-full scrollbar-hide">
+              <Link to="/" state={{ reset: true }} className="sidebar-menu-item" onClick={() => setIsMenuOpen(false)}>
+                <span>Home</span>
+                <ChevronDown size={18} className="-rotate-90 text-white/30" />
               </Link>
-              <Link to="/movies" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                Movies
-                <ChevronDown size={18} className="-rotate-90 text-gray-500" />
+              <Link to="/movies" state={{ reset: true }} className="sidebar-menu-item" onClick={() => setIsMenuOpen(false)}>
+                <span>Movies</span>
+                <ChevronDown size={18} className="-rotate-90 text-white/30" />
               </Link>
-              <Link to="/tv" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                TV Shows
-                <ChevronDown size={18} className="-rotate-90 text-gray-500" />
+              <Link to="/tv" state={{ reset: true }} className="sidebar-menu-item" onClick={() => setIsMenuOpen(false)}>
+                <span>TV Shows</span>
+                <ChevronDown size={18} className="-rotate-90 text-white/30" />
               </Link>
-              <Link to="/browse" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                Browse
-                <ChevronDown size={18} className="-rotate-90 text-gray-500" />
+              <Link to="/browse" state={{ reset: true }} className="sidebar-menu-item" onClick={() => setIsMenuOpen(false)}>
+                <span>Browse</span>
+                <ChevronDown size={18} className="-rotate-90 text-white/30" />
               </Link>
-              <Link to="/watchlist" className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                <div className="flex items-center gap-3">
-                  Watchlist
-                  {count > 0 && <span className="bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{count}</span>}
+              <Link to="/watchlist" className="sidebar-menu-item" onClick={() => setIsMenuOpen(false)}>
+                <div className="flex items-center">
+                  <span>Watchlist</span>
+                  {count > 0 && <span className="watchlist-badge">{count}</span>}
                 </div>
-                <ChevronDown size={18} className="-rotate-90 text-muted/30" />
+                <ChevronDown size={18} className="-rotate-90 text-white/30" />
               </Link>
               
               <div className="flex-1" />
               
               {user ? (
-                <div className="mt-auto space-y-4 pb-2">
-                  <div className="flex items-center gap-4 p-4 bg-surface/30 rounded-2xl border border-white/5">
+                <div className="sidebar-profile">
+                  <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-gradient-to-br from-surface to-primary rounded-full flex items-center justify-center font-bold text-white text-xl shadow-lg ring-2 ring-white/10">
                       {user.name.charAt(0)}
                     </div>
@@ -278,15 +278,17 @@ export default function Header() {
                       <p className="text-muted/60 text-sm truncate">{user.email}</p>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-2">
-                    <Link to="/profile" className="w-full py-4 text-center text-white bg-white/5 hover:bg-white/10 rounded-xl font-semibold border border-white/5 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary" onClick={() => setIsMenuOpen(false)}>Profile Settings</Link>
-                    <button onClick={() => { setIsMenuOpen(false); handleLogout(); }} className="w-full py-4 text-center text-primary bg-primary/5 hover:bg-primary/10 rounded-xl font-semibold border border-primary/20 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary">Sign Out</button>
+                  <div className="mt-2">
+                    <Link to="/profile" className="sidebar-button text-white bg-white/5 hover:bg-white/10 transition-colors" onClick={() => setIsMenuOpen(false)}>Profile Settings</Link>
+                    <button onClick={() => { setIsMenuOpen(false); handleLogout(); }} className="sidebar-button text-[#ff3b3b] bg-[#ff3b3b]/10 hover:bg-[#ff3b3b]/20 transition-colors outline-none border-none">Sign Out</button>
                   </div>
                 </div>
               ) : (
-                <div className="mt-auto grid grid-cols-1 gap-3 pb-2">
-                  <Link to="/login" className="py-4 text-center text-white bg-white/5 rounded-xl font-bold border border-white/10 outline-none focus-visible:ring-2 focus-visible:ring-primary" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-                  <Link to="/signup" className="py-4 text-center text-white bg-primary rounded-xl font-bold shadow-lg shadow-black/30 outline-none focus-visible:ring-2 focus-visible:ring-primary" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                <div className="sidebar-profile">
+                  <div className="mt-2">
+                    <Link to="/login" className="sidebar-button text-white bg-white/5 border border-white/10" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
+                    <Link to="/signup" className="sidebar-button text-white bg-primary shadow-lg shadow-black/30" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
+                  </div>
                 </div>
               )}
             </nav>

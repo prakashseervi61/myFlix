@@ -240,7 +240,7 @@ export default function Header() {
           >
             <Dialog.Title className="sr-only">Mobile Navigation</Dialog.Title>
             
-            <nav className="flex flex-col h-full scrollbar-hide">
+            <nav className="flex flex-col flex-1 min-h-[min-content] scrollbar-hide">
               <Link to="/" state={{ reset: true }} className="sidebar-menu-item" onClick={() => setIsMenuOpen(false)}>
                 <span>Home</span>
                 <ChevronDown size={18} className="-rotate-90 text-white/30" />

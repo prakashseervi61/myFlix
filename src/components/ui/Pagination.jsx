@@ -2,7 +2,7 @@ import React from 'react';
 
 const Pagination = React.memo(({ count, current, goToSlide, duration }) => (
   <div 
-    className="absolute bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-12 md:translate-x-0 md:bottom-12 z-30 flex gap-2"
+    className="absolute bottom-4 left-1/2 -translate-x-1/2 md:left-auto md:right-12 md:translate-x-0 md:bottom-12 z-30 flex items-center justify-center gap-2"
     role="tablist"
     aria-label="Slideshow controls"
   >

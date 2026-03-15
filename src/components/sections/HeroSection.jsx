@@ -81,16 +81,16 @@ function HeroSection({ movies = [] }) {
 
   if (!featuredMovies.length) {
     return (
-      <div className="relative w-full h-[100vh] min-h-[100svh] bg-background overflow-hidden">
+      <div className="relative w-full h-[65vh] min-h-[65svh] md:h-[100vh] md:min-h-[100svh] bg-background overflow-hidden">
         <div className="absolute inset-0 skeleton-loader opacity-20" />
         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-background to-transparent" />
-        <div className="absolute bottom-20 left-12 space-y-4 max-w-xl">
+        <div className="absolute bottom-12 md:bottom-20 inset-x-4 md:inset-x-auto md:left-12 space-y-3 md:space-y-4 max-w-xl md:w-full">
            <div className="h-4 w-24 skeleton-loader opacity-30 rounded" />
-           <div className="h-16 w-3/4 skeleton-loader opacity-30 rounded" />
-           <div className="h-6 w-full skeleton-loader opacity-30 rounded" />
-           <div className="flex gap-4 pt-4">
-             <div className="h-12 w-32 skeleton-loader opacity-30 rounded" />
-             <div className="h-12 w-32 skeleton-loader opacity-30 rounded" />
+           <div className="h-10 md:h-16 w-3/4 skeleton-loader opacity-30 rounded" />
+           <div className="h-5 md:h-6 w-1/2 md:w-full skeleton-loader opacity-30 rounded" />
+           <div className="flex gap-3 md:gap-4 pt-2 md:pt-4">
+             <div className="h-10 md:h-12 w-28 md:w-32 skeleton-loader opacity-30 rounded" />
+             <div className="h-10 md:h-12 w-28 md:w-32 skeleton-loader opacity-30 rounded" />
            </div>
         </div>
       </div>
@@ -102,7 +102,7 @@ function HeroSection({ movies = [] }) {
 
   return (
     <section 
-      className="relative w-full h-[100vh] min-h-[100svh] overflow-hidden bg-black contain-content"
+      className="relative w-full h-[65vh] min-h-[65svh] md:h-[100vh] md:min-h-[100svh] overflow-hidden bg-black contain-content"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       aria-label="Featured Movies"
@@ -158,20 +158,20 @@ function HeroSection({ movies = [] }) {
         </>
       )}
 
-      <div className="absolute inset-0 z-20 flex flex-col justify-end pb-16 sm:pb-20 md:pb-24 lg:pb-32 px-4 sm:px-8 md:px-12 lg:px-16 pointer-events-none">
+      <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col justify-end pb-12 pt-40 px-4 sm:pb-20 md:pb-24 lg:pb-32 sm:px-8 md:px-12 lg:px-16 pointer-events-none bg-gradient-to-t from-black via-black/80 to-transparent md:bg-none md:inset-0 md:pt-0">
         <div className="max-w-4xl w-full mx-auto md:mx-0 pointer-events-auto">
           
-          <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-5 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.3s_forwards]">
+          <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-5 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.3s_forwards]">
             <span className="bg-primary text-white px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/40">
               #1 in Trending
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-3 sm:mb-6 leading-[0.9] tracking-tighter drop-shadow-2xl">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-2 sm:mb-6 leading-[0.9] tracking-tighter drop-shadow-2xl">
             {activeMovie.title}
           </h1>
 
-          <div className="flex items-center gap-3 text-sm md:text-base text-gray-300 mb-4 font-medium opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.5s_forwards]">
+          <div className="flex items-center gap-3 text-sm md:text-base text-gray-300 mb-3 md:mb-4 font-medium opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.5s_forwards]">
              <span className="text-primary font-bold">{activeMovie.rating ? `${(parseFloat(activeMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
              <span className="text-gray-400" aria-hidden="true">•</span>
              <span>{activeMovie.year}</span>
@@ -179,25 +179,25 @@ function HeroSection({ movies = [] }) {
              <span className="border border-gray-500 px-1.5 rounded text-xs">HD</span>
           </div>
 
-          <p className="hidden xs:block text-gray-300 text-sm sm:text-lg leading-relaxed line-clamp-2 sm:line-clamp-3 max-w-2xl mb-6 sm:mb-8 drop-shadow-md opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.6s_forwards]">
+          <p className="hidden md:block text-gray-300 text-sm sm:text-lg leading-relaxed line-clamp-2 sm:line-clamp-3 max-w-2xl mb-6 sm:mb-8 drop-shadow-md opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.6s_forwards]">
             {activeMovie.plot}
           </p>
 
-          <div className="flex items-center gap-3 sm:gap-4 mt-2 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.7s_forwards]">
+          <div className="flex items-center gap-3 sm:gap-4 mt-1 md:mt-2 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.7s_forwards]">
             <button
               onClick={() => navigate(`/movie/${activeMovie.id}`)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 sm:gap-3 px-4 py-2.5 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label={`Watch ${activeMovie.title} now`}
             >
-              <Play className="fill-black w-5 h-5" aria-hidden="true" />
+              <Play className="fill-black w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               Watch Now
             </button>
             <button
               onClick={handleWatchlistClick}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-bold text-sm sm:text-base md:text-lg bg-black/40 text-white transition-all active:scale-95 border border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 sm:gap-3 px-4 py-2.5 sm:px-8 sm:py-4 rounded-lg font-bold text-sm sm:text-base md:text-lg bg-black/40 text-white transition-all active:scale-95 border border-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               aria-label={isBookmarked ? `Remove ${activeMovie.title} from watchlist` : `Add ${activeMovie.title} to watchlist`}
             >
-              {isBookmarked ? <Check className="w-5 h-5" aria-hidden="true" /> : <Plus className="w-5 h-5" aria-hidden="true" />}
+              {isBookmarked ? <Check className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" /> : <Plus className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />}
               {isBookmarked ? 'Added' : 'My List'}
             </button>
             <button 

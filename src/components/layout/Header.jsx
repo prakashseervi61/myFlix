@@ -108,22 +108,22 @@ export default function Header() {
             </nav>
 
             {/* 3. Right Section: Search + Profile */}
-            <div className="flex items-center gap-6 flex-1 justify-end">
+            <div className="flex items-center gap-2 md:gap-6 flex-1 justify-end">
               
               {/* Search Bar Container */}
               <div 
-                className={`relative transition-all duration-500 ease-out ${
+                className={`relative transition-all duration-500 ease-out flex justify-end ${
                   searchExpanded 
                     ? 'w-full max-w-md' 
-                    : 'w-10 md:w-48 lg:w-64'
+                    : 'w-auto md:w-48 lg:w-64'
                 }`}
                 role="search"
               >
                 
                 {/* Expanded Search View (Mobile Overlay) */}
                 {searchExpanded && (
-                  <div className="absolute inset-0 z-[60] bg-background flex items-center px-4 -mx-4 md:hidden animate-in fade-in slide-in-from-right-10 duration-300">
-                    <div className="flex-1 flex items-center h-11 bg-surface rounded-full border border-white/10 focus-within:border-primary transition-all px-4">
+                  <div className="fixed inset-x-0 top-0 h-[70px] z-[110] bg-background border-b border-white/5 flex items-center px-4 md:hidden animate-[fade-in_0.2s_ease-out_forwards]">
+                    <div className="flex-1 flex items-center h-11 w-full bg-surface rounded-full border border-white/10 focus-within:border-primary transition-all px-4">
                       <Search className="w-5 h-5 text-white/40" />
                       <input
                         type="search"
@@ -198,12 +198,12 @@ export default function Header() {
                 )}
               </div>
 
-              <div className="flex items-center ml-2">
-                <div className={`flex items-center gap-4 transition-all duration-300 ${searchExpanded ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 pointer-events-none md:pointer-events-auto' : 'opacity-100 scale-100'}`}>
+              <div className="flex items-center md:ml-2">
+                <div className={`flex items-center gap-1 md:gap-4 transition-all duration-300 ${searchExpanded ? 'opacity-0 md:opacity-100 scale-95 md:scale-100 pointer-events-none md:pointer-events-auto' : 'opacity-100 scale-100'}`}>
                   {user ? (
                     <UserMenu user={user} count={count} onLogout={handleLogout} />
                   ) : (
-                    <div className="hidden md:flex items-center gap-4">
+                    <div className="hidden lg:flex items-center gap-4">
                        <Link to="/login" className="px-4 py-2 text-sm font-bold text-white hover:text-primary transition-colors focus-visible:outline-none">Sign In</Link>
                        <Link to="/signup" className="px-6 py-2.5 text-sm font-black text-white bg-primary rounded-full shadow-lg shadow-primary/20 hover:bg-[#a82e25] transition-all active:scale-95 focus-visible:outline-none border border-white/10">Sign Up</Link>
                     </div>
@@ -226,9 +226,9 @@ export default function Header() {
       {/* Mobile Menu Overlay - Radix UI Dialog */}
       <Dialog.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-300" style={{ top: '70px' }} />
+          <Dialog.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm data-[state=open]:animate-[dialog-fade-in_0.3s_ease-out_forwards] data-[state=closed]:animate-[dialog-fade-out_0.3s_ease-out_forwards]" style={{ top: '70px' }} />
           <Dialog.Content 
-            className="md:hidden fixed right-0 bottom-0 z-[100] bg-background border-l border-white/5 shadow-2xl p-6 h-[calc(100vh-70px)] w-[85vw] max-w-[320px] flex flex-col data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right duration-500 ease-in-out"
+            className="lg:hidden fixed right-0 bottom-0 z-[100] bg-background border-l border-white/5 shadow-2xl p-6 h-[calc(100vh-70px)] w-[85vw] max-w-[320px] flex flex-col data-[state=open]:animate-[slide-in-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards] data-[state=closed]:animate-[slide-out-right_0.4s_cubic-bezier(0.16,1,0.3,1)_forwards]"
             style={{ top: '70px' }}
             aria-describedby={undefined}
           >

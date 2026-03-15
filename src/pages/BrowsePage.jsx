@@ -12,7 +12,7 @@ import MovieCardSkeleton from '../components/ui/MovieCardSkeleton.jsx';
 import MovieListItem from '../components/ui/MovieListItem.jsx';
 import MovieListItemSkeleton from '../components/ui/MovieListItemSkeleton.jsx';
 import BackToTop from '../components/ui/BackToTop.jsx';
-import { useBrowseState } from '../contexts/BrowseContext.jsx';
+import { useUIStore } from '../store/uiStore.js';
 
 /**
  * Browse page with advanced filtering and infinite scroll.
@@ -22,7 +22,7 @@ import { useBrowseState } from '../contexts/BrowseContext.jsx';
 function BrowsePage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { browseState, updateBrowseState } = useBrowseState();
+  const { browseState, updateBrowseState } = useUIStore();
   const { filters, updateFilter, resetFilters } = useFilters();
   const [debouncedFilters] = useDebounce(filters, 500);
   

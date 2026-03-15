@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Play, Plus, Check, Info } from 'lucide-react';
-import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
+import { useUIStore } from '../../store/uiStore.js';
 import { useWatchlist } from '../../contexts/WatchlistContext.jsx';
 import { tmdbService } from '../../services/tmdbService.js';
+import { apiService } from '../../services/apiService.js';
 import TrailerPlayer from './TrailerPlayer.jsx';
 import { useGlobalScrollLock } from '../../hooks/useGlobalScrollLock.js';
 
@@ -13,7 +14,9 @@ import { useGlobalScrollLock } from '../../hooks/useGlobalScrollLock.js';
  * Uses global scroll lock to prevent background scrolling.
  */
 export default function MoviePreviewModal() {
-  const { isOpen, selectedMovie, closeModal } = usePreviewModal();
+  const isOpen = useUIStore((state) => state.isPreviewModalOpen);
+  const selectedMovie = useUIStore((state) => state.previewMovie);
+  const closeModal = useUIStore((state) => state.closePreviewModal);
   const navigate = useNavigate();
   const [trailer, setTrailer] = useState(null);
   const [fullDetails, setFullDetails] = useState(null);
@@ -52,10 +55,26 @@ export default function MoviePreviewModal() {
       
       const fetchAll = async () => {
         try {
-          const [videos, details] = await Promise.all([
-             tmdbService.getMovieVideos(selectedMovie.id),
-             tmdbService.getMovieById(selectedMovie.id)
-          ]);
+          const isTV = selectedMovie.media_type === 'tv' || selectedMovie.number_of_seasons !== undefined || (!selectedMovie.release_date && selectedMovie.first_air_date);
+          
+          let videos = [];
+          let details = null;
+          
+          if (isTV) {
+             const [tvVideos, tvDetails] = await Promise.all([
+               apiService.getTVVideos(selectedMovie.id),
+               apiService.getTVDetails(selectedMovie.id)
+             ]);
+             videos = tvVideos || [];
+             details = tvDetails;
+          } else {
+             const [movieVideos, movieDetails] = await Promise.all([
+               tmdbService.getMovieVideos(selectedMovie.id),
+               tmdbService.getMovieById(selectedMovie.id)
+             ]);
+             videos = movieVideos || [];
+             details = movieDetails;
+          }
 
           const official = videos.find(v => v.site === 'YouTube' && v.type === 'Trailer');
           const anyYoutube = videos.find(v => v.site === 'YouTube');
@@ -87,7 +106,12 @@ export default function MoviePreviewModal() {
 
   const handleDetailsClick = () => {
     closeModal();
-    navigate(`/movie/${selectedMovie.id}`);
+    const isTV = selectedMovie.media_type === 'tv' || selectedMovie.number_of_seasons !== undefined || (!selectedMovie.release_date && selectedMovie.first_air_date);
+    if (isTV) {
+      navigate(`/tv/${selectedMovie.id}`);
+    } else {
+      navigate(`/movie/${selectedMovie.id}`);
+    }
   };
 
   if (!isOpen || !selectedMovie) return null;

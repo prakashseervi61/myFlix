@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import MovieCard from '../components/ui/MovieCard';
 import MovieCardSkeleton from '../components/ui/MovieCardSkeleton';
 import { Film } from 'lucide-react';
-import { useBrowseState } from '../contexts/BrowseContext.jsx';
+import { useUIStore } from '../store/uiStore.js';
 
 /**
  * User's watchlist page.
@@ -15,7 +15,7 @@ function WatchlistPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const watchlistContext = useWatchlist();
-  const { watchlistScrollPosition, setWatchlistScrollPosition } = useBrowseState();
+  const { watchlistScrollPosition, setWatchlistScrollPosition } = useUIStore();
 
   const { watchlist = [] } = watchlistContext || {};
 
@@ -62,7 +62,11 @@ function WatchlistPage() {
 
   const handleMovieClick = (movie) => {
     if (movie?.id) {
-      navigate(`/movie/${movie.id}`);
+      if (movie.media_type === 'tv' || movie.number_of_seasons !== undefined || (!movie.release_date && movie.first_air_date)) {
+         navigate(`/tv/${movie.id}`);
+      } else {
+         navigate(`/movie/${movie.id}`);
+      }
     }
   };
 

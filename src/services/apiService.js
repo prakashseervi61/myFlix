@@ -30,6 +30,10 @@ class ApiService {
     return tmdbService.getMovieById(id, signal);
   }
 
+  async getMovieGenres(signal) {
+    return tmdbService.getGenres(signal);
+  }
+
   // --- TV API Delegations ---
   async getTrendingTV() {
     return tvService.getTrendingTV();

@@ -1,23 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HeroSection from '../components/sections/HeroSection';
 import Row from '../components/sections/Row';
 import LandingSkeleton from '../components/ui/LandingSkeleton';
-import { useMovies } from '../contexts/MovieContext';
-
-const MOVIE_CATEGORIES = [
-  { key: 'Trending Now', title: 'Trending Movies', genreId: null },
-  { key: 'Action', title: 'Action Movies', genreId: '28' },
-  { key: 'Comedy', title: 'Comedy Movies', genreId: '35' },
-  { key: 'Drama', title: 'Drama Movies', genreId: '18' },
-  { key: 'Horror', title: 'Horror Movies', genreId: '27' },
-  { key: 'Romance', title: 'Romance Movies', genreId: '10749' },
-];
+import { useTrendingMovies, useMoviesByGenre } from '../hooks/useMovies';
 
 function MoviesHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const categories = useMovies();
+
+  const qsTM = useTrendingMovies();
+  const qsAM = useMoviesByGenre('28', 'Action');
+  const qsCM = useMoviesByGenre('35', 'Comedy');
+  const qsDM = useMoviesByGenre('18', 'Drama');
+  const qsHM = useMoviesByGenre('27', 'Horror');
+  const qsRM = useMoviesByGenre('10749', 'Romance');
+
+  const categoriesData = useMemo(() => [
+    { title: 'Trending Movies', query: qsTM, exploreParams: null },
+    { title: 'Action Movies', query: qsAM, exploreParams: '28' },
+    { title: 'Comedy Movies', query: qsCM, exploreParams: '35' },
+    { title: 'Drama Movies', query: qsDM, exploreParams: '18' },
+    { title: 'Horror Movies', query: qsHM, exploreParams: '27' },
+    { title: 'Romance Movies', query: qsRM, exploreParams: '10749' },
+  ], [qsTM, qsAM, qsCM, qsDM, qsHM, qsRM]);
 
   const handleMovieClick = (movie) => {
     if (movie?.id) {
@@ -33,8 +39,8 @@ function MoviesHomePage() {
     }
   };
 
-  const isLoading = Object.values(categories).some(cat => cat.loading);
-  const hasError = Object.values(categories).some(cat => cat.error && cat.error !== 'No movies found.');
+  const isLoading = [qsTM, qsAM, qsCM, qsDM, qsHM, qsRM].some(q => q.isLoading);
+  const hasError = [qsTM, qsAM, qsCM, qsDM, qsHM, qsRM].some(q => q.isError);
 
   useEffect(() => {
     if (location.state?.reset) {
@@ -48,18 +54,18 @@ function MoviesHomePage() {
   return (
     <div className="min-h-screen">
       <LandingSkeleton isLoading={isLoading} />
-      <HeroSection movies={categories['Trending Now']?.movies || []} />
+      <HeroSection movies={qsTM.data || []} />
       <main className="relative z-10 pt-8">
         {hasError ? <ErrorDisplay /> : (
            <div className="space-y-8 md:space-y-12 py-12">
-             {MOVIE_CATEGORIES.map(({ key, title, genreId }) => (
+             {categoriesData.map(({ title, query, exploreParams }) => (
                <Row
-                 key={key}
+                 key={title}
                  title={title}
-                 movies={categories[key]?.movies || []}
-                 loading={categories[key]?.loading}
+                 movies={query.data || []}
+                 loading={query.isLoading}
                  onMovieClick={handleMovieClick}
-                 onExplore={() => handleExplore(genreId)}
+                 onExplore={() => handleExplore(exploreParams)}
                />
              ))}
            </div>

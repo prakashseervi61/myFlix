@@ -1,20 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HeroSection from '../components/sections/HeroSection';
 import Row from '../components/sections/Row';
 import LandingSkeleton from '../components/ui/LandingSkeleton';
-import { useTV } from '../contexts/TVContext';
-
-const TV_CATEGORIES = [
-  { key: 'Trending TV Shows', title: 'Trending Series', genreId: null },
-  { key: 'Popular Series', title: 'Popular Series', genreId: null },
-  { key: 'Top Rated Series', title: 'Top Rated Series', genreId: null },
-];
+import { useTrendingTV, usePopularTV, useTopRatedTV } from '../hooks/useTV';
 
 function TVHomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const categories = useTV();
+
+  const qsTTV = useTrendingTV();
+  const qsPTV = usePopularTV();
+  const qsTRTV = useTopRatedTV();
+
+  const categoriesData = useMemo(() => [
+    { title: 'Trending Series', query: qsTTV, exploreParams: null },
+    { title: 'Popular Series', query: qsPTV, exploreParams: null },
+    { title: 'Top Rated Series', query: qsTRTV, exploreParams: null },
+  ], [qsTTV, qsPTV, qsTRTV]);
 
   const handleShowClick = (show) => {
     if (show?.id) {
@@ -30,8 +33,8 @@ function TVHomePage() {
     }
   };
 
-  const isLoading = Object.values(categories).some(cat => cat.loading);
-  const hasError = Object.values(categories).some(cat => cat.error && cat.error !== 'No TV shows found.');
+  const isLoading = [qsTTV, qsPTV, qsTRTV].some(q => q.isLoading);
+  const hasError = [qsTTV, qsPTV, qsTRTV].some(q => q.isError);
 
   useEffect(() => {
     if (location.state?.reset) {
@@ -45,16 +48,16 @@ function TVHomePage() {
   return (
     <div className="min-h-screen">
       <LandingSkeleton isLoading={isLoading} />
-      <HeroSection movies={categories['Trending TV Shows']?.movies || []} />
+      <HeroSection movies={qsTTV.data || []} />
       <main className="relative z-10 pt-8">
         {hasError ? <ErrorDisplay /> : (
            <div className="space-y-8 md:space-y-12 py-12">
-             {TV_CATEGORIES.map(({ key, title, genreId }) => (
+             {categoriesData.map(({ title, query, exploreParams }) => (
                <Row
-                 key={key}
+                 key={title}
                  title={title}
-                 movies={categories[key]?.movies || []}
-                 loading={categories[key]?.loading}
+                 movies={query.data || []}
+                 loading={query.isLoading}
                  onMovieClick={handleShowClick}
                  onExplore={null} /* Usually no explore string for basic TV mixed rows yet */
                />

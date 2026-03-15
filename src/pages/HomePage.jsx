@@ -1,34 +1,48 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import HeroSection from '../components/sections/HeroSection';
 import Row from '../components/sections/Row';
 import LandingSkeleton from '../components/ui/LandingSkeleton';
-import { useMovies } from '../contexts/MovieContext';
-import { useTV } from '../contexts/TVContext';
-import { useBrowseState } from '../contexts/BrowseContext';
-
-const MIXED_CATEGORIES = [
-  { type: 'movie', key: 'Trending Now', title: 'Trending Movies', genreId: null },
-  { type: 'tv', key: 'Trending TV Shows', title: 'Trending TV Shows', genreId: null },
-  { type: 'tv', key: 'Popular Series', title: 'Popular Series', genreId: null },
-  { type: 'movie', key: 'Action', title: 'Action Movies', genreId: '28' },
-  { type: 'tv', key: 'Top Rated Series', title: 'Top Rated Series', genreId: null },
-  { type: 'movie', key: 'Comedy', title: 'Comedy Movies', genreId: '35' },
-  { type: 'movie', key: 'Drama', title: 'Drama Movies', genreId: '18' },
-  { type: 'movie', key: 'Horror', title: 'Horror Movies', genreId: '27' },
-  { type: 'movie', key: 'Romance', title: 'Romance Movies', genreId: '10749' },
-];
+import { useUIStore } from '../store/uiStore.js';
+import { useTrendingMovies, useMoviesByGenre } from '../hooks/useMovies';
+import { useTrendingTV, usePopularTV, useTopRatedTV } from '../hooks/useTV';
 
 /**
  * Homepage with hero carousel and categorized movie/TV rows.
- * Categories are fetched and cached by Contexts.
+ * Categories are fetched using individual React Query hooks.
  */
 function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const movieCategories = useMovies();
-  const tvCategories = useTV();
-  const { homeScrollPosition, setHomeScrollPosition } = useBrowseState();
+  const { homeScrollPosition, setHomeScrollPosition } = useUIStore();
+
+  // Fetch all rows
+  const qsTM = useTrendingMovies();
+  const qsTTV = useTrendingTV();
+  const qsPTV = usePopularTV();
+  const qsAM = useMoviesByGenre('28', 'Action');
+  const qsTRTV = useTopRatedTV();
+  const qsCM = useMoviesByGenre('35', 'Comedy');
+  const qsDM = useMoviesByGenre('18', 'Drama');
+  const qsHM = useMoviesByGenre('27', 'Horror');
+  const qsRM = useMoviesByGenre('10749', 'Romance');
+
+  const isLoading = [qsTM, qsTTV, qsPTV, qsAM, qsTRTV, qsCM, qsDM, qsHM, qsRM].some(q => q.isLoading);
+  const hasError = [qsTM, qsTTV, qsPTV, qsAM, qsTRTV, qsCM, qsDM, qsHM, qsRM].some(q => q.isError);
+  const hasData = [qsTM, qsTTV, qsPTV, qsAM, qsTRTV, qsCM, qsDM, qsHM, qsRM].some(q => q.data?.length > 0);
+
+  const categoriesData = useMemo(() => [
+    { title: 'Trending Movies', query: qsTM, exploreParams: null },
+    { title: 'Trending TV Shows', query: qsTTV, exploreParams: null },
+    { title: 'Popular Series', query: qsPTV, exploreParams: null },
+    { title: 'Action Movies', query: qsAM, exploreParams: '28' },
+    { title: 'Top Rated Series', query: qsTRTV, exploreParams: null },
+    { title: 'Comedy Movies', query: qsCM, exploreParams: '35' },
+    { title: 'Drama Movies', query: qsDM, exploreParams: '18' },
+    { title: 'Horror Movies', query: qsHM, exploreParams: '27' },
+    { title: 'Romance Movies', query: qsRM, exploreParams: '10749' },
+  ], [qsTM, qsTTV, qsPTV, qsAM, qsTRTV, qsCM, qsDM, qsHM, qsRM]);
+
 
   const handleMovieClick = (item) => {
     if (item?.id) {
@@ -47,10 +61,6 @@ function HomePage() {
       navigate('/browse', { state: { reset: true } });
     }
   };
-
-  const isLoading = Object.values(movieCategories).some(cat => cat.loading) || Object.values(tvCategories).some(cat => cat.loading);
-  const hasData = Object.values(movieCategories).some(cat => cat.movies?.length > 0) || Object.values(tvCategories).some(cat => cat.movies?.length > 0);
-  const hasError = Object.values(movieCategories).some(cat => cat.error && cat.error !== 'No movies found.');
 
   // Restore scroll position
   useEffect(() => {
@@ -77,8 +87,8 @@ function HomePage() {
   }, [setHomeScrollPosition]);
 
   // Mix Movies and TV Shows for Hero Section (Max 5)
-  const trendingMovies = movieCategories['Trending Now']?.movies || [];
-  const trendingTV = tvCategories['Trending TV Shows']?.movies || [];
+  const trendingMovies = qsTM.data || [];
+  const trendingTV = qsTTV.data || [];
   const mixedHeroItems = [];
   const maxLength = Math.max(trendingMovies.length, trendingTV.length);
   for (let i = 0; i < maxLength; i++) {
@@ -93,34 +103,31 @@ function HomePage() {
       <LandingSkeleton isLoading={isLoading} />
       <HeroSection movies={heroItems} />
       <main className="relative z-10 pt-8">
-        {hasError ? <ErrorDisplay /> : <ContentRows movieCategories={movieCategories} tvCategories={tvCategories} onMovieClick={handleMovieClick} onExplore={handleExplore} />}
+        {hasError ? <ErrorDisplay /> : <ContentRows categoriesData={categoriesData} onMovieClick={handleMovieClick} onExplore={handleExplore} />}
       </main>
     </div>
   );
 }
 
-const ContentRows = ({ movieCategories, tvCategories, onMovieClick, onExplore }) => (
+const ContentRows = ({ categoriesData, onMovieClick, onExplore }) => (
   <div className="space-y-8 md:space-y-12 py-12">
-    {MIXED_CATEGORIES.map(({ type, key, title, genreId }) => {
-      const categoryData = type === 'tv' ? tvCategories[key] : movieCategories[key];
-      return (
-        <Row
-          key={`${type}-${key}`}
-          title={title}
-          movies={categoryData?.movies || []}
-          loading={categoryData?.loading}
-          onMovieClick={onMovieClick}
-          onExplore={type === 'movie' ? () => onExplore(genreId) : undefined}
-        />
-      );
-    })}
+    {categoriesData.map(({ title, query, exploreParams }) => (
+      <Row
+        key={title}
+        title={title}
+        movies={query.data || []}
+        loading={query.isLoading}
+        onMovieClick={onMovieClick}
+        onExplore={exploreParams ? () => onExplore(exploreParams) : undefined}
+      />
+    ))}
   </div>
 );
 
 const ErrorDisplay = () => (
   <div className="flex items-center justify-center h-96 text-center px-4">
     <div className="max-w-md">
-      <h2 className="text-2xl font-bold text-white mb-2">Unable to Load Movies</h2>
+      <h2 className="text-2xl font-bold text-white mb-2">Unable to Load Content</h2>
       <p className="text-muted mb-6">Please check your connection and try again.</p>
       <button
         onClick={() => window.location.reload()}

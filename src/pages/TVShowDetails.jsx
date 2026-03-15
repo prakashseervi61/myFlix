@@ -1,101 +1,67 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, ChevronLeft, ChevronDown, MonitorPlay } from 'lucide-react';
+import { useTVDetails, useIMDbRating } from '../hooks/useTV';
+// TV episodes natively fetched by useTVEpisodes but wait, apiService.getEpisodesByTmdbId is what the original uses.
+// Let's add useTVEpisodesByTmdbId to useTV.js, or just use useQuery directly here since it's specific.
+import { useQuery } from '@tanstack/react-query';
 import { apiService } from '../services/apiService';
 import EpisodeCard from '../components/ui/EpisodeCard';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+
+export function useTVEpisodesByTmdbId(tmdbId) {
+  return useQuery({
+    queryKey: ['tv', 'episodesByTmdbId', tmdbId],
+    queryFn: () => apiService.getEpisodesByTmdbId(tmdbId),
+    staleTime: 1000 * 60 * 60 * 24, // 24 hours
+    enabled: !!tmdbId,
+  });
+}
 
 export default function TVShowDetails() {
   const { id: tmdbId } = useParams();
   const navigate = useNavigate();
   
-  const [show, setShow] = useState(null);
-  const [imdbRating, setImdbRating] = useState(null);
+  const { data: show, isLoading: loadingShow, error: errorShow } = useTVDetails(tmdbId);
+  const { data: imdbRating } = useIMDbRating(show?.title);
+  const { data: rawEpisodes, isLoading: episodesLoading } = useTVEpisodesByTmdbId(tmdbId);
   
-  const [episodes, setEpisodes] = useState([]);
-  const [allEpisodes, setAllEpisodes] = useState([]); // TVMaze returns all episodes at once
   const [selectedSeason, setSelectedSeason] = useState(1);
-  const [availableSeasons, setAvailableSeasons] = useState([]);
+  const [availableSeasons, setAvailableSeasons] = useState([1]);
   
-  const [loading, setLoading] = useState(true);
-  const [episodesLoading, setEpisodesLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const loading = loadingShow;
+  const error = errorShow ? errorShow.message : null;
+  const allEpisodes = rawEpisodes || [];
 
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    async function fetchData() {
-      setLoading(true);
-      setError(null);
-      try {
-        const showData = await apiService.getTVDetails(tmdbId);
-        
-        if (!showData) throw new Error("Show not found.");
-        
-        if (active) {
-          setShow(showData);
-          
-          // Generate initial season selection from TMDB (in case TVMaze is slow/fails)
-          const seasonNumbers = showData.seasons
-            ?.filter(s => s.season_number > 0) // Skip specials
-            .map(s => s.season_number)
-            .sort((a, b) => a - b) || [1];
-            
-          setAvailableSeasons(seasonNumbers.length > 0 ? seasonNumbers : [1]);
-          setSelectedSeason(seasonNumbers[0] || 1);
-
-          // Get OMDb rating
-          apiService.getIMDbRatingForTV(showData.title).then(rating => {
-            if (active && rating) setImdbRating(rating);
-          });
-
-          // Fetch all episodes from TVMaze
-          setEpisodesLoading(true);
-          const rawEpisodes = await apiService.getEpisodesByTmdbId(tmdbId);
-          if (active) {
-             const epData = rawEpisodes || [];
-             setAllEpisodes(epData);
-             
-             // Update seasons to strictly match available TVMaze episodes
-             if (epData.length > 0) {
-               const uniqueSeasons = [...new Set(epData.map(ep => ep.season))]
-                 .filter(s => s > 0)
-                 .sort((a, b) => a - b);
-                 
-               if (uniqueSeasons.length > 0) {
-                 setAvailableSeasons(uniqueSeasons);
-                 // Only reset selected season if current selection is invalid
-                 setSelectedSeason(prev => uniqueSeasons.includes(prev) ? prev : uniqueSeasons[0]);
-               }
-             }
-             setEpisodesLoading(false);
-          }
-        }
-      } catch (err) {
-        if (active) setError(err.message);
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    if (tmdbId) {
-      fetchData();
-    }
-
-    return () => { active = false; };
   }, [tmdbId]);
 
-  // Filter episodes whenever season changes or allEpisodes loads
+  // Sync seasons when show or episodes load
   useEffect(() => {
-    const filtered = allEpisodes.filter(ep => ep.season === selectedSeason);
-    setEpisodes(filtered);
-  }, [selectedSeason, allEpisodes]);
+    if (show && allEpisodes.length > 0) {
+      const uniqueSeasons = [...new Set(allEpisodes.map(ep => ep.season))]
+        .filter(s => s > 0)
+        .sort((a, b) => a - b);
+        
+      if (uniqueSeasons.length > 0) {
+        setAvailableSeasons(uniqueSeasons);
+        setSelectedSeason(prev => uniqueSeasons.includes(prev) ? prev : uniqueSeasons[0]);
+      }
+    } else if (show?.seasons) {
+      const seasonNumbers = show.seasons
+        .filter(s => s.season_number > 0)
+        .map(s => s.season_number)
+        .sort((a, b) => a - b);
+      if (seasonNumbers.length > 0) {
+        setAvailableSeasons(seasonNumbers);
+        setSelectedSeason(prev => seasonNumbers.includes(prev) ? prev : seasonNumbers[0]);
+      }
+    }
+  }, [show, allEpisodes]);
 
+  const episodes = allEpisodes.filter(ep => ep.season === selectedSeason);
 
   if (error) {
     return (

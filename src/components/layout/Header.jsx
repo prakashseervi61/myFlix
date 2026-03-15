@@ -11,6 +11,7 @@ import { useDebounce } from 'use-debounce';
 import { useGlobalScrollLock } from "../../hooks/useGlobalScrollLock.js";
 import SearchResultsDropdown from "./SearchResultsDropdown.jsx";
 import UserMenu from "./UserMenu.jsx";
+import { useUIStore } from "../../store/uiStore.js";
 import "./Sidebar.css";
 
 const NavItem = React.memo(({ to, state, children }) => (
@@ -31,7 +32,9 @@ export default function Header() {
   const watchlistContext = useWatchlist();
   const count = watchlistContext?.count || 0;
   
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMenuOpen = useUIStore((state) => state.isSidebarOpen);
+  const setIsMenuOpen = useUIStore((state) => state.setSidebarOpen);
+  
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
   

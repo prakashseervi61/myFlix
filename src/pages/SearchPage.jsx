@@ -10,7 +10,7 @@ import { apiService } from '../services/apiService.js';
 import FilterPanel from '../components/layout/FilterPanel.jsx';
 import MovieCard from '../components/ui/MovieCard.jsx';
 import MovieCardSkeleton from '../components/ui/MovieCardSkeleton.jsx';
-import { useBrowseState } from '../contexts/BrowseContext.jsx';
+import { useUIStore } from '../store/uiStore.js';
 
 /**
  * Search page with client-side filtering of results.
@@ -20,7 +20,7 @@ import { useBrowseState } from '../contexts/BrowseContext.jsx';
 function SearchPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { searchPageState, updateSearchPageState } = useBrowseState();
+  const { searchPageState, updateSearchPageState } = useUIStore();
   const urlQuery = searchParams.get('q') || '';
   const [query, setQuery] = useState(urlQuery || searchPageState.query);
   const [debouncedQuery] = useDebounce(query, 500);

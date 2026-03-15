@@ -12,7 +12,7 @@ import MovieCardSkeleton from '../components/ui/MovieCardSkeleton.jsx';
 import MovieListItem from '../components/ui/MovieListItem.jsx';
 import MovieListItemSkeleton from '../components/ui/MovieListItemSkeleton.jsx';
 import BackToTop from '../components/ui/BackToTop.jsx';
-import { useBrowseState } from '../contexts/BrowseContext.jsx';
+import { useUIStore } from '../store/uiStore.js';
 
 /**
  * TV Browse page with advanced filtering and infinite scroll.
@@ -20,7 +20,7 @@ import { useBrowseState } from '../contexts/BrowseContext.jsx';
 function TVBrowsePage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { tvBrowseState, updateTvBrowseState } = useBrowseState();
+  const { tvBrowseState, updateTvBrowseState } = useUIStore();
   const { filters, updateFilter, resetFilters } = useFilters('myflix_tv_filters');
   const [debouncedFilters] = useDebounce(filters, 500);
   

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { Plus, Check, Play, Film, Info, Eye } from "lucide-react";
 import { useMovieCardLogic } from '../../hooks/useMovieCardLogic.js';
-import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
+import { useUIStore } from '../../store/uiStore.js';
 
 /**
  * Movie card with hover effects (desktop) and tap actions (mobile).
@@ -11,7 +11,7 @@ import { usePreviewModal } from '../../contexts/PreviewModalContext.jsx';
  */
 function MovieCard({ movie, onClick }) {
   const { isMovieInWatchlist: inWatchlist, handleToggleWatchlist: handleWatchlistClick } = useMovieCardLogic(movie);
-  const { openModal } = usePreviewModal();
+  const openPreviewModal = useUIStore((state) => state.openPreviewModal);
   const [imageError, setImageError] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -23,8 +23,8 @@ function MovieCard({ movie, onClick }) {
   const handlePreviewClick = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-    openModal(movie);
-  }, [movie, openModal]);
+    openPreviewModal(movie);
+  }, [movie, openPreviewModal]);
 
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' || e.key === ' ') {

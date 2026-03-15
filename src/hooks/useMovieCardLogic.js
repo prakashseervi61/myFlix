@@ -1,7 +1,7 @@
 import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from './useAuth.jsx';
 import { useNavigate } from 'react-router-dom';
-import { usePreviewModal } from '../contexts/PreviewModalContext.jsx';
+import { useUIStore } from '../store/uiStore.js';
 
 /**
  * Centralized movie card interaction logic.
@@ -11,7 +11,7 @@ import { usePreviewModal } from '../contexts/PreviewModalContext.jsx';
  */
 export function useMovieCardLogic(movie) {
   const { isInWatchlist, toggleWatchlist } = useWatchlist();
-  const { openModal } = usePreviewModal();
+  const openPreviewModal = useUIStore((state) => state.openPreviewModal);
   const { user } = useAuth();
   const navigate = useNavigate();
   
@@ -32,7 +32,7 @@ export function useMovieCardLogic(movie) {
   const handleOpenPreview = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    openModal(movie);
+    openPreviewModal(movie);
   };
 
   const isMovieInWatchlist = movie?.id ? isInWatchlist(movie.id) : false;

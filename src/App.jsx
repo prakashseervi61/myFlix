@@ -4,11 +4,7 @@ import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/layout/ErrorBoundary';
 import { AuthProvider } from './hooks/useAuth.jsx';
-import { MovieProvider } from './contexts/MovieContext.jsx';
-import { TVProvider } from './contexts/TVContext.jsx';
 import { WatchlistProvider } from './contexts/WatchlistContext.jsx';
-import { PreviewModalProvider } from './contexts/PreviewModalContext.jsx';
-import { BrowseProvider } from './contexts/BrowseContext.jsx';
 import MoviePreviewModal from './components/ui/MoviePreviewModal.jsx';
 
 /** Lazy-loaded pages for code splitting and faster initial load */
@@ -51,11 +47,7 @@ function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <BrowseProvider>
-          <MovieProvider>
-            <TVProvider>
-              <WatchlistProvider>
-                <PreviewModalProvider>
+        <WatchlistProvider>
                 <div className="min-h-screen bg-background text-white flex flex-col">
                   {!isAuthPage && <Header />}
                   <main className="flex-1">
@@ -83,11 +75,7 @@ function App() {
                   {!isAuthPage && <Footer />}
                   <MoviePreviewModal />
                 </div>
-              </PreviewModalProvider>
-            </WatchlistProvider>
-            </TVProvider>
-          </MovieProvider>
-        </BrowseProvider>
+        </WatchlistProvider>
       </AuthProvider>
     </ErrorBoundary>
   );

@@ -21,6 +21,15 @@ function HeroSection({ movies = [] }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const touchStartRef = useRef(null);
 
+  const handleNavigate = useCallback((item) => {
+    if (!item) return;
+    if (item.media_type === 'tv' || item.number_of_seasons !== undefined || (!item.release_date && item.first_air_date)) {
+       navigate(`/tv/${item.id}`);
+    } else {
+       navigate(`/movie/${item.id}`);
+    }
+  }, [navigate]);
+
   /** Filters movies with backdrops and limits to 6 for performance */
   const featuredMovies = useMemo(() => {
      if (!Array.isArray(movies) || movies.length === 0) return [];
@@ -185,7 +194,7 @@ function HeroSection({ movies = [] }) {
 
           <div className="flex items-center gap-3 sm:gap-4 mt-1 md:mt-2 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.7s_forwards]">
             <button
-              onClick={() => navigate(`/movie/${activeMovie.id}`)}
+              onClick={() => handleNavigate(activeMovie)}
               className="flex-1 sm:flex-none flex items-center justify-center gap-2 sm:gap-3 px-4 py-2.5 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label={`Watch ${activeMovie.title} now`}
             >
@@ -201,7 +210,7 @@ function HeroSection({ movies = [] }) {
               {isBookmarked ? 'Added' : 'My List'}
             </button>
             <button 
-              onClick={() => navigate(`/movie/${activeMovie.id}`)}
+              onClick={() => handleNavigate(activeMovie)}
               className="hidden md:flex items-center justify-center w-14 h-14 rounded-full border border-gray-400 text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               title="More Info"
               aria-label={`More info about ${activeMovie.title}`}

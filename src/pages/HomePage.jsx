@@ -76,10 +76,22 @@ function HomePage() {
     };
   }, [setHomeScrollPosition]);
 
+  // Mix Movies and TV Shows for Hero Section (Max 5)
+  const trendingMovies = movieCategories['Trending Now']?.movies || [];
+  const trendingTV = tvCategories['Trending TV Shows']?.movies || [];
+  const mixedHeroItems = [];
+  const maxLength = Math.max(trendingMovies.length, trendingTV.length);
+  for (let i = 0; i < maxLength; i++) {
+    if (trendingMovies[i]) mixedHeroItems.push(trendingMovies[i]);
+    if (trendingTV[i]) mixedHeroItems.push(trendingTV[i]);
+    if (mixedHeroItems.length >= 5) break;
+  }
+  const heroItems = mixedHeroItems.slice(0, 5);
+
   return (
     <div className="min-h-screen">
       <LandingSkeleton isLoading={isLoading} />
-      <HeroSection movies={movieCategories['Trending Now']?.movies || []} />
+      <HeroSection movies={heroItems} />
       <main className="relative z-10 pt-8">
         {hasError ? <ErrorDisplay /> : <ContentRows movieCategories={movieCategories} tvCategories={tvCategories} onMovieClick={handleMovieClick} onExplore={handleExplore} />}
       </main>

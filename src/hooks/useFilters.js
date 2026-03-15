@@ -42,7 +42,10 @@ export function useFilters(storageKey = DEFAULT_KEY, initialOverrides = {}) {
   }, []);
 
   const resetFilters = useCallback((overrides = {}) => {
-    setFilters({ ...DEFAULT_FILTERS, ...overrides });
+    // Prevent React synthetic events from being spread into state
+    const isEvent = overrides && typeof overrides === 'object' && ('nativeEvent' in overrides || overrides instanceof Event);
+    const safeOverrides = isEvent ? {} : overrides;
+    setFilters({ ...DEFAULT_FILTERS, ...safeOverrides });
   }, []);
 
   const updateFilters = useCallback((newFilters) => {

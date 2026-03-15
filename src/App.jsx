@@ -5,6 +5,7 @@ import Footer from './components/layout/Footer';
 import ErrorBoundary from './components/layout/ErrorBoundary';
 import { AuthProvider } from './hooks/useAuth.jsx';
 import { MovieProvider } from './contexts/MovieContext.jsx';
+import { TVProvider } from './contexts/TVContext.jsx';
 import { WatchlistProvider } from './contexts/WatchlistContext.jsx';
 import { PreviewModalProvider } from './contexts/PreviewModalContext.jsx';
 import { BrowseProvider } from './contexts/BrowseContext.jsx';
@@ -13,9 +14,11 @@ import MoviePreviewModal from './components/ui/MoviePreviewModal.jsx';
 /** Lazy-loaded pages for code splitting and faster initial load */
 const HomePage = lazy(() => import('./pages/HomePage'));
 const BrowsePage = lazy(() => import('./pages/BrowsePage'));
+const TVBrowsePage = lazy(() => import('./pages/TVBrowsePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const MovieDetail = lazy(() => import('./pages/MovieDetail'));
+const TVShowDetails = lazy(() => import('./pages/TVShowDetails'));
 const WatchlistPage = lazy(() => import('./pages/WatchlistPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage'));
@@ -48,8 +51,9 @@ function App() {
       <AuthProvider>
         <BrowseProvider>
           <MovieProvider>
-            <WatchlistProvider>
-              <PreviewModalProvider>
+            <TVProvider>
+              <WatchlistProvider>
+                <PreviewModalProvider>
                 <div className="min-h-screen bg-background text-white flex flex-col">
                   {!isAuthPage && <Header />}
                   <main className="flex-1">
@@ -57,9 +61,11 @@ function App() {
                       <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/browse" element={<BrowsePage />} />
+                        <Route path="/tvshows" element={<TVBrowsePage />} />
                         <Route path="/search" element={<SearchPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
                         <Route path="/movie/:id" element={<MovieDetail />} />
+                        <Route path="/tv/:id" element={<TVShowDetails />} />
                         <Route path="/watchlist" element={<WatchlistPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/signup" element={<SignupPage />} />
@@ -75,6 +81,7 @@ function App() {
                 </div>
               </PreviewModalProvider>
             </WatchlistProvider>
+            </TVProvider>
           </MovieProvider>
         </BrowseProvider>
       </AuthProvider>

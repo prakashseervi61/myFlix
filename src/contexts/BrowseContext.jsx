@@ -15,9 +15,18 @@ export const useBrowseState = () => {
 };
 
 export const BrowseProvider = ({ children }) => {
-  // Persistence for BrowsePage
   const [browseState, setBrowseState] = useState({
     movies: [],
+    page: 1,
+    hasMore: true,
+    scrollPosition: 0,
+    genres: [],
+    lastFilters: null
+  });
+
+  // Persistence for TVBrowsePage
+  const [tvBrowseState, setTvBrowseState] = useState({
+    shows: [],
     page: 1,
     hasMore: true,
     scrollPosition: 0,
@@ -45,6 +54,10 @@ export const BrowseProvider = ({ children }) => {
     setBrowseState(prev => ({ ...prev, ...updates }));
   }, []);
 
+  const updateTvBrowseState = React.useCallback((updates) => {
+    setTvBrowseState(prev => ({ ...prev, ...updates }));
+  }, []);
+
   const updateSearchPageState = React.useCallback((updates) => {
     setSearchPageState(prev => ({ ...prev, ...updates }));
   }, []);
@@ -52,6 +65,8 @@ export const BrowseProvider = ({ children }) => {
   const value = React.useMemo(() => ({
     browseState, 
     updateBrowseState,
+    tvBrowseState,
+    updateTvBrowseState,
     searchPageState,
     updateSearchPageState,
     homeScrollPosition,
@@ -61,6 +76,8 @@ export const BrowseProvider = ({ children }) => {
   }), [
     browseState, 
     updateBrowseState,
+    tvBrowseState,
+    updateTvBrowseState,
     searchPageState,
     updateSearchPageState,
     homeScrollPosition,

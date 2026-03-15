@@ -17,38 +17,63 @@ const SearchResultsDropdown = React.memo(({ results, loading, error, onMovieClic
       </div>
     )}
     {error && <div className="p-4 text-center text-primary text-sm bg-primary/5 border-b border-primary/10">{error}</div>}
-    {!loading && !error && results.length === 0 && <div className="p-8 text-center text-muted text-base font-medium">No movies found.</div>}
+    {!loading && !error && results.length === 0 && <div className="p-8 text-center text-muted text-base font-medium">No results found.</div>}
     
-    <div className="divide-y divide-[#C0927C]/10">
-      {results.map((movie) => {
-        const inList = isInWatchlist ? isInWatchlist(movie.id) : false;
-        return (
-          <button 
-            key={movie.id} 
-            onClick={() => onMovieClick(movie)} 
-            className="w-full p-4 md:p-3 flex items-center gap-4 hover:bg-surface/40 transition-colors text-left group focus:outline-none focus:bg-surface/60 border-b border-white/5 last:border-0"
-          >
-            <div className="relative w-16 h-24 md:w-12 md:h-16 bg-[#2A1F25] rounded-md overflow-hidden shrink-0 shadow-sm border border-white/10 group-hover:border-primary/50 transition-colors">
-               <img src={movie.poster} alt="" className="w-full h-full object-cover" loading="lazy" />
-               {inList && (
-                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[1px]">
-                   <Check size={18} className="text-green-500 font-bold" />
-                 </div>
-               )}
-            </div>
-            <div className="flex-1 min-w-0 py-1">
-              <p className={`text-base md:text-sm font-bold truncate group-hover:text-primary transition-colors ${inList ? 'text-green-400' : 'text-white'}`}>
-                {movie.title}
-              </p>
-              <div className="flex items-center gap-3 mt-2 md:mt-1">
-                <span className="text-muted text-sm md:text-xs font-semibold">{movie.year || 'N/A'}</span>
-                {inList && <span className="text-[10px] text-green-400 font-bold border border-green-500/20 px-1.5 py-0.5 rounded bg-green-500/5 uppercase tracking-wide">Added</span>}
-                {movie.rating && <span className="text-xs md:text-[10px] text-yellow-500 flex items-center gap-1 font-bold bg-yellow-500/10 px-1.5 py-0.5 rounded"><Star size={12} fill="currentColor" /> {movie.rating}</span>}
-              </div>
-            </div>
-          </button>
-        );
-      })}
+    <div className="divide-y divide-[#C0927C]/10 pb-2">
+      {(() => {
+         const movies = results.filter(r => r.media_type !== 'tv');
+         const tvShows = results.filter(r => r.media_type === 'tv');
+
+         const renderItem = (item) => {
+            const inList = isInWatchlist ? isInWatchlist(item.id) : false;
+            return (
+              <button 
+                key={`${item.media_type}-${item.id}`} 
+                onClick={() => onMovieClick(item)} 
+                className="w-full p-4 md:p-3 flex items-center gap-4 hover:bg-surface/40 transition-colors text-left group focus:outline-none focus:bg-surface/60 border-b border-white/5 last:border-0"
+              >
+                <div className="relative w-16 h-24 md:w-12 md:h-16 bg-[#2A1F25] rounded-md overflow-hidden shrink-0 shadow-sm border border-white/10 group-hover:border-primary/50 transition-colors">
+                   <img src={item.poster} alt="" className="w-full h-full object-cover" loading="lazy" />
+                   {inList && (
+                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-[1px]">
+                       <Check size={18} className="text-green-500 font-bold" />
+                     </div>
+                   )}
+                </div>
+                <div className="flex-1 min-w-0 py-1">
+                  <p className={`text-base md:text-sm font-bold truncate group-hover:text-primary transition-colors ${inList ? 'text-green-400' : 'text-white'}`}>
+                    {item.title}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 mt-2 md:mt-1">
+                    {item.media_type === 'tv' && (
+                       <span className="text-[10px] bg-primary/20 text-primary font-bold px-1.5 py-0.5 rounded uppercase tracking-wide border border-primary/20">TV</span>
+                    )}
+                    <span className="text-muted text-sm md:text-xs font-semibold">{item.year || 'N/A'}</span>
+                    {inList && <span className="text-[10px] text-green-400 font-bold border border-green-500/20 px-1.5 py-0.5 rounded bg-green-500/5 uppercase tracking-wide">Added</span>}
+                    {item.rating && <span className="text-xs md:text-[10px] text-yellow-500 flex items-center gap-1 font-bold bg-yellow-500/10 px-1.5 py-0.5 rounded"><Star size={12} fill="currentColor" /> {item.rating}</span>}
+                  </div>
+                </div>
+              </button>
+            );
+         };
+
+         return (
+           <>
+             {tvShows.length > 0 && (
+               <div className="pt-2">
+                 <h3 className="px-4 md:px-3 py-2 text-xs font-black text-white/40 uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-md z-10 border-b border-white/5">TV Shows</h3>
+                 {tvShows.map(renderItem)}
+               </div>
+             )}
+             {movies.length > 0 && (
+               <div className="pt-2">
+                 <h3 className="px-4 md:px-3 py-2 text-xs font-black text-white/40 uppercase tracking-widest sticky top-0 bg-background/95 backdrop-blur-md z-10 border-b border-white/5">Movies</h3>
+                 {movies.map(renderItem)}
+               </div>
+             )}
+           </>
+         );
+      })()}
     </div>
   </div>
 ));

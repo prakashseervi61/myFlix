@@ -4,30 +4,39 @@ import HeroSection from '../components/sections/HeroSection';
 import Row from '../components/sections/Row';
 import LandingSkeleton from '../components/ui/LandingSkeleton';
 import { useMovies } from '../contexts/MovieContext';
+import { useTV } from '../contexts/TVContext';
 import { useBrowseState } from '../contexts/BrowseContext';
 
-const MOVIE_CATEGORIES = [
-  { key: 'Trending Now', title: 'Trending Now', genreId: null },
-  { key: 'Action', title: 'Action', genreId: '28' },
-  { key: 'Comedy', title: 'Comedy', genreId: '35' },
-  { key: 'Drama', title: 'Drama', genreId: '18' },
-  { key: 'Horror', title: 'Horror', genreId: '27' },
-  { key: 'Romance', title: 'Romance', genreId: '10749' },
+const MIXED_CATEGORIES = [
+  { type: 'movie', key: 'Trending Now', title: 'Trending Movies', genreId: null },
+  { type: 'tv', key: 'Trending TV Shows', title: 'Trending TV Shows', genreId: null },
+  { type: 'tv', key: 'Popular Series', title: 'Popular Series', genreId: null },
+  { type: 'movie', key: 'Action', title: 'Action Movies', genreId: '28' },
+  { type: 'tv', key: 'Top Rated Series', title: 'Top Rated Series', genreId: null },
+  { type: 'movie', key: 'Comedy', title: 'Comedy Movies', genreId: '35' },
+  { type: 'movie', key: 'Drama', title: 'Drama Movies', genreId: '18' },
+  { type: 'movie', key: 'Horror', title: 'Horror Movies', genreId: '27' },
+  { type: 'movie', key: 'Romance', title: 'Romance Movies', genreId: '10749' },
 ];
 
 /**
- * Homepage with hero carousel and categorized movie rows.
- * Categories are fetched and cached by MovieContext.
+ * Homepage with hero carousel and categorized movie/TV rows.
+ * Categories are fetched and cached by Contexts.
  */
 function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const categories = useMovies();
+  const movieCategories = useMovies();
+  const tvCategories = useTV();
   const { homeScrollPosition, setHomeScrollPosition } = useBrowseState();
 
-  const handleMovieClick = (movie) => {
-    if (movie?.id) {
-      navigate(`/movie/${movie.id}`);
+  const handleMovieClick = (item) => {
+    if (item?.id) {
+      if (item.media_type === 'tv' || item.number_of_seasons !== undefined || (!item.release_date && item.first_air_date)) {
+         navigate(`/tv/${item.id}`);
+      } else {
+         navigate(`/movie/${item.id}`);
+      }
     }
   };
   
@@ -39,9 +48,9 @@ function HomePage() {
     }
   };
 
-  const isLoading = Object.values(categories).some(cat => cat.loading);
-  const hasData = Object.values(categories).some(cat => cat.movies.length > 0);
-  const hasError = Object.values(categories).some(cat => cat.error && cat.error !== 'No movies found.');
+  const isLoading = Object.values(movieCategories).some(cat => cat.loading) || Object.values(tvCategories).some(cat => cat.loading);
+  const hasData = Object.values(movieCategories).some(cat => cat.movies?.length > 0) || Object.values(tvCategories).some(cat => cat.movies?.length > 0);
+  const hasError = Object.values(movieCategories).some(cat => cat.error && cat.error !== 'No movies found.');
 
   // Restore scroll position
   useEffect(() => {
@@ -70,26 +79,29 @@ function HomePage() {
   return (
     <div className="min-h-screen">
       <LandingSkeleton isLoading={isLoading} />
-      <HeroSection movies={categories['Trending Now']?.movies || []} />
+      <HeroSection movies={movieCategories['Trending Now']?.movies || []} />
       <main className="relative z-10 pt-8">
-        {hasError ? <ErrorDisplay /> : <MovieRows categories={categories} onMovieClick={handleMovieClick} onExplore={handleExplore} />}
+        {hasError ? <ErrorDisplay /> : <ContentRows movieCategories={movieCategories} tvCategories={tvCategories} onMovieClick={handleMovieClick} onExplore={handleExplore} />}
       </main>
     </div>
   );
 }
 
-const MovieRows = ({ categories, onMovieClick, onExplore }) => (
+const ContentRows = ({ movieCategories, tvCategories, onMovieClick, onExplore }) => (
   <div className="space-y-8 md:space-y-12 py-12">
-    {MOVIE_CATEGORIES.map(({ key, title, genreId }) => (
-      <Row
-        key={key}
-        title={title}
-        movies={categories[key]?.movies || []}
-        loading={categories[key]?.loading}
-        onMovieClick={onMovieClick}
-        onExplore={() => onExplore(genreId)}
-      />
-    ))}
+    {MIXED_CATEGORIES.map(({ type, key, title, genreId }) => {
+      const categoryData = type === 'tv' ? tvCategories[key] : movieCategories[key];
+      return (
+        <Row
+          key={`${type}-${key}`}
+          title={title}
+          movies={categoryData?.movies || []}
+          loading={categoryData?.loading}
+          onMovieClick={onMovieClick}
+          onExplore={type === 'movie' ? () => onExplore(genreId) : undefined}
+        />
+      );
+    })}
   </div>
 );
 

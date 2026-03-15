@@ -72,7 +72,11 @@ export default function Header() {
   }, [location.pathname]);
 
   const handleMovieClick = (movie) => {
-    navigate(`/movie/${movie.id}`);
+    if (movie.media_type === 'tv' || movie.number_of_seasons !== undefined || (!movie.release_date && movie.first_air_date)) {
+       navigate(`/tv/${movie.id}`);
+    } else {
+       navigate(`/movie/${movie.id}`);
+    }
     setSearchQuery('');
     setSearchExpanded(false);
   };
@@ -104,6 +108,7 @@ export default function Header() {
             <nav className="hidden lg:flex items-center gap-4 xl:gap-8" aria-label="Main Navigation">
               <NavItem to="/" state={{ reset: true }}>Home</NavItem>
               <NavItem to="/browse" state={{ reset: true }}>Movies</NavItem>
+              <NavItem to="/tvshows" state={{ reset: true }}>TV Shows</NavItem>
               <NavItem to="/watchlist">Watchlist</NavItem>
             </nav>
 
@@ -240,7 +245,11 @@ export default function Header() {
                 <ChevronDown size={18} className="-rotate-90 text-muted/30" />
               </Link>
               <Link to="/browse" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
-                Browse Movies
+                Movies
+                <ChevronDown size={18} className="-rotate-90 text-gray-500" />
+              </Link>
+              <Link to="/tvshows" state={{ reset: true }} className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>
+                TV Shows & Series
                 <ChevronDown size={18} className="-rotate-90 text-gray-500" />
               </Link>
               <Link to="/watchlist" className="text-lg font-semibold text-white py-4 border-b border-muted/10 flex items-center justify-between outline-none focus-visible:text-primary transition-colors" onClick={() => setIsMenuOpen(false)}>

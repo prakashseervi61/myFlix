@@ -187,7 +187,11 @@ function SearchPage() {
 
   const handleMovieClick = (movie) => {
     if (movie?.id) {
-      navigate(`/movie/${movie.id}`);
+      if (movie.media_type === 'tv' || movie.number_of_seasons !== undefined || (!movie.release_date && movie.first_air_date)) {
+         navigate(`/tv/${movie.id}`);
+      } else {
+         navigate(`/movie/${movie.id}`);
+      }
     }
   };
 
@@ -199,7 +203,7 @@ function SearchPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Search</h1>
-          <p className="text-lg text-muted mt-1">Find your next favorite movie.</p>
+          <p className="text-lg text-muted mt-1">Find your next favorite movie or TV show.</p>
         </header>
 
         <div className="flex flex-col md:flex-row gap-6">
@@ -221,7 +225,7 @@ function SearchPage() {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search for movies..."
+                  placeholder="Search for movies or TV shows..."
                   className="flex-1 bg-transparent border-none text-xl md:text-2xl text-white placeholder:text-muted/40 focus:outline-none focus:ring-0 p-0 font-medium"
                 />
                 {query && (
@@ -275,7 +279,7 @@ const RenderContent = ({ initialLoading, isLoadingMore, error, query, results, o
   }
 
   if (query && results.length === 0 && !filtering) {
-    return <StatusDisplay title="No Results Found" message={`No movies found for "${query}" matching your filters.`} />;
+    return <StatusDisplay title="No Results Found" message={`No titles found for "${query}" matching your filters.`} />;
   }
   
   if (results.length > 0 || filtering) {

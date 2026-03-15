@@ -163,6 +163,35 @@ class TMDBService {
     return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
+  async searchMulti(query, page = 1, signal) {
+    if (!query) return [];
+    const url = this.buildUrl('/search/multi', { query, page });
+    const data = await this.request(url, signal);
+    
+    return (data.results || [])
+      .filter(item => item.media_type === 'movie' || item.media_type === 'tv')
+      .map(item => {
+        if (item.media_type === 'tv') {
+           // Basic TV normalization identical to tvService for search results
+           return {
+             id: String(item.id),
+             title: item.name || item.original_name, // Map name to title
+             year: item.first_air_date ? item.first_air_date.split('-')[0] : 'N/A',
+             poster: item.poster_path ? `${IMAGE_BASE_URL}${item.poster_path}` : null,
+             backdrop: item.backdrop_path ? `${BACKDROP_BASE_URL}${item.backdrop_path}` : null,
+             rating: typeof item.vote_average === 'number' ? item.vote_average.toFixed(1) : '0.0',
+             plot: item.overview || 'No overview available.',
+             media_type: 'tv'
+           };
+        } else {
+           const movie = this.normalizeMovieData(item);
+           if (movie) movie.media_type = 'movie';
+           return movie;
+        }
+      })
+      .filter(Boolean);
+  }
+
   async getMovieById(id, signal) {
     const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits,images' });
     const data = await this.request(url, signal);

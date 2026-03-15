@@ -41,9 +41,13 @@ export function useFilters(storageKey = DEFAULT_KEY, initialOverrides = {}) {
     setFilters(prev => ({ ...prev, [key]: value }));
   }, []);
 
-  const resetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTERS);
+  const resetFilters = useCallback((overrides = {}) => {
+    setFilters({ ...DEFAULT_FILTERS, ...overrides });
   }, []);
 
-  return { filters, updateFilter, resetFilters };
+  const updateFilters = useCallback((newFilters) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  }, []);
+
+  return { filters, updateFilter, updateFilters, resetFilters };
 }

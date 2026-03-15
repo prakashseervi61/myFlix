@@ -16,7 +16,7 @@
 .progress-fill {
   height: 100%;
   width: 100%;
-  background-color: #3b82f6; /* Blue fill */
+  background-color: #C1372C; /* Accent fill */
   border-radius: 9999px;
   transform: scaleX(0);
   transform-origin: left;

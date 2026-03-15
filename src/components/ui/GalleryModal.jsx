@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
-import { useGlobalScrollLock } from '../hooks/useGlobalScrollLock.js';
+import { useGlobalScrollLock } from '../../hooks/useGlobalScrollLock.js';
 
 const GalleryModal = ({ isOpen, images, currentIndex, onClose, onPrev, onNext }) => {
   useGlobalScrollLock(isOpen);

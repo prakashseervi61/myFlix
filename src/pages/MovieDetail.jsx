@@ -6,10 +6,10 @@ import { useMovieTrailers } from '../hooks/useMovieTrailers.js';
 import { useWatchlist } from '../contexts/WatchlistContext.jsx';
 import { useAuth } from '../hooks/useAuth.jsx';
 import TrailerPlayer from '../components/ui/TrailerPlayer.jsx';
-import ReviewSection from '../components/ReviewSection.jsx';
-import DiscussionSection from '../components/DiscussionSection.jsx';
-import CastSection from '../components/CastSection.jsx';
-import GallerySection from '../components/GallerySection.jsx';
+import ReviewSection from '../components/sections/ReviewSection.jsx';
+import DiscussionSection from '../components/sections/DiscussionSection.jsx';
+import CastSection from '../components/sections/CastSection.jsx';
+import GallerySection from '../components/sections/GallerySection.jsx';
 
 /**
  * Movie detail page with trailer, metadata, and watchlist actions.
@@ -58,15 +58,15 @@ function MovieDetail() {
   const backdropUrl = movie.backdrop || movie.poster;
 
   return (
-    <div className="min-h-screen bg-[#20151A] text-white selection:bg-[#C1372C]/30">
+    <div className="min-h-screen bg-background text-white selection:bg-primary/30">
       {/* 1. Movie Hero Section */}
       <div className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 scale-105"
           style={{ backgroundImage: `url(${backdropUrl})` }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-[#20151A] via-[#20151A]/40 to-transparent" />
-          <div className="absolute inset-0 bg-[#20151A]/30 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <div className="absolute inset-0 bg-background/30 mix-blend-multiply" />
         </div>
         
         <button
@@ -91,9 +91,9 @@ function MovieDetail() {
             <MovieDetailsHeader movie={movie} />
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                <WatchlistButton inWatchlist={isInWatchlist} onClick={handleWatchlistClick} />
-               <div className="flex items-center gap-6 text-sm font-bold text-[#C0927C] border-l border-[#C0927C]/20 pl-6 h-12">
+               <div className="flex items-center gap-6 text-sm font-bold text-muted border-l border-muted/20 pl-6 h-12">
                  <div className="flex items-center gap-2">
-                   <Star size={20} className="text-[#C1372C] fill-[#C1372C]" /> 
+                   <Star size={20} className="text-primary fill-primary" /> 
                    <span className="text-white text-lg font-black italic">{movie.rating}</span>
                  </div>
                  <div className="opacity-30">|</div>
@@ -110,10 +110,10 @@ function MovieDetail() {
         {/* 3. Trailer Section (Centered 16:9, max-width optimized) */}
         <section className="mt-20 max-w-[950px] mx-auto scroll-mt-24">
           <div className="flex items-center gap-3 mb-8">
-            <Video className="text-[#C1372C]" size={24} />
+            <Video className="text-primary" size={24} />
             <h2 className="text-2xl font-bold uppercase tracking-widest">Official Trailer</h2>
           </div>
-          <div className="bg-[#5E4A65] shadow-2xl rounded-2xl overflow-hidden ring-1 ring-[#C0927C]/20 aspect-video group">
+          <div className="bg-surface shadow-2xl rounded-2xl overflow-hidden ring-1 ring-muted/20 aspect-video group">
             {trailersLoading ? (
               <div className="w-full h-full skeleton-loader" />
             ) : (
@@ -161,7 +161,7 @@ function MovieDetail() {
 }
 
 const LoadingSkeleton = () => (
-  <div className="min-h-screen bg-[#20151A]">
+  <div className="min-h-screen bg-background">
     <div className="w-full h-[50vh] skeleton-loader opacity-50" />
     <div className="max-w-[1280px] mx-auto px-4 md:px-8 -mt-32 relative z-10">
       <div className="flex flex-col md:flex-row gap-8">
@@ -214,10 +214,10 @@ const ErrorDisplay = ({ error, navigate }) => (
     <div className="glass-morphism p-6 md:p-8 rounded-xl max-w-md w-full border border-white/10">
       <AlertTriangle className="mx-auto text-red-500 mb-4" size={40} />
       <h1 className="text-xl md:text-2xl font-bold text-white mb-2">Movie Not Found</h1>
-      <p className="text-[#C0927C] text-sm md:text-base mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
+      <p className="text-muted text-sm md:text-base mb-6">{typeof error === 'string' ? error : 'The requested movie could not be loaded.'}</p>
       <button
         onClick={() => navigate('/')}
-        className="w-full px-6 py-3 bg-[#C1372C] text-white rounded-lg font-semibold hover:bg-[#C1372C]/90 transition-colors"
+        className="w-full px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors"
       >
         Back to Home
       </button>
@@ -241,16 +241,16 @@ const MovieDetailsHeader = ({ movie }) => (
   <div>
     <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-2">{movie.title}</h1>
     
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-[#C0927C]">
-      {movie.year && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-[#C1372C]" /> {movie.year}</span>}
-      {movie.runtime && <span className="flex items-center gap-1.5"><Clock size={14} className="text-[#C1372C]" /> {movie.runtime}</span>}
-      {movie.rating && <span className="flex items-center gap-1.5"><Star size={14} className="text-[#C1372C] fill-[#C1372C]" /> {movie.rating}</span>}
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs sm:text-sm text-muted">
+      {movie.year && <span className="flex items-center gap-1.5"><Calendar size={14} className="text-primary" /> {movie.year}</span>}
+      {movie.runtime && <span className="flex items-center gap-1.5"><Clock size={14} className="text-primary" /> {movie.runtime}</span>}
+      {movie.rating && <span className="flex items-center gap-1.5"><Star size={14} className="text-primary fill-primary" /> {movie.rating}</span>}
     </div>
     
     {movie.genre && (
       <div className="mt-4 flex flex-wrap gap-2">
         {movie.genre.split(', ').map(g => (
-          <span key={g} className="px-2.5 py-1 bg-[#5E4A65] border border-[#C0927C]/20 text-[#C0927C] rounded-md text-[10px] sm:text-xs font-medium uppercase tracking-wide">
+          <span key={g} className="px-2.5 py-1 bg-surface border border-muted/20 text-muted rounded-md text-[10px] sm:text-xs font-medium uppercase tracking-wide">
             {g}
           </span>
         ))}
@@ -265,7 +265,7 @@ const WatchlistButton = ({ inWatchlist, onClick }) => (
     className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-bold text-sm transition-all w-full md:w-auto active:scale-95 ${
       inWatchlist
         ? 'bg-green-600 text-white hover:bg-green-500 shadow-lg shadow-green-900/20'
-        : 'bg-white text-black hover:bg-[#C0927C]/20'
+        : 'bg-white text-black hover:bg-muted/20'
     }`}
   >
     {inWatchlist ? <Check size={18} strokeWidth={3} /> : <Plus size={18} strokeWidth={3} />}
@@ -274,23 +274,23 @@ const WatchlistButton = ({ inWatchlist, onClick }) => (
 );
 
 const MoviePlot = ({ plot }) => plot && (
-  <div className="bg-[#5E4A65]/50 p-4 rounded-xl border border-[#C0927C]/10">
+  <div className="bg-surface/50 p-4 rounded-xl border border-muted/10">
     <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">Plot</h2>
-    <p className="text-sm sm:text-base text-[#C0927C] leading-relaxed">{plot}</p>
+    <p className="text-sm sm:text-base text-muted leading-relaxed">{plot}</p>
   </div>
 );
 
 const MovieDetailsGrid = ({ movie }) => (
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
     {movie.director && (
-      <div className="bg-[#5E4A65]/30 p-3 rounded-lg border border-[#C0927C]/10">
-        <h3 className="text-[#C0927C] text-xs uppercase tracking-wider mb-1">Director</h3>
+      <div className="bg-surface/30 p-3 rounded-lg border border-muted/10">
+        <h3 className="text-muted text-xs uppercase tracking-wider mb-1">Director</h3>
         <p className="text-white font-medium">{movie.director}</p>
       </div>
     )}
     {movie.actors && (
-      <div className="bg-[#5E4A65]/30 p-3 rounded-lg border border-[#C0927C]/10">
-        <h3 className="text-[#C0927C] text-xs uppercase tracking-wider mb-1">Cast</h3>
+      <div className="bg-surface/30 p-3 rounded-lg border border-muted/10">
+        <h3 className="text-muted text-xs uppercase tracking-wider mb-1">Cast</h3>
         <p className="text-white font-medium">{movie.actors}</p>
       </div>
     )}

@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth.jsx';
 import MovieCard from '../components/ui/MovieCard';
 import MovieCardSkeleton from '../components/ui/MovieCardSkeleton';
 import { Film } from 'lucide-react';
+import { useBrowseState } from '../contexts/BrowseContext.jsx';
 
 /**
  * User's watchlist page.
@@ -14,10 +15,26 @@ function WatchlistPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const watchlistContext = useWatchlist();
+  const { watchlistScrollPosition, setWatchlistScrollPosition } = useBrowseState();
 
+  const { watchlist = [] } = watchlistContext || {};
+
+  // Restore scroll position
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+    if (watchlistScrollPosition > 0 && watchlist.length > 0) {
+      const timer = setTimeout(() => {
+        window.scrollTo({ top: watchlistScrollPosition, behavior: 'auto' });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [watchlist.length, watchlistScrollPosition]);
+
+  // Save scroll on unmount
+  useEffect(() => {
+    return () => {
+      setWatchlistScrollPosition(window.scrollY);
+    };
+  }, [setWatchlistScrollPosition]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -43,8 +60,6 @@ function WatchlistPage() {
     );
   }
 
-  const { watchlist = [] } = watchlistContext || {};
-
   const handleMovieClick = (movie) => {
     if (movie?.id) {
       navigate(`/movie/${movie.id}`);
@@ -56,17 +71,17 @@ function WatchlistPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white">My Watchlist</h1>
-          <p className="text-lg text-[#C0927C] mt-1">{watchlist.length} {watchlist.length === 1 ? 'item' : 'items'}</p>
+          <p className="text-lg text-muted mt-1">{watchlist.length} {watchlist.length === 1 ? 'item' : 'items'}</p>
         </header>
         
         {watchlist.length === 0 ? (
           <div className="text-center py-16">
-            <Film size={64} className="mx-auto text-[#C0927C]/30 mb-4" />
+            <Film size={64} className="mx-auto text-muted/30 mb-4" />
             <h2 className="text-2xl font-semibold text-white">Your Watchlist is Empty</h2>
-            <p className="text-[#C0927C] mt-2">Add movies to your watchlist to see them here.</p>
+            <p className="text-muted mt-2">Add movies to your watchlist to see them here.</p>
             <button
               onClick={() => navigate('/browse')}
-              className="mt-6 px-6 py-2 bg-[#C1372C] text-white font-semibold rounded-md hover:bg-[#C1372C]/90 transition-colors"
+              className="mt-6 px-6 py-2 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 transition-colors"
             >
               Browse Movies
             </button>

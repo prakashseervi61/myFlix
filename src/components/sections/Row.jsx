@@ -8,7 +8,7 @@ import MovieCardSkeleton from "../ui/MovieCardSkeleton";
  * Uses RAF for scroll position tracking to avoid layout thrashing.
  * Buttons fade in on hover (desktop) and are hidden on mobile (swipe instead).
  */
-function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
+function Row({ title, subtitle, movies = [], loading = false, onMovieClick, onExplore }) {
   const scrollRef = useRef(null);
   const [showButtons, setShowButtons] = useState({ left: false, right: false });
   const rafRef = useRef(null);
@@ -66,12 +66,26 @@ function Row({ title, subtitle, movies = [], loading = false, onMovieClick }) {
     scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   };
   
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (onExplore) onExplore();
+    }
+  };
+  
   if (!loading && (!movies || movies.length === 0)) return null;
 
   return (
     <section className="mb-8 md:mb-14 animate-in fade-in duration-700 slide-in-from-bottom-4 relative group/row will-change-transform" aria-labelledby={`${title.replace(/\s+/g, '-')}-heading`}>
       <div className="px-4 sm:px-6 lg:px-8 mb-3 flex items-baseline gap-3">
-        <h2 id={`${title.replace(/\s+/g, '-')}-heading`} className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-100 group-hover/row:text-white transition-colors cursor-pointer flex items-center gap-2">
+        <h2 
+          id={`${title.replace(/\s+/g, '-')}-heading`}
+          onClick={onExplore}
+          onKeyDown={handleKeyDown}
+          role={onExplore ? "button" : "heading"}
+          tabIndex={onExplore ? 0 : undefined}
+          className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-gray-100 group-hover/row:text-white transition-colors cursor-pointer flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-md"
+        >
           {title}
           <span className="hidden group-hover/row:inline-block text-cyan-500 text-xs md:text-sm font-semibold opacity-0 -translate-x-2 group-hover/row:opacity-100 group-hover/row:translate-x-0 transition-all duration-300">Explore All</span>
         </h2>

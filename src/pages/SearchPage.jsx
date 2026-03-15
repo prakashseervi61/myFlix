@@ -1,40 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import { Search, X, Grid, List } from 'lucide-react';
-import { useSearch } from '../hooks/useSearch.js';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useFilters } from '../hooks/useFilters.js';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver.js';
 import { tmdbService } from '../services/tmdbService.js';
-import FilterPanel from '../components/FilterPanel.jsx';
+import { apiService } from '../services/apiService.js';
+import FilterPanel from '../components/layout/FilterPanel.jsx';
 import MovieCard from '../components/ui/MovieCard.jsx';
 import MovieCardSkeleton from '../components/ui/MovieCardSkeleton.jsx';
+import { useBrowseState } from '../contexts/BrowseContext.jsx';
 
 /**
  * Search page with client-side filtering of results.
- * Search is handled by useSearch hook, filters applied locally.
+ * Search is handled by useInfiniteQuery, filters applied locally.
  * Supports both grid and list view modes.
  */
 function SearchPage() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const { searchPageState, updateSearchPageState } = useBrowseState();
+  const urlQuery = searchParams.get('q') || '';
+  const [query, setQuery] = useState(urlQuery || searchPageState.query);
   const [debouncedQuery] = useDebounce(query, 500);
-  const [page, setPage] = useState(1);
+
+  // Sync URL query to state
+  useEffect(() => {
+    if (urlQuery && urlQuery !== query) {
+      setQuery(urlQuery);
+    }
+  }, [urlQuery]);
   
-  const { searchResults, loading: searchLoading, error: searchError, hasMore: searchHasMore, searchMovies, clearResults } = useSearch();
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage: searchHasMore,
+    isFetching: searchLoading,
+    isFetchingNextPage,
+    error: queryError
+  } = useInfiniteQuery({
+    queryKey: ['search', debouncedQuery],
+    queryFn: ({ pageParam = 1, signal }) => apiService.searchMovies(debouncedQuery, pageParam, signal),
+    getNextPageParam: (lastPage, allPages) => lastPage.length >= 20 ? allPages.length + 1 : undefined,
+    enabled: debouncedQuery.trim().length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const searchResults = data?.pages.flat() || [];
+  const searchError = queryError?.message || null;
+
   const { filters, updateFilter, resetFilters } = useFilters('myflix_search_filters');
   const [debouncedFilters] = useDebounce(filters, 500);
 
-  const [filteredMovies, setFilteredMovies] = useState([]);
+  const [filteredMovies, setFilteredMovies] = useState(searchPageState.movies);
   const [filtering, setFiltering] = useState(false);
   const [genres, setGenres] = useState([]);
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState(searchPageState.viewMode || 'grid');
+
+  // Check if filters changed since last visit
+  const prevFiltersStr = JSON.stringify(searchPageState.lastFilters);
+  const currFiltersStr = JSON.stringify(debouncedFilters);
+  const filtersChanged = prevFiltersStr !== currFiltersStr;
 
   /** Sentinel for infinite scroll */
   const loadMoreRef = useIntersectionObserver({
     enabled: !searchLoading && searchHasMore && debouncedQuery.trim().length > 0,
-    onIntersect: () => setPage(p => p + 1)
+    onIntersect: () => fetchNextPage()
   });
+
+  // Sync state to context
+  useEffect(() => {
+    updateSearchPageState({
+      query,
+      movies: filteredMovies,
+      lastFilters: debouncedFilters,
+      viewMode
+    });
+  }, [query, filteredMovies, debouncedFilters, viewMode, updateSearchPageState]);
+
+  // Save scroll on unmount
+  useEffect(() => {
+    return () => {
+      updateSearchPageState({ scrollPosition: window.scrollY });
+    };
+  }, [updateSearchPageState]);
+
+  // Restore scroll position
+  useEffect(() => {
+    if (searchPageState.scrollPosition > 0 && filteredMovies.length > 0 && !filtersChanged) {
+      const timer = setTimeout(() => {
+        window.scrollTo({ top: searchPageState.scrollPosition, behavior: 'auto' });
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [filteredMovies.length, searchPageState.scrollPosition, filtersChanged]);
 
   useEffect(() => {
     const fetchGenres = async () => {
@@ -46,18 +106,6 @@ function SearchPage() {
     };
     fetchGenres();
   }, []);
-
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedQuery]);
-
-  useEffect(() => {
-    if (debouncedQuery.trim()) {
-      searchMovies(debouncedQuery, page);
-    } else {
-      clearResults();
-    }
-  }, [debouncedQuery, page, searchMovies, clearResults]);
 
   useEffect(() => {
     let isMounted = true;
@@ -143,15 +191,15 @@ function SearchPage() {
     }
   };
 
-  const initialLoading = searchLoading && page === 1;
-  const isLoadingMore = searchLoading && page > 1;
+  const initialLoading = searchLoading && searchResults.length === 0;
+  const isLoadingMore = searchLoading && searchResults.length > 0;
 
   return (
     <div className="min-h-screen pt-24 pb-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <header className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-white">Search</h1>
-          <p className="text-lg text-[#C0927C] mt-1">Find your next favorite movie.</p>
+          <p className="text-lg text-muted mt-1">Find your next favorite movie.</p>
         </header>
 
         <div className="flex flex-col md:flex-row gap-6">
@@ -161,25 +209,25 @@ function SearchPage() {
                onChange={updateFilter} 
                onReset={resetFilters} 
                genres={genres}
-               className="rounded-xl border border-[#C0927C]/20"
+               className="rounded-xl border border-muted/20"
             />
           </aside>
 
           <div className="flex-1">
             <div className="relative mb-10 group">
-              <div className="flex items-center bg-transparent border-b-2 border-[#C0927C]/30 group-focus-within:border-[#C1372C] transition-all duration-300 pb-2">
-                <Search className="text-[#C0927C]/40 mr-4 shrink-0 group-focus-within:text-[#C1372C] transition-colors" size={24} />
+              <div className="flex items-center bg-transparent border-b-2 border-muted/30 group-focus-within:border-primary transition-all duration-300 pb-2">
+                <Search className="text-muted/40 mr-4 shrink-0 group-focus-within:text-primary transition-colors" size={24} />
                 <input
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search for movies..."
-                  className="flex-1 bg-transparent border-none text-xl md:text-2xl text-white placeholder:text-[#C0927C]/40 focus:outline-none focus:ring-0 p-0 font-medium"
+                  className="flex-1 bg-transparent border-none text-xl md:text-2xl text-white placeholder:text-muted/40 focus:outline-none focus:ring-0 p-0 font-medium"
                 />
                 {query && (
                   <button
                     onClick={() => setQuery('')}
-                    className="ml-4 p-1.5 text-[#C0927C] hover:text-[#C1372C] transition-colors"
+                    className="ml-4 p-1.5 text-muted hover:text-primary transition-colors"
                   >
                     <X size={20} />
                   </button>
@@ -188,7 +236,7 @@ function SearchPage() {
             </div>
 
             <div className="flex justify-end mb-4">
-              <div className="flex items-center gap-2 bg-[#5E4A65] p-1 rounded-lg border border-[#C0927C]/20">
+              <div className="flex items-center gap-2 bg-surface p-1 rounded-lg border border-muted/20">
                 <ViewModeButton current={viewMode} mode="grid" setViewMode={setViewMode}><Grid size={18} /></ViewModeButton>
                 <ViewModeButton current={viewMode} mode="list" setViewMode={setViewMode}><List size={18} /></ViewModeButton>
               </div>
@@ -250,7 +298,7 @@ const RenderContent = ({ initialLoading, isLoadingMore, error, query, results, o
         <div ref={loadMoreRef} className="h-4 w-full" />
         
         {!hasMore && results.length > 0 && (
-           <div className="text-center py-10 text-[#C0927C]/50 text-sm font-medium italic">
+           <div className="text-center py-10 text-muted/50 text-sm font-medium italic">
              You've reached the end of the list.
            </div>
         )}
@@ -262,9 +310,9 @@ const RenderContent = ({ initialLoading, isLoadingMore, error, query, results, o
 };
 
 const StatusDisplay = ({ title, message }) => (
-  <div className="text-center py-16 bg-[#5E4A65]/30 backdrop-blur-md rounded-xl border border-[#C0927C]/20 shadow-xl">
+  <div className="text-center py-16 bg-surface/30 backdrop-blur-md rounded-xl border border-muted/20 shadow-xl">
     <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
-    <p className="text-[#C0927C] mt-2 font-medium">{message}</p>
+    <p className="text-muted mt-2 font-medium">{message}</p>
   </div>
 );
 
@@ -273,8 +321,8 @@ const ViewModeButton = ({ current, mode, setViewMode, children }) => (
     onClick={() => setViewMode(mode)}
     className={`p-2 rounded-md transition-colors ${
       current === mode
-        ? 'bg-[#C1372C] text-white shadow-sm'
-        : 'text-[#C0927C] hover:text-white hover:bg-[#7B3A3C]'
+        ? 'bg-primary text-white shadow-sm'
+        : 'text-muted hover:text-white hover:bg-surface-secondary'
     }`}
     aria-label={`Switch to ${mode} view`}
   >

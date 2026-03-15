@@ -3,40 +3,10 @@ import { Play, Plus, Check, ChevronLeft, ChevronRight, Info } from "lucide-react
 import { useNavigate } from "react-router-dom";
 import { useWatchlist } from "../../contexts/WatchlistContext.jsx";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import Pagination from "../ui/Pagination.jsx";
 import "./HeroSection.css";
 
 const SLIDE_DURATION = 8000;
-
-/** Pagination dots with animated progress fill */
-const Pagination = React.memo(({ count, current, goToSlide, duration }) => (
-  <div 
-    className="absolute bottom-6 left-1/2 -translate-x-1/2 md:left-auto md:right-12 md:translate-x-0 md:bottom-12 z-30 flex gap-2"
-    role="tablist"
-    aria-label="Slideshow controls"
-  >
-    {Array.from({ length: count }).map((_, index) => {
-      const isActive = index === current;
-      return (
-        <button
-          key={index}
-          onClick={() => goToSlide(index)}
-          className="group flex items-center justify-center p-1 outline-none focus-visible:ring-2 focus-visible:ring-white rounded-full"
-          role="tab"
-          aria-selected={isActive}
-          aria-label={`Go to slide ${index + 1}`}
-          tabIndex={0}
-        >
-          <div
-            className={`pagination-dot ${isActive ? 'active' : ''}`}
-            style={{ '--duration': `${duration}ms` }}
-          >
-            {isActive && <div className="progress-fill" />}
-          </div>
-        </button>
-      );
-    })}
-  </div>
-));
 
 /**
  * Hero carousel with auto-advance, swipe support, and animated pagination.
@@ -111,9 +81,9 @@ function HeroSection({ movies = [] }) {
 
   if (!featuredMovies.length) {
     return (
-      <div className="relative w-full h-[100vh] min-h-[100svh] bg-[#20151A] overflow-hidden">
+      <div className="relative w-full h-[100vh] min-h-[100svh] bg-background overflow-hidden">
         <div className="absolute inset-0 skeleton-loader opacity-20" />
-        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#20151A] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-background to-transparent" />
         <div className="absolute bottom-20 left-12 space-y-4 max-w-xl">
            <div className="h-4 w-24 skeleton-loader opacity-30 rounded" />
            <div className="h-16 w-3/4 skeleton-loader opacity-30 rounded" />
@@ -145,7 +115,7 @@ function HeroSection({ movies = [] }) {
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out will-change-opacity ${isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
             aria-hidden={!isCurrent}
           >
-             <div className="absolute inset-0 bg-[#20151A]" />
+             <div className="absolute inset-0 bg-background" />
              <picture className="absolute inset-0">
                <source media="(max-width: 768px)" srcSet={movie.poster_high || movie.poster || movie.backdrop} />
                <img
@@ -192,7 +162,7 @@ function HeroSection({ movies = [] }) {
         <div className="max-w-4xl w-full mx-auto md:mx-0 pointer-events-auto">
           
           <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-5 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.3s_forwards]">
-            <span className="bg-[#C1372C] text-white px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/40">
+            <span className="bg-primary text-white px-2 py-0.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/40">
               #1 in Trending
             </span>
           </div>
@@ -202,7 +172,7 @@ function HeroSection({ movies = [] }) {
           </h1>
 
           <div className="flex items-center gap-3 text-sm md:text-base text-gray-300 mb-4 font-medium opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.5s_forwards]">
-             <span className="text-[#C1372C] font-bold">{activeMovie.rating ? `${(parseFloat(activeMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
+             <span className="text-primary font-bold">{activeMovie.rating ? `${(parseFloat(activeMovie.rating) * 10).toFixed(0)}% Match` : ''}</span>
              <span className="text-gray-400" aria-hidden="true">•</span>
              <span>{activeMovie.year}</span>
              <span className="text-gray-400" aria-hidden="true">•</span>
@@ -216,7 +186,7 @@ function HeroSection({ movies = [] }) {
           <div className="flex items-center gap-3 sm:gap-4 mt-2 opacity-100 sm:opacity-0 sm:animate-[fade-in_0.5s_ease-out_0.7s_forwards]">
             <button
               onClick={() => navigate(`/movie/${activeMovie.id}`)}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C1372C]"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-white text-black rounded-lg font-bold text-sm sm:text-base md:text-lg transition-transform active:scale-95 shadow-lg shadow-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label={`Watch ${activeMovie.title} now`}
             >
               <Play className="fill-black w-5 h-5" aria-hidden="true" />

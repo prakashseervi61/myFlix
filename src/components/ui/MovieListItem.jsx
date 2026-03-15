@@ -25,7 +25,7 @@ const MovieListItem = ({ movie }) => {
   };
 
   return (
-    <div className="flex bg-[#5E4A65]/40 border border-[#C0927C]/20 rounded-xl overflow-hidden transition-all duration-300 hover:bg-[#5E4A65]/60 hover:border-[#C1372C]/40 shadow-lg backdrop-blur-sm group/item">
+    <div className="flex bg-surface/40 border border-muted/20 rounded-xl overflow-hidden transition-all duration-300 hover:bg-surface/60 hover:border-primary/40 shadow-lg backdrop-blur-sm group/item">
       <div className="w-24 sm:w-28 flex-shrink-0" onClick={handleNavigate}>
         <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover cursor-pointer" />
       </div>
@@ -33,18 +33,18 @@ const MovieListItem = ({ movie }) => {
         <div>
           <h3
             onClick={handleNavigate}
-            className="text-base sm:text-lg font-bold text-white cursor-pointer hover:text-[#C1372C] transition-colors"
+            className="text-base sm:text-lg font-bold text-white cursor-pointer hover:text-primary transition-colors"
           >
             {movie.title}
           </h3>
-          <div className="flex items-center text-xs sm:text-sm text-[#C0927C] mt-1 space-x-3">
+          <div className="flex items-center text-xs sm:text-sm text-muted mt-1 space-x-3">
             <span>{year}</span>
             <div className="flex items-center">
               <Star size={14} className="text-yellow-500 mr-1" />
               <span>{rating}</span>
             </div>
           </div>
-          <p className="text-xs sm:text-sm text-[#C0927C]/80 mt-2 sm:mt-3 line-clamp-2">
+          <p className="text-xs sm:text-sm text-muted/80 mt-2 sm:mt-3 line-clamp-2">
             {movie.overview}
           </p>
         </div>
@@ -53,8 +53,8 @@ const MovieListItem = ({ movie }) => {
             onClick={handleToggleWatchlist}
             className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all active:scale-95 ${
               isMovieInWatchlist
-                ? 'bg-[#C1372C] text-white shadow-lg shadow-[#C1372C]/20'
-                : 'bg-white/5 text-[#C0927C] hover:bg-white/10 border border-[#C0927C]/20'
+                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                : 'bg-white/5 text-muted hover:bg-white/10 border border-muted/20'
             }`}
           >
             <Bookmark size={14} className={isMovieInWatchlist ? 'fill-current' : ''} />
@@ -62,7 +62,7 @@ const MovieListItem = ({ movie }) => {
           </button>
           <button
             onClick={handleNavigate}
-            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold bg-white/5 text-[#C0927C] hover:bg-white/10 rounded-xl transition-all active:scale-95 border border-[#C0927C]/20"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold bg-white/5 text-muted hover:bg-white/10 rounded-xl transition-all active:scale-95 border border-muted/20"
           >
             <Eye size={14} />
             <span className="hidden sm:inline">Details</span>
@@ -70,7 +70,7 @@ const MovieListItem = ({ movie }) => {
           {movie.has_trailer && (
             <button
               onClick={handleOpenPreview}
-              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold bg-white/5 text-[#C0927C] hover:bg-white/10 rounded-xl transition-all active:scale-95 border border-[#C0927C]/20"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold bg-white/5 text-muted hover:bg-white/10 rounded-xl transition-all active:scale-95 border border-muted/20"
             >
               <Play size={14} />
               <span className="hidden sm:inline">Trailer</span>

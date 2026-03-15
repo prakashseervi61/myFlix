@@ -11,11 +11,6 @@ const REQUEST_TIMEOUT = 15000;
  * Normalizes movie data to consistent shape for UI consumption.
  */
 class TMDBService {
-  constructor() {
-    this.cache = new Map();
-    this.cacheTimeout = 10 * 60 * 1000;
-  }
-
   buildUrl(endpoint, params = {}) {
     const apiKey = apiConfig.getTmdbKey();
     if (!apiKey) throw new Error('TMDB API key not available');
@@ -30,15 +25,8 @@ class TMDBService {
     return url.toString();
   }
 
-  async request(url, cacheKey, signal, retryCount = 0) {
+  async request(url, signal, retryCount = 0) {
     const MAX_RETRIES = apiConfig.tmdbKeys.length;
-
-    if (cacheKey && this.cache.has(cacheKey)) {
-      const cached = this.cache.get(cacheKey);
-      if (Date.now() - cached.timestamp < this.cacheTimeout) {
-        return cached.data;
-      }
-    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
@@ -56,16 +44,12 @@ class TMDBService {
           const newKey = apiConfig.rotateTmdbKey();
           const newUrl = new URL(url);
           newUrl.searchParams.set('api_key', newKey);
-          return this.request(newUrl.toString(), cacheKey, signal, retryCount + 1);
+          return this.request(newUrl.toString(), signal, retryCount + 1);
         }
         throw new Error(`TMDB API error: ${response.status}`);
       }
 
-      const data = await response.json();
-      if (cacheKey) {
-        this.cache.set(cacheKey, { data, timestamp: Date.now() });
-      }
-      return data;
+      return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
@@ -75,7 +59,7 @@ class TMDBService {
           const newKey = apiConfig.rotateTmdbKey();
           const newUrl = new URL(url);
           newUrl.searchParams.set('api_key', newKey);
-          return this.request(newUrl.toString(), cacheKey, signal, retryCount + 1);
+          return this.request(newUrl.toString(), signal, retryCount + 1);
         }
         return { results: [] };
       }
@@ -85,7 +69,7 @@ class TMDBService {
         const newKey = apiConfig.rotateTmdbKey();
         const newUrl = new URL(url);
         newUrl.searchParams.set('api_key', newKey);
-        return this.request(newUrl.toString(), cacheKey, signal, retryCount + 1);
+        return this.request(newUrl.toString(), signal, retryCount + 1);
       }
       
       throw error;
@@ -127,6 +111,7 @@ class TMDBService {
       year: movie.release_date ? movie.release_date.split('-')[0] : 'N/A',
       release_date: movie.release_date || null,
       poster: poster,
+      poster_path: movie.poster_path || null,
       backdrop: backdrop,
       poster_high: poster_high,
       rating: typeof movie.vote_average === 'number' ? movie.vote_average.toFixed(1) : '0.0',
@@ -155,7 +140,7 @@ class TMDBService {
 
   async getTrendingMovies(signal) {
     const url = this.buildUrl('/trending/movie/week');
-    const data = await this.request(url, 'trending_movies', signal);
+    const data = await this.request(url, signal);
     return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
@@ -167,27 +152,26 @@ class TMDBService {
       page: 1,
     };
     const url = this.buildUrl('/discover/movie', params);
-    const cacheKey = `genre_${genreId}`;
-    const data = await this.request(url, cacheKey, signal);
+    const data = await this.request(url, signal);
     return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async searchMovies(query, page = 1, signal) {
     if (!query) return [];
     const url = this.buildUrl('/search/movie', { query, page });
-    const data = await this.request(url, `search_${query}_${page}`, signal);
+    const data = await this.request(url, signal);
     return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async getMovieById(id, signal) {
     const url = this.buildUrl(`/movie/${id}`, { append_to_response: 'videos,credits,images' });
-    const data = await this.request(url, `movie_${id}`, signal);
+    const data = await this.request(url, signal);
     return this.normalizeMovieData(data);
   }
 
   async getGenres(signal) {
     const url = this.buildUrl('/genre/movie/list');
-    const data = await this.request(url, 'genres_list', signal);
+    const data = await this.request(url, signal);
     return data.genres || [];
   }
 
@@ -216,15 +200,13 @@ class TMDBService {
     delete queryParams.only_with_trailer;
 
     const url = this.buildUrl('/discover/movie', queryParams);
-    const cacheKey = `discover_${JSON.stringify(queryParams)}`;
-    const data = await this.request(url, cacheKey, signal);
+    const data = await this.request(url, signal);
     return (data.results || []).map(m => this.normalizeMovieData(m)).filter(Boolean);
   }
 
   async getMovieVideos(movieId, signal) {
     const url = this.buildUrl(`/movie/${movieId}/videos`);
-    const cacheKey = `videos_${movieId}`;
-    const data = await this.request(url, cacheKey, signal);
+    const data = await this.request(url, signal);
     return data.results || [];
   }
 }

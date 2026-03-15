@@ -2,7 +2,7 @@ import React from 'react';
 
 const MovieListItemSkeleton = () => {
   return (
-    <div className="flex bg-[#2A1F25]/40 border border-[#C0927C]/10 rounded-xl overflow-hidden shadow-lg">
+    <div className="flex bg-[#2A1F25]/40 border border-muted/10 rounded-xl overflow-hidden shadow-lg">
       <div className="w-24 sm:w-28 flex-shrink-0 skeleton-loader"></div>
       <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between">
         <div className="space-y-2">

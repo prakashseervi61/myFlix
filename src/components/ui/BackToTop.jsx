@@ -33,7 +33,7 @@ const BackToTop = () => {
   return (
     <button
       onClick={scrollToTop}
-      className={`fixed bottom-8 right-8 z-[100] p-3 rounded-full bg-[#C1372C] text-white shadow-[0_10px_25px_rgba(193,55,44,0.4)] border border-white/20 transition-all duration-300 transform hover:scale-110 active:scale-95 group ${
+      className={`fixed bottom-8 right-8 z-[100] p-3 rounded-full bg-primary text-white shadow-[0_10px_25px_rgba(193,55,44,0.4)] border border-white/20 transition-all duration-300 transform hover:scale-110 active:scale-95 group ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
       }`}
       aria-label="Back to top"
@@ -44,7 +44,7 @@ const BackToTop = () => {
       />
       
       {/* Subtle glow effect */}
-       <div className="absolute inset-0 rounded-full bg-[#C1372C] blur-md -z-10 opacity-30 group-hover:opacity-60 transition-opacity" />
+       <div className="absolute inset-0 rounded-full bg-primary blur-md -z-10 opacity-30 group-hover:opacity-60 transition-opacity" />
     </button>
   );
 };

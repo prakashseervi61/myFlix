@@ -59,7 +59,7 @@ const ReviewSection = ({ movieId, user }) => {
   return (
     <div className="mt-0 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-        <MessageSquare className="text-[#C1372C]" size={24} />
+        <MessageSquare className="text-primary" size={24} />
         <h2 className="text-2xl font-bold text-white">Guest Reviews</h2>
         <span className="bg-white/10 text-white/60 px-2 py-0.5 rounded-full text-xs font-medium">
           {reviews.length}
@@ -67,9 +67,9 @@ const ReviewSection = ({ movieId, user }) => {
       </div>
 
       {user ? (
-        <form onSubmit={handleSubmit} className="bg-[#5E4A65]/30 p-6 rounded-2xl border border-white/5 space-y-4 shadow-xl">
+        <form onSubmit={handleSubmit} className="bg-surface/30 p-6 rounded-2xl border border-white/5 space-y-4 shadow-xl">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5E4A65] to-[#C1372C] flex items-center justify-center text-white font-bold">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-surface to-primary flex items-center justify-center text-white font-bold">
               {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -94,7 +94,7 @@ const ReviewSection = ({ movieId, user }) => {
                     size={28}
                     className={`${
                       star <= (hover || rating)
-                        ? 'text-[#C1372C] fill-[#C1372C]'
+                        ? 'text-primary fill-primary'
                         : 'text-[#2A1F25]'
                     } transition-colors duration-200`}
                   />
@@ -109,7 +109,7 @@ const ReviewSection = ({ movieId, user }) => {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="What did you think of the movie? Share your thoughts..."
-              className="w-full bg-[#20151A]/80 border border-white/10 rounded-xl p-4 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#C1372C]/50 min-h-[120px] transition-all"
+              className="w-full bg-background/80 border border-white/10 rounded-xl p-4 text-white placeholder:text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/50 min-h-[120px] transition-all"
               required
             />
           </div>
@@ -117,7 +117,7 @@ const ReviewSection = ({ movieId, user }) => {
           <button
             type="submit"
             disabled={isSubmitting || !comment.trim()}
-            className="flex items-center justify-center gap-2 bg-[#C1372C] hover:bg-[#a82e25] disabled:bg-[#2A1F25] disabled:text-[#C0927C]/30 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-[#C1372C]/20 active:scale-[0.98] border border-white/5"
+            className="flex items-center justify-center gap-2 bg-primary hover:bg-[#a82e25] disabled:bg-[#2A1F25] disabled:text-muted/30 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg shadow-primary/20 active:scale-[0.98] border border-white/5"
           >
             {isSubmitting ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -130,9 +130,9 @@ const ReviewSection = ({ movieId, user }) => {
           </button>
         </form>
       ) : (
-        <div className="bg-[#5E4A65]/20 p-8 rounded-2xl border border-dashed border-[#C0927C]/30 text-center space-y-4">
+        <div className="bg-surface/20 p-8 rounded-2xl border border-dashed border-muted/30 text-center space-y-4">
           <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-2">
-            <LogIn className="text-[#C1372C]" size={32} />
+            <LogIn className="text-primary" size={32} />
           </div>
           <h3 className="text-xl font-bold text-white">Want to share your thoughts?</h3>
           <p className="text-gray-400 max-w-xs mx-auto">
@@ -140,7 +140,7 @@ const ReviewSection = ({ movieId, user }) => {
           </p>
           <Link
             to="/login"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-[#C1372C] text-white rounded-xl font-bold hover:bg-[#a82e25] transition-all active:scale-95 border border-white/10"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-[#a82e25] transition-all active:scale-95 border border-white/10"
           >
             Login to write a review
           </Link>
@@ -166,7 +166,7 @@ const ReviewSection = ({ movieId, user }) => {
                         <Star
                           key={star}
                           size={10}
-                          className={star <= review.rating ? 'text-[#C1372C] fill-[#C1372C]' : 'text-gray-800'}
+                          className={star <= review.rating ? 'text-primary fill-primary' : 'text-gray-800'}
                         />
                       ))}
                     </div>

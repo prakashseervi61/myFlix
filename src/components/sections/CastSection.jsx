@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import CastCard from './CastCard.jsx';
+import CastCard from '../ui/CastCard.jsx';
 import { Users, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const CastSection = ({ cast = [] }) => {

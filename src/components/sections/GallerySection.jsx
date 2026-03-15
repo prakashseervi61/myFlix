@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Image as ImageIcon, Maximize2 } from 'lucide-react';
-import GalleryModal from './GalleryModal.jsx';
+import GalleryModal from '../ui/GalleryModal.jsx';
 
 const GallerySection = ({ images = [] }) => {
   const [selectedIdx, setSelectedIdx] = useState(null);

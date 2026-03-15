@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
-:root {
+@theme {
   --color-primary: #C1372C;
-  --color-bg-main: #20151A;
+  --color-background: #20151A;
   --color-surface: #5E4A65;
   --color-surface-secondary: #7B3A3C;
   --color-border: #C0927C;
   --color-accent: #C1372C;
+  --color-muted: #C0927C;
   
-  --text-primary: #FFFFFF;
-  --text-secondary: #C0927C;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #C0927C;
 
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -19,8 +20,6 @@
   --font-size-2xl: 1.5rem;
   --font-size-3xl: 1.875rem;
   --font-size-4xl: 2.25rem;
-
-  --spacing-md: 1rem;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);

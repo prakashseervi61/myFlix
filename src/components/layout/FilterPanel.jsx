@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ChevronDown, Filter as FilterIcon, RotateCcw, Check } from 'lucide-react';
+import { useGlobalScrollLock } from '../../hooks/useGlobalScrollLock.js';
 
 const SORT_OPTIONS = [
   { value: 'popularity.desc', label: 'Most Popular' },
@@ -26,6 +27,9 @@ const LANGUAGES = [
  */
 export default function FilterPanel({ filters, onChange, onReset, genres, className = '' }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Lock body scroll when mobile filter is open
+  useGlobalScrollLock(isOpen);
 
   /** Toggles genre in array filter */
   const toggleGenre = (genreId) => {
